@@ -1,0 +1,4 @@
+goxnode
+=======
+
+MtGox watcher
