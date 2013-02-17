@@ -1,0 +1,19 @@
+{
+    "name": "goxnode",
+    "version": "0.0.1",
+    "description": "MtGox watcher",
+    "keywords": ["mtgox", "bitcoin"],
+    "homepage": "https://github.com/olegtaranenko/goxnode.git",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:olegtaranenko/goxnode.git"
+    },
+    "author": "Oleg Taranenko <olegtaranenko@gmail.com>",
+    "main": "./server.js",
+    "engines": {
+        "node": ">=0.8"
+    },
+    "dependencies": {
+        "socket.io": "*"
+    }
+}
