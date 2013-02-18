@@ -3,13 +3,37 @@
 <head>
     <title>Gox Node Watcher</title>
 
-    <script src="/lib/socket.io.js"></script>
+    <script src="https://socketio.mtgox.com/socket.io/socket.io.js"></script>
+    <!--<script src="/lib/socket.io.js"></script>-->
     <script>
-        var socket = io.connect('http://localhost');
+        var socket = io.connect('https://socketio.mtgox.com/mtgox');
+
+        function onConnect() {
+            console.log(arguments);
+        }
+
+        function onDisconnect() {
+            console.log(arguments);
+        }
+
+        function onError() {
+            console.log(arguments);
+        }
+
+        function onMessage() {
+            console.log(arguments);
+        }
+
+        socket.on('connect',    onConnect);
+        socket.on('disconnect', onDisconnect);
+        socket.on('error',      onError);
+        socket.on('message',    onMessage);
+/*
         socket.on('news', function (data) {
             console.log(data);
             socket.emit('my other event', { my: 'data' });
         });
+*/
     </script>
 </head>
 <body>
