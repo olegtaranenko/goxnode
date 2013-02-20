@@ -3,36 +3,41 @@
 <head>
     <title>Gox Node Watcher</title>
 
+  <link rel="stylesheet" href="css/jquery.mobile.css" />
+  <link rel="stylesheet" href="css/goxnode.css">
+
+
     <!--<script src="https://socketio.mtgox.com/socket.io/socket.io.js"></script>-->
-    <script src="/libs/socket.io.js"></script>
-    <script>
-        var socket = io.connect('http://localhost:8000');
+  <script src="js/lib/socket.io.js"></script>
+
+  <script data-main="js/main" src="js/lib/require.js"></script>
+  <script>
+    var socket = io.connect('http://localhost:8000');
 
 
 
-        function onConnect() {
-            console.log('onConnect() ', arguments);
-        }
+    function onConnect() {
+      console.log('onConnect() ', arguments);
+    }
 
-        function onDisconnect() {
-            console.log('onDisconnect() ', arguments);
-        }
+    function onDisconnect() {
+      console.log('onDisconnect() ', arguments);
+    }
 
-        function onError() {
-            console.log('onError() ', arguments);
-        }
+    function onError() {
+      console.log('onError() ', arguments);
+    }
 
-        function onMessage() {
-            console.log('onMessage() ', arguments);
-        }
+    function onMessage() {
+      console.log('onMessage() ', arguments);
+    }
 
-        socket.on('connect',    onConnect);
-        socket.on('disconnect', onDisconnect);
-        socket.on('error',      onError);
-        socket.on('message',    onMessage);
-    </script>
+    socket.on('connect',    onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('error',      onError);
+    socket.on('message',    onMessage);
+  </script>
 </head>
-<body>
-
+<body data-theme="g">
 </body>
 </html>

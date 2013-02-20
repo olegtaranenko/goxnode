@@ -2,7 +2,10 @@ var express = require('express');
 var path = require("path");
 var http = require('http');
 var app = express();
-var pub_dir = path.join(__dirname, 'public');
+var pub_dir = path.join(__dirname, 'public'),
+  less_dir = path.join(pub_dir, 'less'),
+  css_dir = pub_dir;
+
 var server = http.createServer(app);
 var mtgox = require('./lib/mtgox');
 var client = null; // connect later after loading depth from clarkmoody
@@ -35,10 +38,19 @@ catch(ex) {
 }
 
 
+var lessMiddleware = require('less-middleware');
 
 server.listen(8000);
 
 app.configure(function() {
+  app.use(lessMiddleware({
+    src: less_dir,
+    dest: css_dir,
+    prefix: 'css',
+    compress: false,
+    debug: false
+  }));
+
   app.use(express.static(pub_dir));
 });
 

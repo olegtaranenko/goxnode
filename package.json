@@ -1,23 +1,29 @@
 {
-    "name": "goxnode",
-    "version": "0.0.1",
-    "description": "MtGox watcher",
-    "keywords": ["mtgox", "bitcoin"],
-    "homepage": "https://github.com/olegtaranenko/goxnode.git",
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:olegtaranenko/goxnode.git"
-    },
-    "author": "Oleg Taranenko <olegtaranenko@gmail.com>",
-    "main": "./server.js",
-    "engines": {
-        "node": "~0.8"
-    },
-    "dependencies": {
-      "socket.io-client": "0.9.11",
-      "colors": "0.5.1",
-      "datetime": "0.0.3",
-      "express": ">=3.1",
-      "socket.io": "0.9.11"
-    }
+  "name": "goxnode",
+  "version": "0.0.1",
+  "description": "MtGox watcher",
+  "keywords": ["mtgox", "bitcoin"],
+  "homepage": "https://github.com/olegtaranenko/goxnode.git",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:olegtaranenko/goxnode.git"
+  },
+  "author": "Oleg Taranenko <olegtaranenko@gmail.com>",
+  "main": "./server.js",
+  "engines": {
+    "node": "~0.8"
+  },
+  "dependencies": {
+
+    "url": "~0.7",
+    "path": "~0.4",
+    "less": "~1.3",
+    "less-middleware": "~0.1",
+
+    "socket.io-client": "0.9.11",
+    "colors": "0.5.1",
+    "datetime": "0.0.3",
+    "express": ">=3.1",
+    "socket.io": "0.9.11"
+  }
 }
