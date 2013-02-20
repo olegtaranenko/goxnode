@@ -4,7 +4,7 @@ var http = require('http');
 var app = express();
 var pub_dir = path.join(__dirname, 'public');
 var server = http.createServer(app);
-var mtgox = require('./libs/mtgox');
+var mtgox = require('./lib/mtgox');
 var client = null; // connect later after loading depth from clarkmoody
 //var client = mtgox.connect();
 
@@ -42,10 +42,19 @@ app.configure(function() {
   app.use(express.static(pub_dir));
 });
 
-var io = require('socket.io').listen(server);
-io.set('heartbeat interval', 120);
-io.set('heartbeat timeout', 240);
-io.set('close timeout', 240);
+var mylogger = require('./lib/mylogger');
+
+
+var io = require('socket.io').listen(server, {
+  logger: new mylogger,
+  'log level': 3
+});
+
+
+//io.set('log level', 4);
+//io.set('heartbeat interval', 120);
+//io.set('heartbeat timeout', 240);
+//io.set('close timeout', 240);
 
 io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });

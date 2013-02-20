@@ -1,0 +1,70 @@
+Index: node_modules/socket.io/lib/transport.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- node_modules/socket.io/lib/transport.js	(revision )
++++ node_modules/socket.io/lib/transport.js	(revision )
+@@ -250,7 +250,7 @@
+     clearTimeout(this.closeTimeout);
+     this.closeTimeout = null;
+ 
+-    this.log.debug('cleared close timeout for client', this.id);
++    this.log.heartbeat('cleared close timeout for client', this.id);
+   }
+ };
+ 
+@@ -268,7 +268,7 @@
+       self.end('heartbeat timeout');
+     }, this.manager.get('heartbeat timeout') * 1000);
+ 
+-    this.log.debug('set heartbeat timeout for client', this.id);
++    this.log.heartbeat('set heartbeat timeout for client', this.id);
+   }
+ };
+ 
+@@ -282,7 +282,7 @@
+   if (this.heartbeatTimeout && this.manager.enabled('heartbeats')) {
+     clearTimeout(this.heartbeatTimeout);
+     this.heartbeatTimeout = null;
+-    this.log.debug('cleared heartbeat timeout for client', this.id);
++    this.log.heartbeat('cleared heartbeat timeout for client', this.id);
+   }
+ };
+ 
+@@ -302,7 +302,7 @@
+       self.heartbeatInterval = null;
+     }, this.manager.get('heartbeat interval') * 1000);
+ 
+-    this.log.debug('set heartbeat interval for client', this.id);
++    this.log.heartbeat('set heartbeat interval for client', this.id);
+   }
+ };
+ 
+@@ -326,7 +326,7 @@
+ 
+ Transport.prototype.heartbeat = function () {
+   if (this.open) {
+-    this.log.debug('emitting heartbeat for client', this.id);
++    this.log.heartbeat('emitting heartbeat for client', this.id);
+     this.packet({ type: 'heartbeat' });
+     this.setHeartbeatTimeout();
+   }
+@@ -345,7 +345,7 @@
+   var current = this.manager.transports[this.id];
+ 
+   if ('heartbeat' == packet.type) {
+-    this.log.debug('got heartbeat packet');
++    this.log.heartbeat('got heartbeat packet');
+ 
+     if (current && current.open) {
+       current.onHeartbeatClear();
+@@ -401,7 +401,7 @@
+   if (this.heartbeatInterval && this.manager.enabled('heartbeats')) {
+     clearTimeout(this.heartbeatInterval);
+     this.heartbeatInterval = null;
+-    this.log.debug('cleared heartbeat interval for client', this.id);
++    this.log.heartbeat('cleared heartbeat interval for client', this.id);
+   }
+ };
+ 

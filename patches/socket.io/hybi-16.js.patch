@@ -1,0 +1,23 @@
+Index: node_modules/socket.io/lib/transports/websocket/hybi-16.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- node_modules/socket.io/lib/transports/websocket/hybi-16.js	(revision )
++++ node_modules/socket.io/lib/transports/websocket/hybi-16.js	(revision )
+@@ -193,7 +193,14 @@
+       this.end();
+       return;
+     }
+-    this.log.debug(this.name + ' writing', data);
++    // do not debug log for heartbeats packages
++    var dataParts = data ? data.split(':') : false,
++      logFn = this.log.debug;
++
++    if (dataParts && dataParts[0] == '2') {
++      logFn = this.log.heartbeat;
++    }
++    logFn.call(this.log, this.name + ' writing', data);
+   }
+ };
+ 
