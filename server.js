@@ -39,13 +39,14 @@ catch(ex) {
 server.listen(8000);
 
 app.configure(function() {
-  app.use('/api/v0', function() {
-    debugger;
-  });
   app.use(express.static(pub_dir));
 });
 
 var io = require('socket.io').listen(server);
+io.set('heartbeat interval', 120);
+io.set('heartbeat timeout', 240);
+io.set('close timeout', 240);
+
 io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });
   socket.on('my other event', function (data) {

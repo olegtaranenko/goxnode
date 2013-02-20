@@ -8,20 +8,22 @@
     <script>
         var socket = io.connect('http://localhost:8000');
 
+
+
         function onConnect() {
-            console.log(arguments);
+            console.log('onConnect() ', arguments);
         }
 
         function onDisconnect() {
-            console.log(arguments);
+            console.log('onDisconnect() ', arguments);
         }
 
         function onError() {
-            console.log(arguments);
+            console.log('onError() ', arguments);
         }
 
         function onMessage() {
-            console.log(arguments);
+            console.log('onMessage() ', arguments);
         }
 
         socket.on('connect',    onConnect);
