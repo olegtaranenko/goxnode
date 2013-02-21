@@ -12,12 +12,17 @@ require.config({
     mobile: 'lib/jquery.mobile',
     underscore: 'lib/underscore',
     underscoreDate: 'lib/plugins/underscore.date',
-    text: 'lib/plugins/text'
+    text: 'lib/plugins/text',
+    StartupPage: 'views/StartupPage'
   }
 });
 
 requirejs.config({
   shim: {
+    'underscore': {
+      deps: [],
+      exports: '_'
+    },
     'backbone': {
       deps: ['jquery', 'underscore'],
       exports: 'Backbone'
@@ -46,6 +51,16 @@ requirejs.config({
     text: {
       deps: ['backbone'],
       exports: 'text'
+    },
+    StartupPage: {
+      deps: ['backbone', 'config'],
+      exports: 'StartupPage'
+    },
+    router: {
+      deps: [
+        'StartupPage'
+      ],
+      export: 'router'
     }
   }
 });

@@ -3,3 +3,71 @@
 @import "jqm-mixins.less";
 @import "swatch-g.less";
 
+#nav {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  padding: 0 0 8px;
+  background: rgba(0,0,0,0.3);
+}
+
+#nav .inner {
+  height: 54px;
+  background: @Cyan;
+  text-align: -webkit-center;
+}
+
+#nav h2 {
+  color: #fff;
+  font-size: 17px;
+  font-family: adelle-1, Times;
+  line-height: 54px;
+  margin: 0 60px 0 65px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#nav a {
+  text-indent: -10000px;
+  height: 54px;
+  width: 54px;
+  display: block;
+  background-size: 18px 18px;
+  position: absolute;
+  top: 0;
+}
+
+#nav .add {
+  background: url(images/New_message.png) no-repeat 50% 50%;
+  left: 0;
+}
+
+#nav .back {
+  background: url(images/back.png) no-repeat 50% 50%;
+  left: 0;
+  background-size: 18px 18px;
+}
+
+#nav .menu {
+  background: url(images/Menu_icon.png) no-repeat 50% 50%;
+  right: 0;
+}
+
+#nav .menu span {
+  color: #fff;
+  text-indent: 0;
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  display: block;
+  height: 18px;
+  font-size: 10px;
+  line-height: 18px;
+  padding: 0 6px;
+  background: #f28048;
+  border-radius: 3px;
+}
+

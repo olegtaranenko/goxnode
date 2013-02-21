@@ -2,9 +2,10 @@
  * The file is a part of Goxnode project
  */
 define([
-  'backbone', 'jquery', 'underscore'
+  'backbone', 'jquery', 'underscore',
+  'StartupPage'
 ],
-  function(Backbone, $, _, StartPage) {
+  function(Backbone, $, _, StartupPage) {
 
     return Backbone.Router.extend({
 
@@ -20,6 +21,18 @@ define([
 
 
       startpage: function (opt) {
+        $.mobile.showPageLoadingMsg();
+        var webView = this,
+          back = opt == 'back';
+
+        var newMessages = 5;
+
+        var page = new StartupPage({
+          newMessages: newMessages
+        });
+        webView.changePage(page, back);
+        $.mobile.hidePageLoadingMsg();
+
 /*
         $.mobile.showPageLoadingMsg();
 
@@ -69,8 +82,39 @@ define([
           }
         });
 */
-      }
+      },
 
+      /**
+       * Process change page on the client (in browser) using jquery mobile facility
+       *
+       * @private
+       * @param page {Backbone.View} Backbone View page
+       * @param back {boolean} to manage slide direction
+       */
+      changePage: function (page, back) {
+        var element = $(page.el);
+
+        element.attr('data-role', 'page');
+        element.attr('data-theme', 'g');
+
+        page.render();
+
+        $('body').append(element);
+
+        var transition = $.mobile.defaultPageTransition;
+
+        // We don't want to fade the first page. Slide, and risk the annoying "jump to top".
+        if (this.firstPage) {
+          transition = "none";
+          this.firstPage = false;
+        }
+
+        $.mobile.changePage(element, {
+          changeHash:false,
+          transition: transition,
+          reverse: back
+        });
+      }
     });
   }
 );

@@ -31,7 +31,6 @@
   $.extend($.fn, {
     Goxnode: function (options) {
       return this.each(function () {
-        console.log(this);
         $.Goxnode(options);
       });
     }
