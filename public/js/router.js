@@ -25,7 +25,7 @@ define([
         var webView = this,
           back = opt == 'back';
 
-        var newMessages = 5;
+        var newMessages = 0;
 
         var page = new StartupPage({
           newMessages: newMessages
