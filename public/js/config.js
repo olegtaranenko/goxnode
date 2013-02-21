@@ -4,13 +4,13 @@
   var mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase())),
     tapEvent = mobile ? 'touchstart' : 'vclick';
 
-  var config = {
+  var statics = {
 
     mobile   : mobile,
 
     tapEvent : tapEvent,
 
-    generateEvents: function(events, originalEvents) {
+    generateTapEvents: function(events, originalEvents) {
       var ret = originalEvents || {} ;
       $.each(events, function(key, value) {
         console.log(arguments);
@@ -24,7 +24,7 @@
 
   $.extend($, {
     Goxnode: function(options) {
-      return $.extend(config, options);
+      return $.extend(statics, options);
     }
   });
 

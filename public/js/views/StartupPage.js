@@ -22,7 +22,7 @@ define([
           "#nav a.menu": 'showNew'
         };
 
-      this.events = Goxnode.generateEvents(eventsProto);
+      this.events = Goxnode.generateTapEvents(eventsProto);
     },
 
     addThread: function() {

@@ -29,13 +29,20 @@
     }
 
     function onMessage() {
+      
       console.log('onMessage() ', arguments);
+    }
+
+    function onConfig() {
+      console.log('onConfig() ', arguments);
+      console.log('Goxnode ->', $.Goxnode);
     }
 
     socket.on('connect',    onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('error',      onError);
     socket.on('message',    onMessage);
+    socket.on('config',    onConfig);
   </script>
 </head>
 <body data-theme="g">
