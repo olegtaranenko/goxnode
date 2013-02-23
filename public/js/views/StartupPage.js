@@ -9,11 +9,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'text!/templates/startup.html'
-], function($, _, Backbone, tpl) {
+  'text!/templates/startup.html',
+  'StartupModel'
+], function($, _, Backbone, tpl, StartupModel) {
 
   return Backbone.View.extend({
     template: _.template(tpl),
+
+    model: StartupModel,
 
     initialize: function () {
       var Goxnode = $.Goxnode(),

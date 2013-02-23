@@ -1,5 +1,5 @@
 /*
-* jQuery Mobile Git Build: SHA1: 6e3dd698b5ea9fe86288b2864cde2590e5dd9eef <> Date: Thu Feb 21 01:05:57 2013 +0200
+* jQuery Mobile Git Build: SHA1: 2ca372d6393f10fd7be87e8f24b085ed5dad1c72 <> Date: Thu Feb 21 02:02:22 2013 +0200
 * http://jquerymobile.com
 *
 * Copyright 2010, 2013 jQuery Foundation, Inc. and other contributors
@@ -1064,6 +1064,152 @@ a.ui-link-inherit {
 .ui-mobile-nosupport-boxshadow .ui-link-inherit:focus {
 	outline-width: 1px;
 	outline-style: auto;
+}
+/* slider tooltip
+-----------------------------------------------------------------------------------------------------------*/
+.ui-slider .ui-btn-inner {
+	padding: 5px 0 0 0 !important;
+	font-size:.8em;
+}
+.ui-slider-popup {
+	width: 64px;
+	height: 64px;
+	font-size: 36px;
+	padding-top: 14px;
+	opacity: 0.8;
+}
+/* Dimensions related to the popup arrow
+-----------------------------------------------------------------------------------------------------------*/
+/* desired triangle height: 10px */
+/**
+ * guide for the arrow - its width, height, and offset are theme-dependent and
+ * should be expessed as left, right, top, bottom, so that the element bearing
+ * such a class becomes stretched inside its parent position: relative element.
+ * The left/top/right/bottom specified below should reflect the corresponding
+ * border radii and so it leaves room for the shadow:
+ *     ..--------------------..
+ *   ."        ^ top           ".
+ *  /          v                 \
+ * |     +------------------+     |
+ * |     |                  |     |
+ * | left|                  |right|
+ * |<--->|                  |<--->|
+ * |     +------------------+     |
+ *  \          ^                 /
+ *   `.        v bottom        .'
+ *     ""--------------------""
+ * The idea is that the top/left of the arrow container box does not move to a
+ * coordinate smaller than the top/left of the guide and the right/bottom of
+ * the arrow container box does not move to a coordinate larger than the
+ * bottom/right of the guide. This will help us avoid the following situation:
+ *        ..--------------------..
+ *      ."        ^ top           ".
+ *   /|/          v                 \
+ *  / |     +------------------+     |
+ *  \ |     |                  |     |
+ *   \| left|                  |right|
+ *    |<--->|                  |<--->|
+ *    |     +------------------+     |
+ *     \          ^                 /
+ *      `.        v bottom        .'
+ *        ""--------------------""
+ * The arrow should not receive a top/left coordinate such that it is too close
+ * to one of the corners, because then at first the shadow of the arrow and,
+ * given a coordinate even closer to the corner, even the body of the arrow will
+ * "stick out" of the corner of the popup. The guide provides a hint to the
+ * arrow positioning code as to which range of values is acceptable for the
+ * arrow container's top/left coordinate.
+ **/
+.ui-popup.ui-corner-all > .arrow-guide {
+	left: .6em /*{global-radii-blocks}*/;
+	right: .6em /*{global-radii-blocks}*/;
+	top: .6em /*{global-radii-blocks}*/;
+	bottom: .6em /*{global-radii-blocks}*/;
+}
+.arrow-container {
+	width: 20px;
+	height: 20px;
+}
+/* aside from the "infinities" (-1000,2000), triangle height is used */
+.arrow-container.l {
+	left: -10px;
+	clip: rect(-1000px,10px,2000px,-1000px);
+}
+.arrow-container.ie.l {
+	clip: rect(-1000px 10px 2000px -1000px);
+}
+.arrow-container.t {
+	top: -10px;
+	clip: rect(-1000px,2000px,10px,-1000px);
+}
+.arrow-container.ie.t {
+	clip: rect(-1000px 2000px 10px -1000px);
+}
+.arrow-container.r {
+	right: -10px;
+	clip: rect(-1000px,2000px,2000px,10px);
+}
+.arrow-container.ie.r {
+	clip: rect(-1000px 2000px 2000px 10px);
+}
+.arrow-container.b {
+	bottom: -10px;
+	clip: rect(10px,2000px,1000px,-1000px);
+}
+.arrow-container.ie.b {
+	clip: rect(10px 2000px 1000px -1000px);
+}
+/**
+ * The arrow needs to be centred inside the arrow container such that, when
+ * rotated 45 degrees, its corners touch, but do not break through, the sides
+ * of the arrow container:
+ *
+ * +----------+
+ * |    /\    |
+ * |   /  \  <------ arrow container
+ * |  /    \  |
+ * | /      \ |
+ * |/  arrow \|
+ * |\        /|
+ * | \      / |
+ * |  \    /  |
+ * |   \  /   |
+ * |    \/    |
+ * +----------+
+ **/
+.arrow {
+	/* (2*desired triangle height)/sqrt(2) - does not account for border - centred within the outer rectangle */
+	width: 14.142135624px;
+	height: 14.142135624px;
+	/* ( (2*desired triangle height) - (above width/height) ) / 2 */
+	left: 2.928932188px;
+	top: 2.928932188px;
+}
+.arrow-container.ie .arrow {
+	/* Fix rotation center  - see http://www.useragentman.com/IETransformsTranslator/ */
+	margin-left: -3px;
+	margin-top: -3px;
+}
+.arrow-background {
+	/* desired triangle height is used here */
+	width: 20px;
+	height: 20px;
+}
+.arrow-container.t .arrow-background {
+	/* 0px triangle height */
+	background-position: 0 10px;
+}
+.arrow-container.l .arrow-background {
+	/* triangle height 0px */
+	background-position: 10px 0;
+}
+/* For some reason (probably because of all the decimal places) there's a
+   rounding error in the background position, so push it over by one */
+.arrow-container.b .arrow-background {
+	background-position: 0 11px;
+}
+.arrow-container.r .arrow-background {
+	background-position: 11px 0;
 }
 /* some unsets - more probably needed */
 .ui-mobile, .ui-mobile body { height: 99.9%; }
@@ -2418,6 +2564,78 @@ label.ui-submit { font-size: 16px; line-height: 1.4; font-weight: normal; margin
 .ui-popup > .ui-btn-left { left: -9px; }
 .ui-popup > .ui-btn-right { right: -9px; }
 .ui-popup-hidden { top: -99999px; left: -9999px; }
+.ui-popup > .arrow-guide {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	pointer-events: none;
+}
+.arrow-container {
+	position: absolute;
+}
+.arrow {
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	position: absolute;
+	overflow: hidden;
+	box-sizing: border-box;
+}
+.arrow-container.ie .arrow {
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865474, M12=-0.7071067811865477, M21=0.7071067811865477, M22=0.7071067811865474, SizingMethod='auto expand')";
+	filter: progid:DXImageTransform.Microsoft.Matrix(
+	      	M11=0.7071067811865474,
+        	M12=-0.7071067811865477,
+        	M21=0.7071067811865477,
+        	M22=0.7071067811865474,
+        	SizingMethod='auto expand');
+}
+.arrow-background {
+	position: absolute;
+	border: none;
+}
+.arrow-container.ie .arrow-background {
+	background: none;
+}
+.arrow-container.t .arrow-background,
+.arrow-container.b .arrow-background {
+	/* Undo rotation and reflect in x axis */
+	-webkit-transform: rotate(-45deg) scale(1, -1);
+	-moz-transform: rotate(-45deg) scale(1, -1);
+	-ms-transform: rotate(-45deg) scale(1, -1);
+	transform: rotate(-45deg) scale(1, -1);
+}
+.arrow-container.t.ie .arrow-background,
+.arrow-container.b.ie .arrow-background {
+   -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865483, M12=-0.7071067811865467, M21=-0.7071067811865467, M22=-0.7071067811865483, SizingMethod='auto expand')";
+   filter: progid:DXImageTransform.Microsoft.Matrix(
+            M11=0.7071067811865483,
+            M12=-0.7071067811865467,
+            M21=-0.7071067811865467,
+            M22=-0.7071067811865483,
+            SizingMethod='auto expand');
+}
+.arrow-container.l .arrow-background,
+.arrow-container.r .arrow-background {
+	/* Undo rotation and reflect in y axis */
+	-webkit-transform: rotate(-45deg) scale(-1, 1);
+	-moz-transform: rotate(-45deg) scale(-1, 1);
+	-ms-transform: rotate(-45deg) scale(-1, 1);
+	transform: rotate(-45deg) scale(-1, 1);
+}
+.arrow-container.l.ie .arrow-background,
+.arrow-container.r.ie .arrow-background {
+   -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=-0.7071067811865483, M12=0.7071067811865467, M21=0.7071067811865467, M22=0.7071067811865483, SizingMethod='auto expand')";
+   filter: progid:DXImageTransform.Microsoft.Matrix(
+            M11=-0.7071067811865483,
+            M12=0.7071067811865467,
+            M21=0.7071067811865467,
+            M22=0.7071067811865483,
+            SizingMethod='auto expand');
+}
 .ui-checkbox, .ui-radio { position: relative; clear: both; margin: 0; z-index: 1; }
 .ui-checkbox .ui-btn, .ui-radio .ui-btn { text-align: left; z-index: 2; }
 .ui-controlgroup .ui-checkbox .ui-btn, .ui-controlgroup .ui-radio .ui-btn { margin: 0; }
@@ -2922,6 +3140,11 @@ div.ui-slider-switch.ui-mini {
 		width: 5em;
 	}
 }	
+.ui-slider-popup {
+	position: absolute !important;
+	text-align: center;
+	z-index: 100;
+}
 .ui-table {
    border: 0;
    border-collapse: collapse;

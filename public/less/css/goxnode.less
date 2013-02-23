@@ -71,3 +71,61 @@
   border-radius: 3px;
 }
 
+@m-border: 1px solid #888;
+
+#gox {
+  padding-top: 62px;
+  .usd {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-right: @m-border;
+    border-bottom: @m-border;
+    margin-left: -1px;
+
+    text-align: center;
+    float: left;
+    width: 50%;
+  }
+  .btc {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: @m-border;
+    /*margin-right: -1px;*/
+    text-align: center;
+    float: right;
+    width: 50%;
+  }
+  .clean {
+    float: none;
+  }
+  .currency-header {
+    font-weight: 600;
+    font-size: 28px;
+  }
+
+  .field4 > span {
+    width: 25%;
+  }
+
+  .currency-state {
+    font-weight: 600;
+    font-size: 20px;
+  }
+
+  .currency-state, .attempt {
+    & > .usd {
+      &.current-bid {
+        color: red;
+      }
+    }
+    & > .btc {
+      &.current-sell, &.instant {
+        margin-right: -1px;
+        border-left: @m-border;
+      }
+      &.current-sell {
+        color: green;
+      }
+    }
+  }
+}

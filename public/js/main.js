@@ -13,7 +13,8 @@ require.config({
     underscore: 'lib/underscore',
     underscoreDate: 'lib/plugins/underscore.date',
     text: 'lib/plugins/text',
-    StartupPage: 'views/StartupPage'
+    StartupPage: 'views/StartupPage',
+    StartupModel: 'models/StartupModel'
   }
 });
 
@@ -52,8 +53,12 @@ requirejs.config({
       deps: ['backbone'],
       exports: 'text'
     },
+    StartupModel: {
+      deps: ['backbone'],
+      exports: 'StartupModel'
+    },
     StartupPage: {
-      deps: ['backbone', 'config'],
+      deps: ['backbone', 'config', 'StartupModel'],
       exports: 'StartupPage'
     },
     router: {

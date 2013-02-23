@@ -6,3 +6,70 @@
   </div>
 </div>
 
+<%
+  var tradeFee = 0.994;
+
+  var base = 'BTC',
+    cur = 'USD'
+
+  var fondBase = 50.0023,
+    fondCur = 1000.0324;
+
+  var buy = 29.1234,
+    sell = 29.8721;
+
+  var strategies = {
+    100: {
+      slipBase: 0.95,
+      slipCur:  0.98
+    },
+    50: {
+      slipBase: 0.97,
+      slipCur: 0.99
+    },
+    30: {
+      slipBase: 0.98,
+      slipCur: 1
+    }
+  };
+
+  function r (fond) {
+    return Math.round(fond * 10000) / 10000 ;
+  }
+
+%>
+<div id="gox">
+  <div class="currency-header">
+    <span class="usd"><%= cur %></span>
+    <span class="btc"><%= base %></span>
+  </div>
+  <div class="currency-state field4">
+    <span class="usd"><%= fondCur %></span>
+    <span class="usd current-bid">@<%= buy %></span>
+    <span class="btc current-sell">@<%= sell %></span>
+    <span class="btc"><%= fondBase %></span>
+  </div>
+
+  <%
+    _.each(strategies, function (strategy, prc) {
+      //debugger;
+      var prcInt = parseInt(prc) / 100;
+      var strategyBase = fondCur / sell * prcInt * tradeFee,
+        strategyCur = fondBase * buy * prcInt * tradeFee;
+
+      var instantBase = strategyBase * strategy.slipBase,
+        instantCur = strategyCur * strategy.slipCur;
+
+  %>
+  <div class="attempt p<%= prc %> field4">
+    <span class="usd instant"><%= r(instantCur) %></span>
+    <span class="usd order"><%= r(strategyCur) %></span>
+    <span class="btc instant"><%= r(instantBase) %></span>
+    <span class="btc order"><%= r(strategyBase) %></span>
+  </div>
+  <%
+  });
+  %>
+
+</div>
+
