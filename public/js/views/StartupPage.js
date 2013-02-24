@@ -22,10 +22,54 @@ define([
       var Goxnode = $.Goxnode(),
         eventsProto = {
           "#nav a.add": 'addThread',
-          "#nav a.menu": 'showNew'
+          "#nav a.menu": 'showNew',
+          "#gox .attempt > span": 'tradeOrder'
         };
 
       this.events = Goxnode.generateTapEvents(eventsProto);
+    },
+
+    tradeOrder: function(e) {
+      var target = e.target,
+        targetsClasses = target.className,
+        classes = targetsClasses.split(' '),
+        parent = target.parentNode,
+        parentClasses = parent.className,
+        re = /p(\d+)/,
+        matched = parentClasses.match(re),
+        strategy = false;
+
+      if (matched) {
+        strategy = parseInt(matched[1]);
+      }
+
+      var tradeType = null; // buy or sell
+      var tradeUrgent = null; // instant or order
+      var currency = null;
+      _.each(classes, function(cls) {
+        switch (cls) {
+          case 'usd':
+          case 'btc':
+            currency = cls;
+            break;
+          case 'order':
+            tradeUrgent = false;
+            break;
+          case 'instant':
+            tradeUrgent = true;
+            break;
+        }
+      });
+
+//      tradeType = 'buy';
+//      tradeType = 'sell';
+
+      console.log('trade Order ->', currency.toUpperCase() + ': ' + strategy + '%, ', (tradeUrgent ? 'instant' : 'order'));
+      //debugger;
+
+      if (strategy) {
+
+      }
     },
 
     addThread: function() {
