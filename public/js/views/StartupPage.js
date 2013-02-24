@@ -6,15 +6,19 @@
  * Created at: 21.02.13 10:55
  */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
-  'text!/templates/startup.html',
-  'StartupModel'
-], function($, _, Backbone, tpl, StartupModel) {
+  'jquery', 'underscore', 'backbone',
+  'text!/templates/startup.html', 'text!/templates/orderui.html',
+  'StartupModel', 'TradeAction'
+],
+
+function($, _, Backbone,
+          tpl, orderUI,
+          StartupModel, TradeAction
+) {
 
   return Backbone.View.extend({
     template: _.template(tpl),
+    orderTemplate: _.template(orderUI),
 
     model: StartupModel,
 
@@ -23,7 +27,7 @@ define([
         eventsProto = {
           "#nav a.add": 'addThread',
           "#nav a.menu": 'showNew',
-          "#gox .attempt > span": 'tradeOrder'
+          ".attempt > span": 'tradeOrder'
         };
 
       this.events = Goxnode.generateTapEvents(eventsProto);
@@ -48,9 +52,9 @@ define([
       var currency = null;
       _.each(classes, function(cls) {
         switch (cls) {
-          case 'usd':
-          case 'btc':
-            currency = cls;
+          case 'USD':
+          case 'BTC':
+            currency = cls.toUpperCase();
             break;
           case 'order':
             tradeUrgent = false;
@@ -64,12 +68,37 @@ define([
 //      tradeType = 'buy';
 //      tradeType = 'sell';
 
-      console.log('trade Order ->', currency.toUpperCase() + ': ' + strategy + '%, ', (tradeUrgent ? 'instant' : 'order'));
+      console.log('Init Trade Order ->', currency + ': ' + strategy + '%, ', (tradeUrgent ? 'instant' : 'order'));
       //debugger;
 
-      if (strategy) {
+      var tradeAction = new TradeAction({
+        type: tradeType,
+        currency: currency,
+        size: 0.01 * 10e8,
+        strategy: strategy
+      });
 
-      }
+      this.createOrderUI(tradeAction);
+
+    },
+
+
+    createOrderUI: function(tradeOrder) {
+/*
+      var model = this.model; //StartupModel
+      model.set({
+        activeOrder: tradeOrder
+      });
+*/
+
+      var goxEl = $('#gox')[0],
+        orderUI = this.orderTemplate({
+          tradeOrder: tradeOrder
+        });
+
+
+      var orderEl = $(goxEl).append(orderUI).trigger('create');
+
     },
 
     addThread: function() {

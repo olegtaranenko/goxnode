@@ -3,19 +3,18 @@
  * (c) 2013 Oleg Taranenko all rights reserved
  * mailto:olegtaranenko@gmail.com
  *
- * Created at: 21.02.13 11:22
+ * Created at: 24.02.13 02:29
  */
 define([
-  'backbone', 'TradeAction'
-], function(Backbone, TradeAction) {
+  'backbone'
+], function(Backbone) {
 
   return Backbone.Model.extend({
     defaults: {
-      id: 0,
-      login: '',
-      status: 'inactive',
-      activeOrder: null, // active Trade Order
-      now: 0      // time in millis
+      ts: 0, // millis
+      type: '', // 'bid' or 'ask'
+      sizeInt: 0, // BTC * 10E8
+      strategy: '' // instant or order
     },
     initialize: function() {
 

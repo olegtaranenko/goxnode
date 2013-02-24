@@ -14,7 +14,8 @@ require.config({
     underscoreDate: 'lib/plugins/underscore.date',
     text: 'lib/plugins/text',
     StartupPage: 'views/StartupPage',
-    StartupModel: 'models/StartupModel'
+    StartupModel: 'models/StartupModel',
+    TradeAction: 'models/TradeAction'
   }
 });
 
