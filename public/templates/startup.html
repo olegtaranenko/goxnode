@@ -7,7 +7,9 @@
 </div>
 
 <%
-  var tradeFee = 0.994;
+  var tradeFee = 0.994,
+    baseQuant = 0.0001,
+    baseMinTrade = 0.01;
 
   var base = 'BTC',
     cur = 'USD'
@@ -15,8 +17,8 @@
   var fondBase = 50.0023,
     fondCur = 1000.0324;
 
-  var buy = 29.1234,
-    sell = 29.8721;
+  var bid = 29.1234,
+    ask = 29.8721;
 
   var strategies = {
     100: {
@@ -45,8 +47,8 @@
   </div>
   <div class="currency-state field4">
     <span class="usd"><%= fondCur %></span>
-    <span class="usd current-bid">@<%= buy %></span>
-    <span class="btc current-sell">@<%= sell %></span>
+    <span class="usd current-bid">@<%= bid %></span>
+    <span class="btc current-ask">@<%= ask %></span>
     <span class="btc"><%= fondBase %></span>
   </div>
 
@@ -54,18 +56,22 @@
     _.each(strategies, function (strategy, prc) {
       //debugger;
       var prcInt = parseInt(prc) / 100;
-      var strategyBase = fondCur / sell * prcInt * tradeFee,
-        strategyCur = fondBase * buy * prcInt * tradeFee;
 
-      var instantBase = strategyBase * strategy.slipBase,
-        instantCur = strategyCur * strategy.slipCur;
+      var strategyBase = fondBase * prcInt * tradeFee,
+        strategyCur = fondCur * prcInt * tradeFee
+
+      var orderBase = strategyCur / (bid + baseQuant),
+        orderCur = strategyBase * (ask - baseQuant);
+
+      var instantBase = strategyCur * strategy.slipBase / ask,
+        instantCur = strategyBase * strategy.slipCur * bid;
 
   %>
   <div class="attempt p<%= prc %> field4">
     <span class="usd instant"><%= r(instantCur) %></span>
-    <span class="usd order"><%= r(strategyCur) %></span>
+    <span class="usd order"><%= r(orderCur) %></span>
+    <span class="btc order"><%= r(orderBase) %></span>
     <span class="btc instant"><%= r(instantBase) %></span>
-    <span class="btc order"><%= r(strategyBase) %></span>
   </div>
   <%
   });
