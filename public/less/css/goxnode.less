@@ -75,6 +75,7 @@
 
 #gox {
   padding-top: 62px;
+  cursor: default;
   .usd {
     padding-top: 5px;
     padding-bottom: 5px;
@@ -126,6 +127,19 @@
       &.current-ask {
         color: green;
       }
+    }
+  }
+
+  .attempt > span {
+
+    &:hover {
+      background-color: #cccccc;
+      cursor: pointer;
+    }
+    &:active {
+      outline-color: rgb(91, 157, 217);
+      outline-style: auto;
+      outline-width: 5px;
     }
   }
 }
