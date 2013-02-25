@@ -3,9 +3,9 @@
  */
 define([
   'backbone', 'jquery', 'underscore',
-  'StartupPage'
+  'StartupPage', 'StartupModel'
 ],
-  function(Backbone, $, _, StartupPage) {
+  function(Backbone, $, _, StartupPage, StartupModel) {
 
     return Backbone.Router.extend({
 
@@ -28,8 +28,12 @@ define([
 
         var newMessages = 0;
 
+        var model = new StartupModel({
+          ts: (new Date()).getTime()
+        });
+
         var page = new StartupPage({
-          newMessages: newMessages
+          model: model
         });
         webView.changePage(page, back);
         $.mobile.hidePageLoadingMsg();

@@ -20,20 +20,27 @@ function($, _, Backbone,
     template: _.template(tpl),
     orderTemplate: _.template(orderUI),
 
-    model: StartupModel,
-
-    initialize: function () {
+    /**
+     *
+     * @param config
+     */
+    initialize: function (config) {
       var Goxnode = $.Goxnode(),
         eventsProto = {
           "#nav a.add": 'addThread',
           "#nav a.menu": 'showNew',
-          ".attempt > span": 'tradeOrder'
+          ".attempt > span": 'tradeAction'
         };
 
       this.events = Goxnode.generateTapEvents(eventsProto);
+      this.model = config.model;
     },
 
-    tradeOrder: function(e) {
+    /**
+     *
+     * @param e
+     */
+    tradeAction: function(e) {
       var target = e.target,
         targetsClasses = target.className,
         classes = targetsClasses.split(' '),
@@ -68,7 +75,7 @@ function($, _, Backbone,
 //      tradeType = 'buy';
 //      tradeType = 'sell';
 
-      console.log('Init Trade Order ->', currency + ': ' + strategy + '%, ', (tradeUrgent ? 'instant' : 'order'));
+      console.log('Init Trade Action ->', currency + ': ' + strategy + '%, ', (tradeUrgent ? 'instant' : 'order'));
       //debugger;
 
       var tradeAction = new TradeAction({
@@ -78,27 +85,54 @@ function($, _, Backbone,
         strategy: strategy
       });
 
-      this.createOrderUI(tradeAction);
+      var cancelEl = this.createOrderUI(tradeAction);
+//      var cancelSel = 'a[data-icon=delete]';
+//      var cancelEl = $(cancelSel, el)[0];
+      var tapEvent = $.Goxnode().tapEvent;
+      $(cancelEl).on(tapEvent, {me: this}, this.doCancel);
+    },
 
+    /**
+     *
+     * @param e
+     */
+    doCancel: function(e) {
+      console.log('doCancel', e);
+      var me = e.data.me,
+        model = me.model,
+        goxEl = model.get('el'),
+        action = model.get('activeOrder'),
+        actionEl = action.get('el');
+
+      goxEl.removeChild(actionEl);
     },
 
 
+    /**
+     *
+     * @param tradeOrder
+     */
     createOrderUI: function(tradeOrder) {
-/*
       var model = this.model; //StartupModel
       model.set({
         activeOrder: tradeOrder
       });
-*/
 
       var goxEl = $('#gox')[0],
         orderUI = this.orderTemplate({
-          tradeOrder: tradeOrder
+          tradeAction: tradeOrder
         });
 
 
-      var orderEl = $(goxEl).append(orderUI).trigger('create');
+      $(goxEl).append(orderUI).trigger('create');
 
+      var actionEl = goxEl.lastElementChild
+
+      tradeOrder.set({
+        el: actionEl
+      });
+
+      return actionEl;
     },
 
     addThread: function() {
@@ -119,6 +153,14 @@ function($, _, Backbone,
         threads: threads,
         newMessages: newMessages
       }));
+
+      var goxnode = this.el.lastElementChild,
+        model = this.model;
+
+      model.set({
+        el: goxnode
+      });
+
       return this;
     }
   });

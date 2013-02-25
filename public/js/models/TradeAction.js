@@ -14,8 +14,10 @@ define([
       ts: 0, // millis
       type: '', // 'bid' or 'ask'
       sizeInt: 0, // BTC * 10E8
-      strategy: '' // instant or order
+      strategy: '', // instant or order
+      el: null // div element to perform further manipulation in ui
     },
+
     initialize: function() {
 
     }

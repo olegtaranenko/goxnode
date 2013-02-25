@@ -14,8 +14,9 @@ define([
       id: 0,
       login: '',
       status: 'inactive',
-      activeOrder: null, // active Trade Order
-      now: 0      // time in millis
+      activeOrder: null,  // active Trade Order
+      el: null,           // #gox
+      now: 0              // time in millis
     },
     initialize: function() {
 
