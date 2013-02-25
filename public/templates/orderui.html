@@ -1,9 +1,8 @@
 <div class="trade-action" data-theme="c">
-  <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true" style="float: left;">
-    <a href="#" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext"></a>
+  <fieldset data-role="controlgroup" data-type="horizontal" style="float: left;">
+    <a href="#" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
   </fieldset>
-  <span class="trade-action">Trade Action</span>
-  <span class="trade-type">BUY</span>
+
   <fieldset data-mini="true" data-role="controlgroup" style="float: right;" >
     <input type="checkbox" id="autoPop" name="autoPop" />
     <label for="autoPop" data-theme="c">Auto</label>
@@ -11,5 +10,22 @@
     <input type="checkbox" id="stopLoss" name="stopLoss" checked="on"/>
     <label for="stopLoss" data-theme="c">Stop Loss</label>
   </fieldset>
+  <div class="trade-info">
+    <div>
+      <span class="trade-action"><strong>Trade Action</strong></span>
+    </div>
+
+    <div class="trade-action-info">
+      <span>Started at:</span>
+      <span class="info-bold">20:01:13.134, 23 Feb</span>
+    </div>
+
+    <div class="trade-action-info">
+      <span>Feedback at:</span>
+      <span class="feedback-loading"></span>
+      <span class="info-bold">20:01:14.362, 23 Feb</span>
+    </div>
+  </div>
+  <hr/>
 </div>
 <div style="clear: both"></div>

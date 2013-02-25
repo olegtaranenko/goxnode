@@ -21,6 +21,7 @@ define([
 
 
       startpage: function (opt) {
+        console.log('startpage...');
         $.mobile.showPageLoadingMsg();
         var webView = this,
           back = opt == 'back';

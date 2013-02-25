@@ -1,0 +1,82 @@
+/* G
+-----------------------------------------------------------------------------------------------------------*/
+
+/* Vars */
+@h-btn-color: red;
+@h-btn-font: whithe;
+@h-btn-hover: lighten(@h-btn-color, 20%);
+@h-btn-down: lighten(@h-btn-color, 30%);
+
+/* btn-up */
+@h-bup-border: 1px solid #ccc;
+@h-bup-background-color: @h-btn-color;
+@h-bup-color: @h-btn-font;
+@h-bup-shadow-x: 0;
+@h-bup-shadow-y: 1px;
+@h-bup-shadow-radius: 0;
+@h-bup-shadow-color: #fff;
+@h-bup-background-start: #fff;
+@h-bup-background-end: #f1f1f1;
+
+/* btn-hover */
+@h-bhover-border: 1px solid #bbb;
+@h-bhover-background-color: @h-btn-hover;
+@h-bhover-color: @h-btn-hover;
+@h-bhover-shadow-x: 0;
+@h-bhover-shadow-y: 1px;
+@h-bhover-shadow-radius: 0;
+@h-bhover-shadow-color: #fff;
+@h-bhover-background-start: #f6f6f6;
+@h-bhover-background-end: #e0e0e0;
+
+/* btn-down */
+@h-bdown-border: 1px solid #bbb;
+@h-bdown-background-color: @h-btn-down;
+@h-bdown-color: #2f3e46;
+@h-bdown-shadow-x: 0;
+@h-bdown-shadow-y: 1px;
+@h-bdown-shadow-radius: 0;
+@h-bdown-shadow-color: #fff;
+@h-bdown-background-start: #d0d0d0;
+@h-bdown-background-end: #dfdfdf;
+
+
+
+/* Style */
+.ui-btn-up-h {
+	#jqm > .btn-attrs(@h-bup-background-color, @h-bup-border, @h-bup-color);
+	text-shadow: @h-bup-shadow-x @h-bup-shadow-y @h-bup-shadow-radius @h-bup-shadow-color;
+	#jqm > .bg(@h-bup-background-start, a-bup-background-end);
+	&:visited, a.ui-link-inherit {
+		color: @h-bup-color;
+	}
+  .bui-unread& {
+    background-color: #ccc;
+  }
+}
+
+.ui-btn-hover-h {
+	#jqm > .btn-attrs(@h-bhover-background-color, @h-bhover-border, @h-bhover-color);
+	text-shadow: @h-bhover-shadow-x @h-bhover-shadow-y @h-bhover-shadow-radius @h-bhover-shadow-color;
+	#jqm > .bg(@h-bhover-background-start, @h-bhover-background-end);
+	&:visited,&:hover,a.ui-link-inherit {
+		color: @h-bhover-color;
+	}
+}
+
+.ui-btn-down-h {
+	#jqm > .btn-attrs(@h-bdown-background-color, @h-bdown-border, @h-bdown-color);
+	text-shadow: @h-bdown-shadow-x @h-bdown-shadow-y @h-bdown-shadow-radius @h-bdown-shadow-color;
+	#jqm > .bg(@h-bdown-background-start, @h-bdown-background-end);
+	&:visited,&:hover,a.ui-link-inherit {
+		color: @h-bdown-color;
+	}
+}
+
+.ui-btn-up-h,
+.ui-btn-hover-h,
+.ui-btn-down-h {
+	font-family: @global-font-family;
+	text-decoration: none;
+}
+
