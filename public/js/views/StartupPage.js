@@ -80,42 +80,59 @@ function($, _, Backbone,
       //debugger;
 
       var tradeAction = new TradeAction({
-        ts: (new Date()).getTime(),
+        timestamp: $.now(),
         type: tradeType,
         currency: currency,
         size: 0.01 * 10e8,
         strategy: strategy
       });
 
-      var cancelEl = this.createOrderUI(tradeAction);
+      var tradeActionEl = this.createOrderUI(tradeAction);
+      var cancelEl = $('a', tradeActionEl);
       var tapEvent = $.Goxnode().tapEvent;
       $(cancelEl).on(tapEvent, {me: this}, this.doCancel);
     },
 
     /**
      *
-     * @param e
+     * Cancel Trade Action on user tapping at 'Cancel' button
+     *
+     * @param e {Event} jQuery event, this => button
      */
     doCancel: function(e) {
       var me = e.data.me,
         model = me.model,
         goxEl = model.get('el'),
-        action = model.get('activeOrder'),
-        actionEl = action.get('el');
+        tradeActions = model.get('activeTradeActions'),
+        target = e.target;
+
+      do {
+        var targetId = target.id,
+          done = target.tagName == 'A';
+
+        target = target.parentElement;
+      } while (!done);
+
+      var tradeAction = tradeActions.get(targetId),
+        actionEl = tradeAction.get('el');
 
       goxEl.removeChild(actionEl);
+      tradeActions.remove(tradeAction);
     },
 
 
     /**
      *
-     * @param tradeAction
+     * Using template orderui.html constructs the markup for new Trade Action and append it to #gox form.
+     * Reference to created DOM element is stored to TradeAction model
+     *
+     * @param tradeAction {TradeAction} model
      */
     createOrderUI: function(tradeAction) {
-      var model = this.model; //StartupModel
-      model.set({
-        activeOrder: tradeAction
-      });
+      var model = this.model, //StartupModel
+        tradeActions = model.get('activeTradeActions');
+
+      tradeActions.add(tradeAction);
 
       var goxEl = model.get('el'),
         orderUI = this.orderTemplate({
@@ -123,10 +140,13 @@ function($, _, Backbone,
         });
 
 
+      // jqm enhancement
       $(goxEl).append(orderUI).trigger('create');
 
+      // trick to get new created DOM element
       var actionEl = goxEl.lastElementChild;
 
+      // let save it to model
       tradeAction.set({
         el: actionEl
       });
@@ -134,11 +154,19 @@ function($, _, Backbone,
       return actionEl;
     },
 
+
+    /**
+     * tb removed?
+     */
     addThread: function() {
       console.log('new thread about to add...');
       alert('addThread');
     },
 
+
+    /**
+     * tb removed?
+     */
     showNew: function() {
       console.log('show new threads...');
     },

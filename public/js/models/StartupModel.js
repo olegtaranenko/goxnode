@@ -6,18 +6,19 @@
  * Created at: 21.02.13 11:22
  */
 define([
-  'backbone', 'TradeAction'
-], function(Backbone, TradeAction) {
+  'backbone', 'TradeActions'
+], function(Backbone, TradeActions) {
 
   return Backbone.Model.extend({
     defaults: {
       id: 0,
       login: '',
       status: 'inactive',
-      activeOrder: null,  // active Trade Order
+      activeTradeActions: new TradeActions(),  // active Trade Order pool
       el: null,           // #gox
       now: 0              // time in millis
     },
+
     initialize: function() {
 
     }

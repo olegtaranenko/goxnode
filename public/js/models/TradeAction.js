@@ -11,7 +11,7 @@ define([
 
   return Backbone.Model.extend({
     defaults: {
-      ts: 0, // millis
+      timestamp: 0, // millis
       type: '', // 'bid' or 'ask'
       sizeInt: 0, // BTC * 10E8
       strategy: '', // instant or order

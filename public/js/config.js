@@ -10,6 +10,8 @@
 
     tapEvent : tapEvent,
 
+    actionDateFormat: '%H:%M:%S.%i',
+
     generateTapEvents: function(events, originalEvents) {
       var ret = originalEvents || {} ;
       $.each(events, function(key, value) {

@@ -1,9 +1,11 @@
 <%
-  var ts = tradeAction.get('ts'),
+  var cid = tradeAction.cid,
+    timestamp = tradeAction.get('timestamp'),
     strategy = tradeAction.get('strategy'),
     type = tradeAction.get('type').toUpperCase(),
     sizeInt = tradeAction.get('sizeInt'),
-    now = new Date(ts),
+    now = new Date(timestamp),
+    actionDateFormat = $.Goxnode().actionDateFormat,
     currency = tradeAction.get('currency'),
     msg;
 
@@ -21,7 +23,7 @@
 
 <div class="trade-action" data-theme="c">
   <fieldset data-role="controlgroup" data-type="horizontal" style="float: left;">
-    <a href="#?ts=<%= ts %>" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
+    <a href="#" id="<%= cid %>" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
   </fieldset>
 
   <fieldset data-mini="true" data-role="controlgroup" style="float: right;" >
@@ -33,7 +35,7 @@
   </fieldset>
   <div class="trade-info">
     <div>
-      <span class="trade-action-info"><small><i><%= _.strftime(now, '%H:%M:%S.%i') %></i></small> <strong><%= type %>, <%= strategy %>%, <%= currency %></strong></span>
+      <span class="trade-action-info"><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= type %>, <%= strategy %>%, <%= currency %></strong></span>
     </div>
 
     <div>
