@@ -158,7 +158,7 @@
                     default: return s;
                 }
             });
-            return format.replace(/%([AaBbCDdeFGgHhIjklMmnpRrSsTtTtUuVvWwYyZz%])/g, function (s, key) {
+            return format.replace(/%([AaBbCDdeFGgHhIijklMmnpRrSsTtTtUuVvWwYyZz%])/g, function (s, key) {
                 switch (key) {
                     case 'A': return locale.fullWeekdays[d.getDay()];
                     case 'a': return locale.shortWeekdays[d.getDay()];
@@ -171,6 +171,7 @@
                     case 'g': return pad(_d.weekBasedYear(d) % 100, 2);
                     case 'H': return pad(d.getHours(), 2);
                     case 'I': return pad(d.getHours() % 12 || 12, 2);
+                    case 'i': return pad(d.getMilliseconds(), 3);
                     case 'j': return pad(_d.dayOfYear(d), 3);
                     case 'k': return pad(d.getHours(), 2, ' ');
                     case 'l': return pad(d.getHours() % 12 || 12, 2, ' ');

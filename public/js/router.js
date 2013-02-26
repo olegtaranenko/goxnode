@@ -28,9 +28,7 @@ define([
 
         var newMessages = 0;
 
-        var model = new StartupModel({
-          ts: (new Date()).getTime()
-        });
+        var model = new StartupModel();
 
         var page = new StartupPage({
           model: model

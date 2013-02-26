@@ -59,8 +59,8 @@ function($, _, Backbone,
       var currency = null;
       _.each(classes, function(cls) {
         switch (cls) {
-          case 'USD':
-          case 'BTC':
+          case 'usd':
+          case 'btc':
             currency = cls.toUpperCase();
             break;
           case 'order':
@@ -75,10 +75,12 @@ function($, _, Backbone,
 //      tradeType = 'buy';
 //      tradeType = 'sell';
 
-      console.log('Init Trade Action ->', currency + ': ' + strategy + '%, ', (tradeUrgent ? 'instant' : 'order'));
+      tradeType = (tradeUrgent ? 'instant' : 'order');
+      console.log('Init Trade Action ->', currency + ': ' + strategy + '%, ', tradeType);
       //debugger;
 
       var tradeAction = new TradeAction({
+        ts: (new Date()).getTime(),
         type: tradeType,
         currency: currency,
         size: 0.01 * 10e8,
@@ -86,8 +88,6 @@ function($, _, Backbone,
       });
 
       var cancelEl = this.createOrderUI(tradeAction);
-//      var cancelSel = 'a[data-icon=delete]';
-//      var cancelEl = $(cancelSel, el)[0];
       var tapEvent = $.Goxnode().tapEvent;
       $(cancelEl).on(tapEvent, {me: this}, this.doCancel);
     },
@@ -97,7 +97,6 @@ function($, _, Backbone,
      * @param e
      */
     doCancel: function(e) {
-      console.log('doCancel', e);
       var me = e.data.me,
         model = me.model,
         goxEl = model.get('el'),
@@ -110,25 +109,25 @@ function($, _, Backbone,
 
     /**
      *
-     * @param tradeOrder
+     * @param tradeAction
      */
-    createOrderUI: function(tradeOrder) {
+    createOrderUI: function(tradeAction) {
       var model = this.model; //StartupModel
       model.set({
-        activeOrder: tradeOrder
+        activeOrder: tradeAction
       });
 
-      var goxEl = $('#gox')[0],
+      var goxEl = model.get('el'),
         orderUI = this.orderTemplate({
-          tradeAction: tradeOrder
+          tradeAction: tradeAction
         });
 
 
       $(goxEl).append(orderUI).trigger('create');
 
-      var actionEl = goxEl.lastElementChild
+      var actionEl = goxEl.lastElementChild;
 
-      tradeOrder.set({
+      tradeAction.set({
         el: actionEl
       });
 

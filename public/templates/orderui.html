@@ -1,6 +1,27 @@
+<%
+  var ts = tradeAction.get('ts'),
+    strategy = tradeAction.get('strategy'),
+    type = tradeAction.get('type').toUpperCase(),
+    sizeInt = tradeAction.get('sizeInt'),
+    now = new Date(ts),
+    currency = tradeAction.get('currency'),
+    msg;
+
+/*
+  if (strategy == 'order') {
+    if (currency == 'USD') {
+
+    } else {
+    }
+  } else {
+    type = 'Instant'
+  }
+*/
+%>
+
 <div class="trade-action" data-theme="c">
   <fieldset data-role="controlgroup" data-type="horizontal" style="float: left;">
-    <a href="#" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
+    <a href="#?ts=<%= ts %>" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
   </fieldset>
 
   <fieldset data-mini="true" data-role="controlgroup" style="float: right;" >
@@ -12,20 +33,12 @@
   </fieldset>
   <div class="trade-info">
     <div>
-      <span class="trade-action"><strong>Trade Action</strong></span>
+      <span class="trade-action-info"><small><i><%= _.strftime(now, '%H:%M:%S.%i') %></i></small> <strong><%= type %>, <%= strategy %>%, <%= currency %></strong></span>
     </div>
 
-    <div class="trade-action-info">
-      <span>Started at:</span>
-      <span class="info-bold">20:01:13.134, 23 Feb</span>
+    <div>
+      <span class="trade-action-info"> <strong></strong></span>
     </div>
-
-    <div class="trade-action-info">
-      <span>Feedback at:</span>
-      <span class="feedback-loading"></span>
-      <span class="info-bold">20:01:14.362, 23 Feb</span>
-    </div>
-  </div>
   <hr/>
   <div style="clear: both"></div>
 </div>
