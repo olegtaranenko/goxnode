@@ -1,6 +1,8 @@
 workspace.xml
+misc.xml
 node_modules
 .DS_Store
 config.json
 config.oleg.json
 api
+*.bak
