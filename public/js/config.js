@@ -17,6 +17,10 @@
       USD: 100000
     },
 
+    digits: {
+      BTC: 10000,
+      USD: 100
+    },
 
     generateTapEvents: function(events, originalEvents) {
       var ret = originalEvents || {} ;

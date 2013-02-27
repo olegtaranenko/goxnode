@@ -14,19 +14,20 @@
 
   var base = tradeAccount.get('base'),
     cur = tradeAccount.get('cur'),
-    $m = $.Goxnode().multipliers,
+    $G = $.Goxnode(),
+    $m = $G.multipliers,
+    $d = $G.digits,
     baseMult = $m[base],
     curMult = $m[cur]
 
-  debugger;
   var fondBase = tradeAccount.get(base) / baseMult,
     fondCur = tradeAccount.get(cur) / curMult;
 
   var bid = 29.1234,
     ask = 29.8721;
 
-  function r (fond, digits) {
-    digits = digits || baseMult;
+  function r (fond, currency) {
+    digits = $d[currency] || 100;
     return Math.round(fond * digits) / digits;
   }
 
@@ -59,10 +60,10 @@
 
   %>
   <div class="attempt p<%= prc %> field4">
-    <span class="usd instant"><%= r(instantCur) %></span>
-    <span class="usd order"><%= r(orderCur) %></span>
-    <span class="btc order"><%= r(orderBase) %></span>
-    <span class="btc instant"><%= r(instantBase) %></span>
+    <span class="usd instant"><%= r(instantCur, cur) %></span>
+    <span class="usd order"><%= r(orderCur, cur) %></span>
+    <span class="btc order"><%= r(orderBase, base) %></span>
+    <span class="btc instant"><%= r(instantBase, base) %></span>
   </div>
   <%
   });
