@@ -12,6 +12,12 @@
 
     actionDateFormat: '%H:%M:%S.%i',
 
+    multipliers: {
+      BTC: 100000000,
+      USD: 100000
+    },
+
+
     generateTapEvents: function(events, originalEvents) {
       var ret = originalEvents || {} ;
       $.each(events, function(key, value) {

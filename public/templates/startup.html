@@ -2,41 +2,32 @@
   <div class="inner">
     <a href="#" class="add"></a>
     <h2>Gox Node Trader</h2>
-    <a href="#" class="menu"><% if (newMessages > 0) print('<span>' + newMessages + '</span>') %></a>
+    <a href="#" class="menu"></a>
   </div>
 </div>
 
 <%
+
   var tradeFee = 0.994,
     baseQuant = 0.0001,
     baseMinTrade = 0.01;
 
-  var base = 'BTC',
-    cur = 'USD'
+  var base = tradeAccount.get('base'),
+    cur = tradeAccount.get('cur'),
+    $m = $.Goxnode().multipliers,
+    baseMult = $m[base],
+    curMult = $m[cur]
 
-  var fondBase = 50.0023,
-    fondCur = 1000.0324;
+  debugger;
+  var fondBase = tradeAccount.get(base) / baseMult,
+    fondCur = tradeAccount.get(cur) / curMult;
 
   var bid = 29.1234,
     ask = 29.8721;
 
-  var strategies = {
-    100: {
-      slipBase: 0.95,
-      slipCur:  0.98
-    },
-    50: {
-      slipBase: 0.97,
-      slipCur: 0.99
-    },
-    30: {
-      slipBase: 0.98,
-      slipCur: 1
-    }
-  };
-
-  function r (fond) {
-    return Math.round(fond * 10000) / 10000 ;
+  function r (fond, digits) {
+    digits = digits || baseMult;
+    return Math.round(fond * digits) / digits;
   }
 
 %>

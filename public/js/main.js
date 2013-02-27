@@ -15,6 +15,7 @@ require.config({
     text: 'lib/plugins/text',
     StartupPage: 'views/StartupPage',
     StartupModel: 'models/StartupModel',
+    TradeAccountModel: 'models/TradeAccountModel',
     TradeAction: 'models/TradeAction',
     TradeActions: 'collections/TradeActions'
   }

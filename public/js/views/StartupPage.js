@@ -72,12 +72,8 @@ function($, _, Backbone,
         }
       });
 
-//      tradeType = 'buy';
-//      tradeType = 'sell';
-
       tradeType = (tradeUrgent ? 'instant' : 'order');
       console.log('Init Trade Action ->', currency + ': ' + strategy + '%, ', tradeType);
-      //debugger;
 
       var tradeAction = new TradeAction({
         timestamp: $.now(),
@@ -87,7 +83,9 @@ function($, _, Backbone,
         strategy: strategy
       });
 
-      var tradeActionEl = this.createOrderUI(tradeAction);
+      var tradeActionEl = this.createTradeAction(tradeAction, {
+        ui: true
+      });
       var cancelEl = $('a', tradeActionEl);
       var tapEvent = $.Goxnode().tapEvent;
       $(cancelEl).on(tapEvent, {me: this}, this.doCancel);
@@ -111,13 +109,18 @@ function($, _, Backbone,
           done = target.tagName == 'A';
 
         target = target.parentElement;
+        if (!done) {
+          done = !target;
+        }
       } while (!done);
 
-      var tradeAction = tradeActions.get(targetId),
-        actionEl = tradeAction.get('el');
+      if (targetId) {
+        var tradeAction = tradeActions.get(targetId),
+          actionEl = tradeAction.get('el');
 
-      goxEl.removeChild(actionEl);
-      tradeActions.remove(tradeAction);
+        goxEl.removeChild(actionEl);
+        tradeActions.remove(tradeAction);
+      }
     },
 
 
@@ -128,7 +131,7 @@ function($, _, Backbone,
      *
      * @param tradeAction {TradeAction} model
      */
-    createOrderUI: function(tradeAction) {
+    createTradeAction: function(tradeAction) {
       var model = this.model, //StartupModel
         tradeActions = model.get('activeTradeActions');
 
@@ -171,18 +174,21 @@ function($, _, Backbone,
       console.log('show new threads...');
     },
 
+    /**
+     * Main page rendering. Use predefined template
+     * @returns {*}
+     */
     render: function() {
-      var options = this.options,
-        threads = options.threads,
-        newMessages = options.newMessages;
+      var model = this.model;
+      var strategies = model.get('strategies'),
+        tradeAccount = model.get('tradeAccount');
 
       $(this.el).html(this.template({
-        threads: threads,
-        newMessages: newMessages
+        strategies: strategies,
+        tradeAccount: tradeAccount
       }));
 
-      var goxnode = this.el.lastElementChild,
-        model = this.model;
+      var goxnode = this.el.lastElementChild;
 
       model.set({
         el: goxnode
