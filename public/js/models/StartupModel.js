@@ -14,20 +14,6 @@ define([
       id: 0,
       login: '',
       status: 'inactive',
-      strategies: {
-        100: {
-          slipBase: 0.95,
-          slipCur:  0.98
-        },
-        50: {
-          slipBase: 0.97,
-          slipCur: 0.99
-        },
-        30: {
-          slipBase: 0.98,
-          slipCur: 1
-        }
-      },
       tradeAccount: new TradeAccountModel(),
       stockExchange: new StockExchangeModel(),
       stockTicker: new StockTickerModel(),

@@ -11,6 +11,7 @@ define([
 
   return Backbone.Model.extend({
     defaults: {
+      strategies: [ "100", "50", "30"],
       BTC: 5000230000,
       USD: 100003240
     },

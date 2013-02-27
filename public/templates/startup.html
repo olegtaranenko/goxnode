@@ -45,9 +45,9 @@
   </div>
 
   <%
-    _.each(strategies, function (strategy, prc) {
+    _.each(strategies, function (strategy) {
       //debugger;
-      var prcInt = parseInt(prc) / 100;
+      var prcInt = parseInt(strategy) / 100;
 
       var strategyBase = fondBase * prcInt * stockFee,
         strategyCur = fondCur * prcInt * stockFee
@@ -55,11 +55,16 @@
       var orderBase = strategyCur / (bid + baseQuant),
         orderCur = strategyBase * (ask - baseQuant);
 
-      var instantBase = strategyCur * strategy.slipBase / ask,
-        instantCur = strategyBase * strategy.slipCur * bid;
+      var slips = stockTicker.get('slips');
+
+      var slipBase = slips[strategy].base,
+        slipCur = slips[strategy].cur;
+
+      var instantBase = strategyCur * slipBase / ask,
+        instantCur = strategyBase * slipCur * bid;
 
   %>
-  <div class="attempt p<%= prc %> field4">
+  <div class="attempt p<%= strategy %> field4">
     <span class="usd instant"><%= r(instantCur, cur) %></span>
     <span class="usd order"><%= r(orderCur, cur) %></span>
     <span class="btc order"><%= r(orderBase, base) %></span>

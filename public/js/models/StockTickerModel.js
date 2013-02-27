@@ -12,7 +12,21 @@ define([
   return Backbone.Model.extend({
     defaults: {
       bid: 29.1234,
-      ask: 29.8721
+      ask: 29.8721,
+      slips: {
+        "100": {
+          base: 0.95,
+          cur:  0.98
+        },
+        "50": {
+          base: 0.97,
+          cur:  0.99
+        },
+        "30": {
+          base: 0.98,
+          cur:  1
+        }
+      }
     },
 
     initialize: function() {

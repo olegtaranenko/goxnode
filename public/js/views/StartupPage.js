@@ -180,8 +180,8 @@ function($, _, Backbone,
      */
     render: function() {
       var model = this.model;
-      var strategies = model.get('strategies'),
-        tradeAccount = model.get('tradeAccount'),
+      var tradeAccount = model.get('tradeAccount'),
+        strategies = tradeAccount.get('strategies'),
         stockExchange = model.get('stockExchange'),
         stockTicker = model.get('stockTicker');
 
