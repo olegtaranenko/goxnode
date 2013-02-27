@@ -3,7 +3,7 @@
  * (c) 2013 Oleg Taranenko all rights reserved
  * mailto:olegtaranenko@gmail.com
  *
- * Created at: 26.02.13 16:41
+ * Created at: 27.02.13 16:34
  */
 define([
   'backbone'
@@ -11,8 +11,8 @@ define([
 
   return Backbone.Model.extend({
     defaults: {
-      BTC: 5000230000,
-      USD: 100003240
+      bid: 29.1234,
+      ask: 29.8721
     },
 
     initialize: function() {

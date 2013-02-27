@@ -17,6 +17,8 @@ require.config({
     StartupModel: 'models/StartupModel',
     TradeAccountModel: 'models/TradeAccountModel',
     TradeAction: 'models/TradeAction',
+    StockExchangeModel: 'models/StockExchangeModel',
+    StockTickerModel: 'models/StockTickerModel',
     TradeActions: 'collections/TradeActions'
   }
 });

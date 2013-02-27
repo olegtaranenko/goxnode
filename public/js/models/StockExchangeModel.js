@@ -3,7 +3,7 @@
  * (c) 2013 Oleg Taranenko all rights reserved
  * mailto:olegtaranenko@gmail.com
  *
- * Created at: 26.02.13 16:41
+ * Created at: 27.02.13 16:34
  */
 define([
   'backbone'
@@ -11,8 +11,11 @@ define([
 
   return Backbone.Model.extend({
     defaults: {
-      BTC: 5000230000,
-      USD: 100003240
+      base: 'BTC',
+      cur: 'USD',
+      stockFee: 0.994,
+      baseQuant: 0.00001,
+      baseMinTrade: 0.01,
     },
 
     initialize: function() {

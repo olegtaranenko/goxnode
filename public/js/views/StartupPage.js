@@ -181,11 +181,15 @@ function($, _, Backbone,
     render: function() {
       var model = this.model;
       var strategies = model.get('strategies'),
-        tradeAccount = model.get('tradeAccount');
+        tradeAccount = model.get('tradeAccount'),
+        stockExchange = model.get('stockExchange'),
+        stockTicker = model.get('stockTicker');
 
       $(this.el).html(this.template({
         strategies: strategies,
-        tradeAccount: tradeAccount
+        tradeAccount: tradeAccount,
+        stockExchange: stockExchange,
+        stockTicker: stockTicker
       }));
 
       var goxnode = this.el.lastElementChild;

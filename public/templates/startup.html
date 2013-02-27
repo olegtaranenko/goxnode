@@ -8,23 +8,23 @@
 
 <%
 
-  var tradeFee = 0.994,
-    baseQuant = 0.0001,
-    baseMinTrade = 0.01;
+  var stockFee = stockExchange.get('stockFee'),
+    baseQuant = stockExchange.get('baseQuant'),
+    baseMinTrade = stockExchange.get('baseMinTrade'),
+    base = stockExchange.get('base'),
+    cur = stockExchange.get('cur'),
 
-  var base = tradeAccount.get('base'),
-    cur = tradeAccount.get('cur'),
     $G = $.Goxnode(),
     $m = $G.multipliers,
     $d = $G.digits,
     baseMult = $m[base],
-    curMult = $m[cur]
+    curMult = $m[cur];
 
   var fondBase = tradeAccount.get(base) / baseMult,
     fondCur = tradeAccount.get(cur) / curMult;
 
-  var bid = 29.1234,
-    ask = 29.8721;
+  var bid = stockTicker.get('bid'),
+    ask = stockTicker.get('ask');
 
   function r (fond, currency) {
     digits = $d[currency] || 100;
@@ -49,8 +49,8 @@
       //debugger;
       var prcInt = parseInt(prc) / 100;
 
-      var strategyBase = fondBase * prcInt * tradeFee,
-        strategyCur = fondCur * prcInt * tradeFee
+      var strategyBase = fondBase * prcInt * stockFee,
+        strategyCur = fondCur * prcInt * stockFee
 
       var orderBase = strategyCur / (bid + baseQuant),
         orderCur = strategyBase * (ask - baseQuant);

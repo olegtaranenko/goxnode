@@ -6,8 +6,8 @@
  * Created at: 21.02.13 11:22
  */
 define([
-  'backbone', 'TradeActions', 'TradeAccountModel'
-], function(Backbone, TradeActions, TradeAccountModel) {
+  'backbone', 'TradeActions', 'TradeAccountModel', 'StockTickerModel', 'StockExchangeModel'
+], function(Backbone, TradeActions, TradeAccountModel, StockTickerModel, StockExchangeModel) {
 
   return Backbone.Model.extend({
     defaults: {
@@ -29,7 +29,10 @@ define([
         }
       },
       tradeAccount: new TradeAccountModel(),
-      activeTradeActions: new TradeActions(),  // active Trade Order pool
+      stockExchange: new StockExchangeModel(),
+      stockTicker: new StockTickerModel(),
+      activeTradeActions: new TradeActions(),  // active Trade Actions pool
+
       el: null,           // #gox
       now: 0              // time in millis
     },
