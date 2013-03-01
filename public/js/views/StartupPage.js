@@ -56,7 +56,7 @@ function($, _, Backbone,
         strategyPercent = parseInt(strategy);
       }
 
-      var tradeType = null; // buy or sell
+      var actionNature = null; // buy or sell
       var tradeUrgent = null; // instant or order
       var currency = null;
       _.each(classes, function(cls) {
@@ -74,8 +74,8 @@ function($, _, Backbone,
         }
       });
 
-      tradeType = (tradeUrgent ? 'instant' : 'order');
-      console.log('Init Trade Action ->', currency + ': ' + strategyPercent + '%, ', tradeType);
+      actionNature = (tradeUrgent ? 'instant' : 'order');
+      console.log('Init Trade Action ->', currency + ': ' + strategyPercent + '%, ', actionNature);
 
       var model = this.model,
         tradeAccount = model.get('tradeAccount'),
@@ -84,7 +84,7 @@ function($, _, Backbone,
 
       var tradeAction = new TradeAction({
         timestamp: $.now(),
-        type: tradeType,
+        nature: actionNature,
         currency: currency,
         size: 0.01 * 10e8,
         strategy: strategyPercent

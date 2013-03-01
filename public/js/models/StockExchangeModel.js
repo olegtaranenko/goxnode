@@ -20,6 +20,7 @@ define([
       return Math.round(fond * digits) / digits;
     },
 
+
     getStockParams: function() {
       return {
         base: this.get('base'),
@@ -29,7 +30,8 @@ define([
       }
     },
 
-    getStrategyFonds: function(percent, fonds, currency) {
+
+    getStrategyFonds: function(fonds, percent, currency) {
       var stockFee = this.get('stockFee'),
         parts = [],
         ret = {};
@@ -115,12 +117,10 @@ define([
         ret = ret[0];
       }
       return ret;
-
-
-
     },
 
-    calculateFonds: function(tradeAccount, currency) {
+
+    getTradeFonds: function(tradeAccount, currency) {
       var stockFee = this.get('stockFee'),
         baseQuant = this.get('baseQuant'),
         baseMinTrade = this.get('baseMinTrade'),
@@ -138,6 +138,7 @@ define([
       }
     },
 
+
     defaults: {
       base: 'BTC',
       cur: 'USD',
@@ -145,6 +146,7 @@ define([
       baseQuant: 0.00001,
       baseMinTrade: 0.01
     },
+
 
     initialize: function() {
 

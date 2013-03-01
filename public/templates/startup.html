@@ -9,7 +9,7 @@
 <%
 
   var stockParams = stockExchange.getStockParams();
-  var fonds = stockExchange.calculateFonds(tradeAccount);
+  var fonds = stockExchange.getTradeFonds(tradeAccount);
 
   var fondBase = fonds.base,
     fondCur = fonds.cur,
@@ -41,7 +41,7 @@
       debugger;
       var percentFloat = parseInt(strategy) / 100;
 
-      var strategyFonds = stockExchange.getStrategyFonds(percentFloat, fonds);
+      var strategyFonds = stockExchange.getStrategyFonds(fonds, percentFloat);
 
       var orderFonds = stockExchange.getOrderFonds(strategyFonds, ticker);
 

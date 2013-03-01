@@ -12,9 +12,9 @@ define([
   return Backbone.Model.extend({
     defaults: {
       timestamp: 0, // millis
-      type: '', // 'bid' or 'ask'
+      nature: '', // action nature: 'order', 'instant'
       sizeInt: 0, // BTC * 10E8
-      strategy: '', // instant or order
+      strategy: '', // percent in string: "100", "50", "30"
       el: null // div element to perform further manipulation in ui
     },
 

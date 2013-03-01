@@ -2,7 +2,7 @@
   var cid = tradeAction.cid,
     timestamp = tradeAction.get('timestamp'),
     strategy = tradeAction.get('strategy'),
-    type = tradeAction.get('type').toUpperCase(),
+    nature = tradeAction.get('nature').toUpperCase(),
     sizeInt = tradeAction.get('sizeInt'),
     now = new Date(timestamp),
     actionDateFormat = $.Goxnode().actionDateFormat,
@@ -10,13 +10,13 @@
     msg, orderType;
 
 
-  if (type == 'ORDER') {
+  if (nature == 'ORDER') {
     if (currency == 'USD') {
       orderType = 'ASK';
     } else {
       orderType = 'BID';
     }
-  } else if (type == 'INSTANT') {
+  } else if (nature == 'INSTANT') {
     msg = 'Instant'
   }
 
@@ -28,7 +28,7 @@
   </fieldset>
 
   <fieldset data-mini="true" data-role="controlgroup" style="float: right;" >
-    <% if (type == 'ORDER') { %>
+    <% if (nature == 'ORDER') { %>
     <input type="checkbox" id="autoPop" name="autoPop" />
     <label for="autoPop" data-theme="c">Auto pop</label>
     <!--<button date-icon="search">Search</button>-->
@@ -38,9 +38,9 @@
   </fieldset>
   <div class="trade-info">
     <div>
-      <span class="trade-action-info"><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= type %>, <%= strategy %>%, <%= currency %></strong></span>
+      <span class="trade-action-info"><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= nature %>, <%= strategy %>%, <%= currency %></strong></span>
     </div>
-    <% if (type == 'ORDER') { %>
+    <% if (nature == 'ORDER') { %>
       <span class="trade-action-info"><strong><%= orderType %>, <%= strategy %>%, <%= currency %></strong></span>
     <% } %>
     <div>
