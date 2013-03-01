@@ -48,10 +48,12 @@ function($, _, Backbone,
         parentClasses = parent.className,
         re = /p(\d+)/,
         matched = parentClasses.match(re),
-        strategy = false;
+        strategy = false,
+        strategyPercent = false;
 
       if (matched) {
-        strategy = parseInt(matched[1]);
+        strategy = matched[1];
+        strategyPercent = parseInt(strategy);
       }
 
       var tradeType = null; // buy or sell
@@ -73,14 +75,19 @@ function($, _, Backbone,
       });
 
       tradeType = (tradeUrgent ? 'instant' : 'order');
-      console.log('Init Trade Action ->', currency + ': ' + strategy + '%, ', tradeType);
+      console.log('Init Trade Action ->', currency + ': ' + strategyPercent + '%, ', tradeType);
+
+      var model = this.model,
+        tradeAccount = model.get('tradeAccount'),
+        stockExchange = model.get('stockExchange'),
+        stockTicker = model.get('stockTicker');
 
       var tradeAction = new TradeAction({
         timestamp: $.now(),
         type: tradeType,
         currency: currency,
         size: 0.01 * 10e8,
-        strategy: strategy
+        strategy: strategyPercent
       });
 
       var tradeActionEl = this.createTradeAction(tradeAction, {

@@ -10,6 +10,10 @@ define([
 ], function(Backbone) {
 
   return Backbone.Model.extend({
+    evaluateValues: function () {
+
+    },
+
     defaults: {
       bid: 29.1234,
       ask: 29.8721,
