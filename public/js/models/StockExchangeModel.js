@@ -29,26 +29,98 @@ define([
       }
     },
 
-    pureFonds: function(fonds, percent, currency) {
-      var base, cur, ret;
+    getStrategyFonds: function(percent, fonds, currency) {
+      var stockFee = this.get('stockFee'),
+        parts = [],
+        ret = {};
 
       if (currency !== undefined) {
-        switch (currency) {
-          case 'base':
-          case 'cur':
-            ret = fonds[currency];
-        }
+        parts.push(currency);
       } else {
+        parts.push('base', 'cur');
+      }
 
-        ret = {
-          base: base,
-          cur: cur
-        }
+      _.each(parts, function(part) {
+        ret[part] = fonds[part] * percent * stockFee;
+      });
+
+      if (parts.length == 1) {
+        ret = ret[0];
       }
       return ret;
+
     },
 
-    calculateFonds: function(tradeAccount) {
+
+    getOrderFonds: function(fonds, ticker, currency) {
+      var ask = ticker.ask,
+        bid = ticker.bid;
+
+      var baseQuant = this.get('baseQuant'),
+        parts = [],
+        ret = {};
+
+
+      if (currency !== undefined) {
+        parts.push(currency);
+      } else {
+        parts.push('base', 'cur');
+      }
+
+      _.each(parts, function(part) {
+        switch(part) {
+          case 'base':
+            ret[part] = fonds.cur / (bid + baseQuant);
+            break;
+          case 'cur':
+            ret[part] = fonds.base * (ask - baseQuant);
+            break;
+        }
+      });
+
+      if (parts.length == 1) {
+        ret = ret[0];
+      }
+      return ret;
+
+    },
+
+
+    getInstantFonds: function(fonds, ticker, slips, currency) {
+      var ask = ticker.ask,
+        bid = ticker.bid;
+
+      var parts = [],
+        ret = {};
+
+
+      if (currency !== undefined) {
+        parts.push(currency);
+      } else {
+        parts.push('base', 'cur');
+      }
+
+      _.each(parts, function(part) {
+        switch(part) {
+          case 'base':
+            ret[part] = fonds.cur * slips.base / ask;
+            break;
+          case 'cur':
+            ret[part] = fonds.base * slips.cur * bid;
+            break;
+        }
+      });
+
+      if (parts.length == 1) {
+        ret = ret[0];
+      }
+      return ret;
+
+
+
+    },
+
+    calculateFonds: function(tradeAccount, currency) {
       var stockFee = this.get('stockFee'),
         baseQuant = this.get('baseQuant'),
         baseMinTrade = this.get('baseMinTrade'),

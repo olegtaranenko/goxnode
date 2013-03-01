@@ -10,9 +10,29 @@ define([
 ], function(Backbone) {
 
   return Backbone.Model.extend({
-    evaluateValues: function () {
+    getStrategySlips: function(strategy, currency) {
 
+      var slips = this.get('slips'),
+        strategySlip = slips[strategy],
+        parts = [],
+        ret = {};
+
+      if (currency !== undefined) {
+        parts.push(currency);
+      } else {
+        parts.push('base', 'cur');
+      }
+
+      _.each(parts, function(part) {
+        ret[part] = strategySlip[part];
+      });
+
+      if (parts.length == 1) {
+        ret = ret[0];
+      }
+      return ret;
     },
+
 
     defaults: {
       bid: 29.1234,

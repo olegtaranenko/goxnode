@@ -95,7 +95,7 @@ function($, _, Backbone,
       });
       var cancelEl = $('a', tradeActionEl);
       var tapEvent = $.Goxnode().tapEvent;
-      $(cancelEl).on(tapEvent, {me: this}, this.doCancel);
+      $(cancelEl).on(tapEvent, {me: this}, this.cancelTradeAction);
     },
 
     /**
@@ -104,7 +104,7 @@ function($, _, Backbone,
      *
      * @param e {Event} jQuery event, this => button
      */
-    doCancel: function(e) {
+    cancelTradeAction: function(e) {
       var me = e.data.me,
         model = me.model,
         goxEl = model.get('el'),
@@ -132,7 +132,6 @@ function($, _, Backbone,
 
 
     /**
-     *
      * Using template orderui.html constructs the markup for new Trade Action and append it to #gox form.
      * Reference to created DOM element is stored to TradeAction model
      *
@@ -182,7 +181,8 @@ function($, _, Backbone,
     },
 
     /**
-     * Main page rendering. Use predefined template
+     * Main page rendering. Use predefined template 'startup.html'
+     *
      * @returns {*}
      */
     render: function() {

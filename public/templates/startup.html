@@ -17,7 +17,11 @@
     cur = stockParams.cur;
 
   var bid = stockTicker.get('bid'),
-    ask = stockTicker.get('ask');
+    ask = stockTicker.get('ask'),
+    ticker = {
+      bid: bid,
+      ask: ask
+    };
 
 %>
 <div id="gox">
@@ -37,26 +41,20 @@
       debugger;
       var percentFloat = parseInt(strategy) / 100;
 
-      var strategyBase = fondBase * percentFloat * stockParams.stockFee,
-        strategyCur = fondCur * percentFloat * stockParams.stockFee
+      var strategyFonds = stockExchange.getStrategyFonds(percentFloat, fonds);
 
-      var orderBase = strategyCur / (bid + stockParams.baseQuant),
-        orderCur = strategyBase * (ask - stockParams.baseQuant);
+      var orderFonds = stockExchange.getOrderFonds(strategyFonds, ticker);
 
-      var slips = stockTicker.get('slips');
+      var slips = stockTicker.getStrategySlips(strategy);
 
-      var slipBase = slips[strategy].base,
-        slipCur = slips[strategy].cur;
-
-      var instantBase = strategyCur * slipBase / ask,
-        instantCur = strategyBase * slipCur * bid;
+      var instantFonds = stockExchange.getInstantFonds(strategyFonds, ticker, slips);
 
   %>
   <div class="attempt p<%= strategy %> field4">
-    <span class="usd instant"><%= stockExchange.round(instantCur, cur) %></span>
-    <span class="usd order"><%= stockExchange.round(orderCur, cur) %></span>
-    <span class="btc order"><%= stockExchange.round(orderBase, base) %></span>
-    <span class="btc instant"><%= stockExchange.round(instantBase, base) %></span>
+    <span class="usd instant"><%= stockExchange.round(instantFonds.cur, cur) %></span>
+    <span class="usd order"><%= stockExchange.round(orderFonds.cur, cur) %></span>
+    <span class="btc order"><%= stockExchange.round(orderFonds.base, base) %></span>
+    <span class="btc instant"><%= stockExchange.round(instantFonds.base, base) %></span>
   </div>
   <%
   });
