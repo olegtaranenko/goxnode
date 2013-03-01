@@ -93,7 +93,7 @@ function($, _, Backbone,
         strategy: strategyPercent
       });
 
-      var tradeActionEl = this.createTradeAction(tradeAction, {
+      var tradeActionEl = this.createTradeAction(tradeAction, stockExchange, {
         ui: true
       });
       var cancelEl = $('a', tradeActionEl);
@@ -140,7 +140,7 @@ function($, _, Backbone,
      *
      * @param tradeAction {TradeAction} model
      */
-    createTradeAction: function(tradeAction) {
+    createTradeAction: function(tradeAction, stockExchange) {
       var model = this.model, //StartupModel
         tradeActions = model.get('activeTradeActions');
 
@@ -148,7 +148,8 @@ function($, _, Backbone,
 
       var goxEl = model.get('el'),
         orderUI = this.orderTemplate({
-          tradeAction: tradeAction
+          tradeAction: tradeAction,
+          stockExchange: stockExchange
         });
 
 

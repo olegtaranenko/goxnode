@@ -23,6 +23,12 @@
     },
 
 
+    roundFond: function(fond, currency) {
+      var digits = this.digits[currency] || 100;
+      return Math.round(fond * digits) / digits;
+    },
+
+
     generateTapEvents: function(events, originalEvents) {
       var ret = originalEvents || {} ;
       $.each(events, function(key, value) {

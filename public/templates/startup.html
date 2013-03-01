@@ -22,6 +22,8 @@
     ask = ticker.ask,
     bid = ticker.bid;
 
+  var $G = $.Goxnode();
+
 %>
 <div id="gox">
   <div class="currency-header">
@@ -50,10 +52,10 @@
 
   %>
   <div class="attempt p<%= strategy %> field4">
-    <span class="usd instant"><%= stockExchange.round(instantFonds.cur, cur) %></span>
-    <span class="usd order"><%= stockExchange.round(orderFonds.cur, cur) %></span>
-    <span class="btc order"><%= stockExchange.round(orderFonds.base, base) %></span>
-    <span class="btc instant"><%= stockExchange.round(instantFonds.base, base) %></span>
+    <span class="usd instant"><%= $G.roundFond(instantFonds.cur, cur) %></span>
+    <span class="usd order"><%= $G.roundFond(orderFonds.cur, cur) %></span>
+    <span class="btc order"><%= $G.roundFond(orderFonds.base, base) %></span>
+    <span class="btc instant"><%= $G.roundFond(instantFonds.base, base) %></span>
   </div>
   <%
   });

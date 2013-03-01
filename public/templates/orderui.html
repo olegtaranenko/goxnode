@@ -1,13 +1,16 @@
 <%
+  var $G = $.Goxnode();
+
   var cid = tradeAction.cid,
     timestamp = tradeAction.get('timestamp'),
     strategy = tradeAction.get('strategy'),
     nature = tradeAction.get('nature').toUpperCase(),
     sizeInt = tradeAction.get('sizeInt'),
     now = new Date(timestamp),
-    actionDateFormat = $.Goxnode().actionDateFormat,
+    actionDateFormat = $G.actionDateFormat,
     currency = tradeAction.get('currency'),
     baseSize = tradeAction.get('size'),
+    base = stockExchange.getBaseCurrency(),
     msg, orderType;
 
 
@@ -42,7 +45,7 @@
       <span class="trade-action-info"><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= nature %>, <%= strategy %>%, <%= currency %></strong></span>
     </div>
     <% if (nature == 'ORDER') { %>
-      <span class="trade-action-info"><strong><%= orderType %>, <%= stockExchange.round(baseSize) %>, <%= base %></strong></span>
+      <span class="trade-action-info"><strong><%= orderType %>, <%= $G.roundFond(baseSize) %>, <%= base %></strong></span>
     <% } %>
     <div>
       <span class="trade-action-info"> <strong></strong></span>

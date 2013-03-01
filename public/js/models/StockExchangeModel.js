@@ -9,17 +9,9 @@ define([
   'backbone'
 ], function(Backbone) {
 
-  var $G = $.Goxnode(),
-    $m = $G.multipliers,
-    $d = $G.digits;
+  var $G = $.Goxnode();
 
   return Backbone.Model.extend({
-
-    round: function(fond, currency) {
-      digits = $d[currency] || 100;
-      return Math.round(fond * digits) / digits;
-    },
-
 
     getCurrencyPair: function() {
       return {
@@ -28,6 +20,10 @@ define([
       }
     },
 
+
+    getBaseCurrency: function() {
+      return this.get('base');
+    },
 
     getCurrencyPart: function(currency) {
       if (currency === this.get('base')) {
