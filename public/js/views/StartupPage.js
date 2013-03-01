@@ -41,6 +41,8 @@ function($, _, Backbone,
      * @param e
      */
     tradeAction: function(e) {
+      var $G = $.Goxnode();
+
       var target = e.target,
         targetsClasses = target.className,
         classes = targetsClasses.split(' '),
@@ -56,7 +58,6 @@ function($, _, Backbone,
         strategyPercent = parseInt(strategy);
       }
 
-      var actionNature = null; // buy or sell
       var tradeUrgent = null; // instant or order
       var currency = null;
       _.each(classes, function(cls) {
@@ -74,7 +75,7 @@ function($, _, Backbone,
         }
       });
 
-      actionNature = (tradeUrgent ? 'instant' : 'order');
+      var actionNature = (tradeUrgent ? 'instant' : 'order');
       console.log('Init Trade Action ->', currency + ': ' + strategyPercent + '%, ', actionNature);
 
       var model = this.model,
@@ -82,11 +83,13 @@ function($, _, Backbone,
         stockExchange = model.get('stockExchange'),
         stockTicker = model.get('stockTicker');
 
+      var baseSize = stockExchange.getNatureBaseSize(tradeAccount, stockTicker, actionNature, strategy, currency);
+
       var tradeAction = new TradeAction({
         timestamp: $.now(),
         nature: actionNature,
         currency: currency,
-        size: 0.01 * 10e8,
+        size: baseSize,
         strategy: strategyPercent
       });
 
@@ -94,7 +97,7 @@ function($, _, Backbone,
         ui: true
       });
       var cancelEl = $('a', tradeActionEl);
-      var tapEvent = $.Goxnode().tapEvent;
+      var tapEvent = $G.tapEvent;
       $(cancelEl).on(tapEvent, {me: this}, this.cancelTradeAction);
     },
 

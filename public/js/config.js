@@ -22,6 +22,7 @@
       USD: 100
     },
 
+
     generateTapEvents: function(events, originalEvents) {
       var ret = originalEvents || {} ;
       $.each(events, function(key, value) {

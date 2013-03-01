@@ -8,26 +8,25 @@
 
 <%
 
-  var stockParams = stockExchange.getStockParams();
-  var fonds = stockExchange.getTradeFonds(tradeAccount);
+  //debugger;
+  var pair = stockExchange.getCurrencyPair();
+  var freeFonds = tradeAccount.getFreeFonds(pair);
+  var fonds = stockExchange.getTradeFonds(freeFonds);
 
-  var fondBase = fonds.base,
-    fondCur = fonds.cur,
-    base = stockParams.base
-    cur = stockParams.cur;
+  var fondBase = freeFonds.base,
+    fondCur = freeFonds.cur,
+    base = pair.base
+    cur = pair.cur;
 
-  var bid = stockTicker.get('bid'),
-    ask = stockTicker.get('ask'),
-    ticker = {
-      bid: bid,
-      ask: ask
-    };
+  var ticker = stockTicker.getTicker(),
+    ask = ticker.ask,
+    bid = ticker.bid;
 
 %>
 <div id="gox">
   <div class="currency-header">
-    <span class="usd"><%= stockParams.cur %></span>
-    <span class="btc"><%= stockParams.base %></span>
+    <span class="usd"><%= cur %></span>
+    <span class="btc"><%= base %></span>
   </div>
   <div class="currency-state field4">
     <span class="usd"><%= fondCur %></span>
@@ -38,7 +37,7 @@
 
   <%
     _.each(strategies, function (strategy) {
-      debugger;
+      //debugger;
       var percentFloat = parseInt(strategy) / 100;
 
       var strategyFonds = stockExchange.getStrategyFonds(fonds, percentFloat);

@@ -21,6 +21,32 @@ define([
     },
 
 
+    getCurrencyPair: function() {
+      return {
+        base: this.get('base'),
+        cur: this.get('cur')
+      }
+    },
+
+
+    getCurrencyPart: function(currency) {
+      if (currency === this.get('base')) {
+        return 'base';
+      } else {
+        return 'cur';
+      }
+    },
+
+
+    getOppositePart: function(part) {
+      if (part !== 'base') {
+        return 'base';
+      } else {
+        return 'cur';
+      }
+    },
+
+
     getStockParams: function() {
       return {
         base: this.get('base'),
@@ -31,31 +57,67 @@ define([
     },
 
 
-    getStrategyFonds: function(fonds, percent, currency) {
-      var stockFee = this.get('stockFee'),
-        parts = [],
+    getTradeFonds: function(freeFonds, currencyPart) {
+      var me = this,
+        stockFee = this.get('stockFee');
+
+      var parts = [],
         ret = {};
 
-      if (currency !== undefined) {
-        parts.push(currency);
+      var partial = currencyPart !== undefined;
+      if (partial) {
+        var oppositePart = me.getOppositePart(currencyPart);
+
+        parts.push(oppositePart);
       } else {
         parts.push('base', 'cur');
       }
 
       _.each(parts, function(part) {
-        ret[part] = fonds[part] * percent * stockFee;
+        var fond = (partial ? freeFonds : freeFonds[part]) * stockFee;
+
+        if (!partial) {
+          ret[part] = fond;
+        } else {
+          ret = fond;
+        }
       });
 
-      if (parts.length == 1) {
-        ret = ret[0];
+      return ret;
+    },
+
+
+    getStrategyFonds: function(fonds, percent, currencyPart) {
+      var me = this,
+        parts = [],
+        ret = {};
+
+      var partial = currencyPart !== undefined;
+      if (partial) {
+        parts.push(currencyPart);
+      } else {
+        parts.push('base', 'cur');
       }
+
+      _.each(parts, function(part) {
+        var oppositePart = me.getOppositePart(part),
+          oppositeFond = (partial ? fonds : fonds[oppositePart])  * percent;
+
+        if (!partial) {
+          ret[part] = oppositeFond;
+        } else {
+          ret = oppositeFond;
+        }
+      });
+
       return ret;
 
     },
 
 
-    getOrderFonds: function(fonds, ticker, currency) {
-      var ask = ticker.ask,
+    getOrderFonds: function(fonds, ticker, currencyPart) {
+      var me = this,
+        ask = ticker.ask,
         bid = ticker.bid;
 
       var baseQuant = this.get('baseQuant'),
@@ -63,79 +125,91 @@ define([
         ret = {};
 
 
-      if (currency !== undefined) {
-        parts.push(currency);
+      var partial = currencyPart !== undefined;
+      if (partial) {
+        parts.push(currencyPart);
       } else {
         parts.push('base', 'cur');
       }
 
       _.each(parts, function(part) {
+        var oppositePart = part,
+          oppositeFond = partial ? fonds : fonds[oppositePart];
+
         switch(part) {
           case 'base':
-            ret[part] = fonds.cur / (bid + baseQuant);
+            ret[part] = oppositeFond / (bid + baseQuant);
             break;
           case 'cur':
-            ret[part] = fonds.base * (ask - baseQuant);
+            ret[part] = oppositeFond * (ask - baseQuant);
             break;
         }
       });
 
-      if (parts.length == 1) {
-        ret = ret[0];
+      if (partial) {
+        ret = ret[currencyPart];
       }
       return ret;
 
     },
 
 
-    getInstantFonds: function(fonds, ticker, slips, currency) {
-      var ask = ticker.ask,
+    getInstantFonds: function(fonds, ticker, slips, currencyPart) {
+      var me = this,
+        ask = ticker.ask,
         bid = ticker.bid;
 
       var parts = [],
         ret = {};
 
 
-      if (currency !== undefined) {
-        parts.push(currency);
+      var partial = currencyPart !== undefined;
+      if (partial) {
+        parts.push(currencyPart);
       } else {
         parts.push('base', 'cur');
       }
 
       _.each(parts, function(part) {
+        var oppositePart = part,
+          oppositeFond = partial ? fonds : fonds[oppositePart];
+
         switch(part) {
           case 'base':
-            ret[part] = fonds.cur * slips.base / ask;
+            ret[part] = oppositeFond * slips.base / ask;
             break;
           case 'cur':
-            ret[part] = fonds.base * slips.cur * bid;
+            ret[part] = oppositeFond * slips.cur * bid;
             break;
         }
       });
 
-      if (parts.length == 1) {
-        ret = ret[0];
+      if (partial) {
+        ret = ret[currencyPart];
       }
       return ret;
     },
 
 
-    getTradeFonds: function(tradeAccount, currency) {
-      var stockFee = this.get('stockFee'),
-        baseQuant = this.get('baseQuant'),
-        baseMinTrade = this.get('baseMinTrade'),
-        base = this.get('base'),
-        cur = this.get('cur'),
+    getNatureBaseSize: function(tradeAccount, stockTicker, nature, strategy, currency) {
+      var part = this.getCurrencyPart(currency),
+        oppositePart = this.getOppositePart(part),
+        oppositeCurrency = this.get(oppositePart);
 
-        baseMult = $m[base],
-        curMult = $m[cur],
-        fondBase = tradeAccount.get(base) / baseMult,
-        fondCur = tradeAccount.get(cur) / curMult;
+      var freeFonds = tradeAccount.getFreeFonds(oppositeCurrency);
+      var tradeFonds = this.getTradeFonds(freeFonds, part);
+      var percent = parseInt(strategy) / 100;
+      var strategyFonds = this.getStrategyFonds(tradeFonds, percent, part);
+      var ticker = stockTicker.getTicker();
 
-      return {
-        base: fondBase,
-        cur: fondCur
+      var retFond;
+      if (nature.toUpperCase() == 'INSTANT') {
+        var slips = stockTicker.getStrategySlips(strategy);
+        retFond = this.getInstantFonds(strategyFonds, ticker, slips, part);
+      } else if (nature.toUpperCase() == 'ORDER') {
+        retFond = this.getOrderFonds(strategyFonds, ticker, part);
       }
+      return retFond;
     },
 
 

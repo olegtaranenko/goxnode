@@ -10,8 +10,16 @@ define([
 ], function(Backbone) {
 
   return Backbone.Model.extend({
-    getStrategySlips: function(strategy, currency) {
 
+    getTicker: function () {
+      return {
+        ask: this.get('ask'),
+        bid: this.get('bid')
+      }
+    },
+
+
+    getStrategySlips: function(strategy, currency) {
       var slips = this.get('slips'),
         strategySlip = slips[strategy],
         parts = [],

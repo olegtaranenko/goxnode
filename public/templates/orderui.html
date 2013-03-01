@@ -7,6 +7,7 @@
     now = new Date(timestamp),
     actionDateFormat = $.Goxnode().actionDateFormat,
     currency = tradeAction.get('currency'),
+    baseSize = tradeAction.get('size'),
     msg, orderType;
 
 
@@ -41,7 +42,7 @@
       <span class="trade-action-info"><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= nature %>, <%= strategy %>%, <%= currency %></strong></span>
     </div>
     <% if (nature == 'ORDER') { %>
-      <span class="trade-action-info"><strong><%= orderType %>, <%= strategy %>%, <%= currency %></strong></span>
+      <span class="trade-action-info"><strong><%= orderType %>, <%= stockExchange.round(baseSize) %>, <%= base %></strong></span>
     <% } %>
     <div>
       <span class="trade-action-info"> <strong></strong></span>
