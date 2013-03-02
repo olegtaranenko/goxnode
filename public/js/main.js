@@ -73,12 +73,12 @@ requirejs.config({
         'StartupPage'
       ],
       export: 'router'
-    },
-    localhost: {
-      deps: [
-        'socket.io', 'config'
-      ],
-      export: 'localhost'
+//    },
+//    localhost: {
+//      deps: [
+//        'socket.io', 'config'
+//      ],
+//      export: 'localhost'
     }
   }
 });
@@ -89,8 +89,7 @@ require([
   'jqueryCookiesPlugin',
   'underscore', 'underscoreDate',
   'mobile',
-  'text', 'jquery', 'config',
-  'localhost'
+  'text', 'jquery'
 ],
 
 function(Backbone, AppRouter) {
