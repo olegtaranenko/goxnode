@@ -13,7 +13,13 @@ define([
     defaults: {
       timestamp: 0, // millis
       nature: '', // action nature: 'order', 'instant'
-      sizeInt: 0, // BTC * 10E8
+//      sizeInt: 0, // BTC * 10E8
+      currency: '',
+      price: 0.0,
+      size: 0.0,
+      brutto: 0.0,
+      curSize: 0.0,
+      curBrutto: 0.0,
       strategy: '', // percent in string: "100", "50", "30"
       el: null // div element to perform further manipulation in ui
     },

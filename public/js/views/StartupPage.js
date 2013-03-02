@@ -58,7 +58,7 @@ function($, _, Backbone,
         strategyPercent = parseInt(strategy);
       }
 
-      var tradeUrgent = null; // instant or order
+      var actionNature = null; //(tradeUrgent ? 'instant' : 'order');
       var currency = null;
       _.each(classes, function(cls) {
         switch (cls) {
@@ -67,15 +67,12 @@ function($, _, Backbone,
             currency = cls.toUpperCase();
             break;
           case 'order':
-            tradeUrgent = false;
-            break;
           case 'instant':
-            tradeUrgent = true;
+            actionNature = cls.toUpperCase();
             break;
         }
       });
 
-      var actionNature = (tradeUrgent ? 'instant' : 'order');
       console.log('Init Trade Action ->', currency + ': ' + strategyPercent + '%, ', actionNature);
 
       var model = this.model,
@@ -83,17 +80,21 @@ function($, _, Backbone,
         stockExchange = model.get('stockExchange'),
         stockTicker = model.get('stockTicker');
 
-      var baseSize = stockExchange.getNatureBaseSize(tradeAccount, stockTicker, actionNature, strategy, currency);
+      var params = stockExchange.getNatureBaseSize(tradeAccount, stockTicker, actionNature, strategy, currency);
 
       var tradeAction = new TradeAction({
         timestamp: $.now(),
         nature: actionNature,
         currency: currency,
-        size: baseSize,
+        price: params.tradePrice,
+        size: params.baseFond,
+        brutto: params.baseBrutto,
+        curSize: params.currencyFond,
+        curBrutto: params.currencyBrutto,
         strategy: strategyPercent
       });
 
-      var tradeActionEl = this.createTradeAction(tradeAction, stockExchange, {
+      var tradeActionEl = this.createTradeAction(tradeAction, stockExchange, stockTicker, {
         ui: true
       });
       var cancelEl = $('a', tradeActionEl);
@@ -140,7 +141,7 @@ function($, _, Backbone,
      *
      * @param tradeAction {TradeAction} model
      */
-    createTradeAction: function(tradeAction, stockExchange) {
+    createTradeAction: function(tradeAction, stockExchange, stockTicker) {
       var model = this.model, //StartupModel
         tradeActions = model.get('activeTradeActions');
 
@@ -149,7 +150,8 @@ function($, _, Backbone,
       var goxEl = model.get('el'),
         orderUI = this.orderTemplate({
           tradeAction: tradeAction,
-          stockExchange: stockExchange
+          stockExchange: stockExchange,
+          stockTicker: stockTicker
         });
 
 

@@ -10,20 +10,39 @@
     actionDateFormat = $G.actionDateFormat,
     currency = tradeAction.get('currency'),
     baseSize = tradeAction.get('size'),
+    baseBrutto = tradeAction.get('brutto'),
+    curSize = tradeAction.get('curSize'),
+    curBrutto = tradeAction.get('curBrutto'),
     base = stockExchange.getBaseCurrency(),
+    cur = stockExchange.getCurCurrency(),
+    curIncrease = '-', baseIncrease = '-',
     msg, orderType;
 
 
   if (nature == 'ORDER') {
     if (currency == 'USD') {
       orderType = 'ASK';
+      curIncrease = '+';
     } else {
       orderType = 'BID';
+      baseIncrease = '+';
     }
   } else if (nature == 'INSTANT') {
-    msg = 'Instant'
+    if (currency == 'USD') {
+      orderType = 'SELL';
+      curIncrease = '+';
+    } else {
+      orderType = 'BUY';
+      baseIncrease = '+';
+    }
   }
 
+  if (baseIncrease == '+') {
+    curSize = curBrutto;
+  } else {
+    baseSize = baseBrutto;
+  }
+  
 %>
 
 <div class="trade-action" data-theme="c">
@@ -41,15 +60,16 @@
     <% } %>
   </fieldset>
   <div class="trade-info">
-    <div>
-      <span class="trade-action-info"><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= nature %>, <%= strategy %>%, <%= currency %></strong></span>
+    <div class="trade-action-info">
+      <span><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= nature %>, <%= strategy %>%, <%= currency %></strong></span>
     </div>
-    <% if (nature == 'ORDER') { %>
-      <span class="trade-action-info"><strong><%= orderType %>, <%= $G.roundFond(baseSize) %>, <%= base %></strong></span>
-    <% } %>
-    <div>
-      <span class="trade-action-info"> <strong></strong></span>
+    <div class="trade-action-info">
+      <span><strong><%= orderType %> <%= $G.roundFond(baseBrutto, base) %>@<%= tradeAction.get('price') %></strong></span>
     </div>
+    <div class="trade-action-info">
+      <span style="float:left"> <%= curIncrease %> <%= $G.roundFond(curSize, cur) %>  </span>
+      <span style="float:right"><%= baseIncrease %> <%= $G.roundFond(baseSize, base) %></span>
+    </div>
+    <div style="clear: both"></div>
   <hr/>
-  <div style="clear: both"></div>
 </div>

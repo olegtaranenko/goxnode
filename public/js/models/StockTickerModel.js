@@ -9,6 +9,8 @@ define([
   'backbone'
 ], function(Backbone) {
 
+  var $G = $.Goxnode();
+
   return Backbone.Model.extend({
 
     getTicker: function () {
@@ -18,6 +20,31 @@ define([
       }
     },
 
+    getNatureTradePrice: function(nature, strategy, currencyPart, baseQuant) {
+      var ret;
+
+      switch (nature) {
+        case 'INSTANT':
+          var slips = this.get('slips'),
+            strategySlip = slips[strategy];
+
+          if (currencyPart == 'base') {
+            ret = strategySlip.basePrice;
+          } else {
+            ret = strategySlip.curPrice;
+          }
+          break;
+
+        case 'ORDER':
+          if (currencyPart == 'base') {
+            ret = this.get('bid') + baseQuant;
+          } else {
+            ret = this.get('ask') - baseQuant;
+          }
+          break;
+      }
+      return ret;
+    },
 
     getStrategySlips: function(strategy, currency) {
       var slips = this.get('slips'),
@@ -48,15 +75,21 @@ define([
       slips: {
         "100": {
           base: 0.95,
-          cur:  0.98
+          basePrice: 29.701,
+          cur:  0.98,
+          curPrice: 29.3213
         },
         "50": {
           base: 0.97,
-          cur:  0.99
+          basePrice: 29.7513,
+          cur:  0.99,
+          curPrice: 29.2011
         },
         "30": {
           base: 0.98,
-          cur:  1
+          basePrice: 29.8121,
+          cur:  1,
+          curPrice: 29.1234
         }
       }
     },
