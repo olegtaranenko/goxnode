@@ -32,7 +32,6 @@ catch(ex) {
   util.debug(util.inspect(ex));
   util.debug('Failed to parse %1. No channels available.', dataJsonName);
 }
-
 */
 
 
@@ -61,6 +60,14 @@ app.configure(function() {
     debug: false
   }));
 
+  app.use('/client.json', function(req, res) {
+    fs.readFile('./client.json', function(err, data) {
+      if (!err) {
+        res.write(data);
+        res.end();
+      }
+    });
+  });
   app.use(express.static(pub_dir));
 });
 
@@ -68,7 +75,7 @@ app.configure(function() {
 //setup my own implementation of the logger instead of used in socket.io
 var mylogger = require('./lib/mylogger');
 
-// create websocket server
+// create connection via socket.io layer
 var io = require('socket.io').listen(server, {
   logger: new mylogger,
   'log level': 3
@@ -81,10 +88,10 @@ var io = require('socket.io').listen(server, {
 //io.set('close timeout', 240);
 
 
-// execute 'autoexec.bat' for connected browser
+// additional configuration after connecting via socket.io channel
+// may send sensitive data, such credentials, etc.
 io.sockets.on('connection', function (socket) {
-  socket.emit('config', { config: config });
-//  socket.on('my other event', function (data) {
-//    console.log(data);
-//  });
+  socket.emit('config', {
+    config: config
+  });
 });

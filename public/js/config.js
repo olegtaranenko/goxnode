@@ -1,11 +1,30 @@
 // Use Goxnode namespace as a jQuery plugin to get access from anywhere
 (function($){
 
+  $.ajax('/client.json')
+    .done(function(data){
+      try {
+        eval('statics.socketio.config = ' + data);
+        console.log('done', statics.socketio.config);
+      } catch (e) {
+        console.error('Failure parsing client.json', e);
+      }
+    })
+    .fail(function() {
+      console.error('Error reading client configuration', arguments);
+    })
+    .always(function(data, result, response){
+      console.log('always', typeof response);
+    });
+
   var mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase())),
     tapEvent = mobile ? 'touchstart' : 'vclick';
 
   var statics = {
 
+    socketio : {
+      config: {}
+    },
     mobile   : mobile,
 
     tapEvent : tapEvent,

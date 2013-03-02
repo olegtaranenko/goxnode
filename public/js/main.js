@@ -76,7 +76,7 @@ requirejs.config({
     },
     localhost: {
       deps: [
-        'socket.io'
+        'socket.io', 'config'
       ],
       export: 'localhost'
     }
@@ -90,7 +90,7 @@ require([
   'underscore', 'underscoreDate',
   'mobile',
   'text', 'jquery', 'config',
-  'socket.io', 'localhost'
+  'localhost'
 ],
 
 function(Backbone, AppRouter) {

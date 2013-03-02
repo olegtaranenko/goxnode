@@ -5,33 +5,39 @@
  *
  * Created at: 02.03.13 18:37
  */
-var socket = io.connect('http://localhost:8000');
+
+define(['socket.io', 'config'],
+  function(io, config) {
+  var socket = io.connect($.Goxnode().socketio.config.node.url);
 
 
 
-function onConnect() {
-  console.log('onConnect() ', arguments);
-}
+  function onConnect() {
+    console.log('onConnect() ', arguments);
+  }
 
-function onDisconnect() {
-  console.log('onDisconnect() ', arguments);
-}
+  function onDisconnect() {
+    console.log('onDisconnect() ', arguments);
+  }
 
-function onError() {
-  console.log('onError() ', arguments);
-}
+  function onError() {
+    console.log('onError() ', arguments);
+  }
 
-function onMessage() {
+  function onMessage() {
 
-  console.log('onMessage() ', arguments);
-}
+    console.log('onMessage() ', arguments);
+  }
 
-function onConfig() {
-  console.log('onConfig() ', arguments);
-}
+  function onConfig() {
+    console.log('onConfig() ', arguments);
+  }
 
-socket.on('connect',    onConnect);
-socket.on('disconnect', onDisconnect);
-socket.on('error',      onError);
-socket.on('message',    onMessage);
-socket.on('config',    onConfig);
+  socket.on('connect',    onConnect);
+  socket.on('disconnect', onDisconnect);
+  socket.on('error',      onError);
+  socket.on('message',    onMessage);
+  socket.on('config',     onConfig);
+
+  return socket;
+});
