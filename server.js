@@ -12,16 +12,31 @@ var server = http.createServer(app);
 // library from mtgox-socket-client
 var mtgox = require('./lib/mtgox');
 //var client = null; // connect later after loading depth from clarkmoody
-//var client = mtgox.connect();
+var clientMtgox = mtgox.connect();
+
+var util = require('util');
+var fs = require('fs');
+//setup my own implementation of the logger instead of used in socket.io
+var mylogger = require('./lib/mylogger'),
+  log = new mylogger();
+
+
+clientMtgox.on('connect', function() {
+  log.info('Connected to MtGox!');
+});
+
+clientMtgox.on('subscribe', function(data) {
+  if (data.channel == 'dbf1dee9-4f2e-4a08-8cb7-748919a71b21') {
+    clientMtgox.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
+  }
+});
+
 
 
 // load clarkmoody data local;
-var util = require('util');
-var fs = require('fs');
-
-
 // load configuration for the web server instance
 // i.e. current user, default currency etc
+/*
 var dataJsonName = __dirname + '/api/v0/depth/fulldepth.json';
 try {
   var fullDepth = JSON.parse(fs.readFileSync(dataJsonName));
@@ -31,6 +46,7 @@ try {
 catch(ex) {
   util.debug(util.inspect(ex));
 }
+*/
 
 
 try {
@@ -69,9 +85,6 @@ app.configure(function() {
   app.use(express.static(pub_dir));
 });
 
-
-//setup my own implementation of the logger instead of used in socket.io
-var mylogger = require('./lib/mylogger');
 
 // create connection via socket.io layer
 var io = require('socket.io').listen(server, {
