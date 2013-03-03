@@ -11,8 +11,9 @@ var server = http.createServer(app);
 
 // library from mtgox-socket-client
 var mtgox = require('./lib/mtgox');
-var client = null; // connect later after loading depth from clarkmoody
+//var client = null; // connect later after loading depth from clarkmoody
 //var client = mtgox.connect();
+
 
 // load clarkmoody data local;
 var util = require('util');
@@ -21,18 +22,15 @@ var fs = require('fs');
 
 // load configuration for the web server instance
 // i.e. current user, default currency etc
-/*
-var dataJsonName = __dirname + '/api/v0/depth/USD.json';
+var dataJsonName = __dirname + '/api/v0/depth/fulldepth.json';
 try {
-  var config = JSON.parse(fs.readFile(dataJsonName, function() {
+  var fullDepth = JSON.parse(fs.readFileSync(dataJsonName));
 
-  }));
+  util.debug(fullDepth);
 }
 catch(ex) {
   util.debug(util.inspect(ex));
-  util.debug('Failed to parse %1. No channels available.', dataJsonName);
 }
-*/
 
 
 try {

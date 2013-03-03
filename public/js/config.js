@@ -5,9 +5,10 @@ define(['socket.io', 'jquery'],
     $.ajax('/client.json')
       .done(function(data){
         try {
-          eval('statics.socketio.config = ' + data);
-          console.log('done', statics.socketio.config);
-          localhostConnect();
+          var clientConfig = eval('statics.socketio.config = ' + data);
+          console.log('Client configuration loaded successful => ', clientConfig);
+          socketConnect(clientConfig.node.url);
+//          socketConnect(clientConfig.mtgox.url);
         } catch (e) {
           console.error('Failure parsing client.json', e);
         }
@@ -95,12 +96,9 @@ define(['socket.io', 'jquery'],
 
 
 
-//    var socket = io.connect($.Goxnode().socketio.config.node.url);
+    function socketConnect(url) {
 
-
-    function localhostConnect() {
-
-      var socket = io.connect('http://localhost:8000');
+      var socket = io.connect(url);
 
       function onConnect() {
         console.log('onConnect() ', arguments);

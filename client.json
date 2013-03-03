@@ -1,6 +1,9 @@
 {
   "node": {
     "url": "http://localhost:8000"
+  },
+  "mtgox": {
+    "url": "https://socketio.mtgox.com:80/mtgox"
   }
 }
 
