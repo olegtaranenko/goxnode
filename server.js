@@ -18,19 +18,13 @@ var util = require('util');
 var fs = require('fs');
 //setup my own implementation of the logger instead of used in socket.io
 var mylogger = require('./lib/mylogger'),
-  log = new mylogger();
+  Log = new mylogger();
 
 
 clientMtgox.on('connect', function() {
-  log.info('Connected to MtGox!');
+  Log.info('Connected to MtGox!');
+//  clientMtgox.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
 });
-
-clientMtgox.on('subscribe', function(data) {
-  if (data.channel == 'dbf1dee9-4f2e-4a08-8cb7-748919a71b21') {
-    clientMtgox.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
-  }
-});
-
 
 
 // load clarkmoody data local;
@@ -89,11 +83,11 @@ app.configure(function() {
 // create connection via socket.io layer
 var io = require('socket.io').listen(server, {
   logger: new mylogger,
-  'log level': 3
+  'Log level': 3
 });
 
 
-//io.set('log level', 4);
+//io.set('Log level', 4);
 //io.set('heartbeat interval', 120);
 //io.set('heartbeat timeout', 240);
 //io.set('close timeout', 240);

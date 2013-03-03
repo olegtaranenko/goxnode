@@ -14,7 +14,7 @@
     "node": "~0.8"
   },
   "dependencies": {
-
+    "dateformat": "*",
     "url": "~0.7",
     "path": "~0.4",
     "less": "~1.3",
