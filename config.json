@@ -1,5 +1,14 @@
 {
-  "mtgox": {
-    "login": "olegtaranenko"
+  "account": {
+    "account": "olegtaranenko",
+    "currencies": "USD"
+  },
+  "security": {
+    "apiKey": "cfe8e734-573c-4d60-bfc1-53a6a05f31c4",
+    "secret": "g1bhLJkvA2xbitRymHY0U0kKqFyVqdrR1yRf8PkLrxeNWPo0c46uJvcBp2pLa2fpXEfBig/v4tgljm5O0n4eiQ=="
+  },
+  "security1": {
+    "apiKey": "0ff914ed-4f40-47d7-8adc-805decdfc4d3",
+    "secret": "PHFq+laB1xRbyNEe98Rrj3JbEteREUuKm2NBZx3yA5eWz5fsba+1baD3n+krn04dVOYoApuauFDLl+26npsoTw=="
   }
 }
