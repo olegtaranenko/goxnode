@@ -2,6 +2,7 @@
   <dictionary name="user1">
     <words>
       <w>brutto</w>
+      <w>hmac</w>
     </words>
   </dictionary>
 </component>

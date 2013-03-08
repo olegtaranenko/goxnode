@@ -1,7 +1,6 @@
 var express = require('express');
-//var crypto = require('crypto');
+var debug = require('debug')('server');
 var path = require("path");
-"request": "2.11.4",
 var http = require('http');
 var app = express();
 var pub_dir = path.join(__dirname, 'public'),
@@ -10,9 +9,8 @@ var pub_dir = path.join(__dirname, 'public'),
 
 // web server
 var server = http.createServer(app);
-
-var util = require('util');
 var fs = require('fs');
+
 //setup my own implementation of the logger instead of used in socket.io
 var mylogger = require('./lib/mylogger'),
   Log = new mylogger();
@@ -26,8 +24,8 @@ try {
   var secret = config.security.secret;
 }
 catch(ex) {
-  util.debug(util.inspect(ex));
-  util.debug('Failed to parse config.json. No channels available.');
+  debug(ex);
+  debug('Failed to parse config.json. No channels available.');
 }
 
 
@@ -46,7 +44,16 @@ clientMtgox.on('connect', function() {
   this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
   this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
   this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
-  this.phpCall();
+  var info = '1/generic/private/info';
+  this.queryHttps(info, function(err, result) {
+    if (err) {
+      Log.error('Error by call to ', info, 'error => ', err);
+      return;
+    }
+    Log.debug('Call ', info, 'result => ', result);
+    debug('return =>', result);
+  });
+//  this.phpCall();
 //  this.queryApi('private\/info');
 
 // load configuration for the web server instance
@@ -58,12 +65,10 @@ clientMtgox.on('connect', function() {
     Log.info('Full Depth is loaded');
   }
   catch(ex) {
-    Log.error(util.inspect(ex));
+    debug(ex);
   }
 
 });
-
-
 
 
 // on-fly preprocessor for less/css bowels
@@ -71,7 +76,7 @@ var lessMiddleware = require('less-middleware');
 
 // run node web-server
 server.listen(8000);
-
+debug('server started at port', server.port );
 
 // configure express
 app.configure(function() {
