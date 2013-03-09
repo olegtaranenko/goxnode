@@ -7,14 +7,5 @@
   "security": {
     "apiKey": "870a601b-ccab-475b-83a9-170abef4c19f",
     "secret": "DZd2AIpau4Sy8j4lz6xdZUN3HJSEE+VnOd/8phWShRJe+P6Nw6dzzN7+wbUa3HXprtdoLFtqcBV+zsmbOnleJA=="
-  },
-
-  "security2": {
-    "apiKey": "cfe8e734-573c-4d60-bfc1-53a6a05f31c4",
-    "secret": "g1bhLJkvA2xbitRymHY0U0kKqFyVqdrR1yRf8PkLrxeNWPo0c46uJvcBp2pLa2fpXEfBig/v4tgljm5O0n4eiQ=="
-  },
-  "security1": {
-    "apiKey": "0ff914ed-4f40-47d7-8adc-805decdfc4d3",
-    "secret": "PHFq+laB1xRbyNEe98Rrj3JbEteREUuKm2NBZx3yA5eWz5fsba+1baD3n+krn04dVOYoApuauFDLl+26npsoTw=="
   }
 }

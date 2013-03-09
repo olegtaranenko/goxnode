@@ -15,19 +15,10 @@ var fs = require('fs');
 var mylogger = require('./lib/mylogger'),
   Log = new mylogger();
 
-try {
-  var configFile = __dirname + '/config.json';
-  var configText = fs.readFileSync(configFile).toString();
-  var config = JSON.parse(configText);
-  var apiKey = config.security.apiKey;
-  var secret = config.security.secret;
-}
-catch(ex) {
-  debug(ex);
-  debug('Failed to parse config.json. No channels available.');
-}
-
-
+var configFile = __dirname + '/config.json',
+  config = require(configFile),
+  apiKey = config.security.apiKey,
+  secret = config.security.secret;
 
 // library from mtgox-socket-client
 var mtgox = require('./lib/mtgox');
@@ -42,9 +33,10 @@ clientMtgox.queryHttps(privateInfo, function(err, result) {
     Log.error('Error by call to ', privateInfo, 'error => ', err);
     return;
   }
-  Log.debug('Call ', privateInfo, 'result => ', result);
-  debug('return =>', result);
+  Log.debug('Call ', privateInfo, 'result => ', JSON.stringify(result));
 });
+
+
 
 clientMtgox.on('connect', function() {
   Log.info('Connected to MtGox via socket.io!');
@@ -52,6 +44,10 @@ clientMtgox.on('connect', function() {
   this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
   this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
   this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
+
+  var idKey // = 'WF4/5QWMQSiNQWW/s5aGHwAAAABRPNyD2yAdDjGh8/dSUabAZ1GKQCcgRbzWqNGTsSmxukGwwFo';
+  this.subscribePrivateChannel(idKey);
+
 //  this.queryApi('private/info');
 
 // load configuration for the web server instance
@@ -59,11 +55,9 @@ clientMtgox.on('connect', function() {
   var dataJsonName = __dirname + '/api/v0/depth/fulldepth.json';
   try {
     var fullDepth = JSON.parse(fs.readFileSync(dataJsonName));
-
     Log.info('Full Depth is loaded');
-  }
-  catch(ex) {
-    debug(ex);
+  } catch(ex) {
+    Log.error('Error by parsing Depth: ', ex);
   }
 
 });
