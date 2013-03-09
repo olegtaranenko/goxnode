@@ -33,7 +33,15 @@ clientMtgox.queryHttps(privateInfo, function(err, result) {
     Log.error('Error by call to ', privateInfo, 'error => ', err);
     return;
   }
-  Log.debug('Call ', privateInfo, 'result => ', JSON.stringify(result));
+
+  var ordersPath = '1/generic/private/orders';
+  clientMtgox.queryHttps(ordersPath, function(err, orders) {
+    if (err) {
+      Log.error('Error by call to ', ordersPath, 'error => ', err);
+      return;
+    }
+    Log.info('Open Orders  => ', orders, '\n', JSON.stringify(orders));
+  });
 });
 
 
@@ -45,8 +53,7 @@ clientMtgox.on('connect', function() {
   this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
   this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
 
-  var idKey // = 'WF4/5QWMQSiNQWW/s5aGHwAAAABRPNyD2yAdDjGh8/dSUabAZ1GKQCcgRbzWqNGTsSmxukGwwFo';
-  this.subscribePrivateChannel(idKey);
+  this.subscribePrivateChannel();
 
 //  this.queryApi('private/info');
 
