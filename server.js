@@ -15,7 +15,6 @@ var fs = require('fs');
 var mylogger = require('./lib/mylogger'),
   Log = new mylogger();
 
-
 try {
   var configFile = __dirname + '/config.json';
   var configText = fs.readFileSync(configFile).toString();
@@ -37,24 +36,23 @@ var clientMtgox = mtgox.connect({
   secret: secret
 });
 
+var privateInfo = '1/generic/private/info';
+clientMtgox.queryHttps(privateInfo, function(err, result) {
+  if (err) {
+    Log.error('Error by call to ', privateInfo, 'error => ', err);
+    return;
+  }
+  Log.debug('Call ', privateInfo, 'result => ', result);
+  debug('return =>', result);
+});
 
 clientMtgox.on('connect', function() {
-  Log.info('Connected to MtGox!');
+  Log.info('Connected to MtGox via socket.io!');
 
   this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
   this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
   this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
-  var info = '1/generic/private/info';
-  this.queryHttps(info, function(err, result) {
-    if (err) {
-      Log.error('Error by call to ', info, 'error => ', err);
-      return;
-    }
-    Log.debug('Call ', info, 'result => ', result);
-    debug('return =>', result);
-  });
-//  this.phpCall();
-//  this.queryApi('private\/info');
+//  this.queryApi('private/info');
 
 // load configuration for the web server instance
 // i.e. current user, default currency etc
