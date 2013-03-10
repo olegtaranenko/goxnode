@@ -28,7 +28,6 @@ var clientMtgox = mtgox.connect({
 });
 
 
-retrievePrivateInfo();
 
 clientMtgox.on('connect', function() {
   Log.info('Connected to MtGox via socket.io!');
@@ -37,10 +36,6 @@ clientMtgox.on('connect', function() {
   this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
   this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
 
-  this.subscribePrivateChannel();
-
-  retrieveOpenOrders();
-//  this.queryApi('private/info');
 
 // load configuration for the web server instance
 // i.e. current user, default currency etc
@@ -99,31 +94,22 @@ var io = require('socket.io').listen(server, {
 
 // additional configuration after connecting via socket.io channel
 // may send sensitive data, such credentials, etc.
-var serverSocket;
 io.sockets.on('connection', function (socket) {
-  serverSocket = socket;
-  socket.emit('config', {
-    config: config
-  });
+  executeClosure(socket, [retrievePrivateInfo, subscribePrivateChannel, retrieveOpenOrders], this);
 });
 
 
+function executeClosure(socket, funcs, scope) {
+  if (funcs instanceof Array && funcs.length) {
+    var cb = funcs.splice(0, 1)[0];
+    cb.apply(scope||this, arguments);
+  }
+}
 
 ////////////////// Closure functions //////////////////////
 
-function retrieveOpenOrders() {
-  var ordersPath = '1/generic/private/orders';
-  clientMtgox.queryHttps(ordersPath, function (err, orders) {
-    if (err) {
-      Log.error('Error by call to ', ordersPath, 'error => ', err);
-      return;
-    }
-    Log.info('Open Orders  => ', orders, '\n', JSON.stringify(orders));
-  });
-}
-
-
-function retrievePrivateInfo() {
+function retrievePrivateInfo(socket, cb, scope) {
+  var args = arguments;
   var privateInfo = '1/generic/private/info';
   clientMtgox.queryHttps(privateInfo, function (err, result) {
     if (err) {
@@ -131,6 +117,36 @@ function retrievePrivateInfo() {
       return;
     }
     socket.emit('privateinfo', result);
-    retrieveOpenOrders();
+    executeClosure.apply(scope|| this, args);
   });
 }
+
+
+function retrieveOpenOrders(socket, cb, scope) {
+  var args = arguments;
+  var ordersPath = '1/generic/private/orders';
+  clientMtgox.queryHttps(ordersPath, function (err, orders) {
+    if (err) {
+      Log.error('Error by call to ', ordersPath, 'error => ', err);
+      return;
+    }
+//    Log.info('Open Orders  => ', orders, '\n', JSON.stringify(orders));
+    socket.emit('ordersinfo', orders);
+    executeClosure.apply(scope || this, args);
+  });
+}
+
+function subscribePrivateChannel(socket, cb, scope) {
+  var args = arguments;
+  var idKeyPath = '1/generic/private/idkey';
+  clientMtgox.queryHttps(idKeyPath, function (err, result) {
+    if (err) {
+      Log.error('Error by call to ', idKeyPath, 'error => ', err);
+      return;
+    }
+    Log.info('Got new idKey => ', result);
+    clientMtgox.subscribePrivate(result);
+    executeClosure.apply(scope || this, args);
+  });
+}
+

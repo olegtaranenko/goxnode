@@ -1,5 +1,5 @@
 // Use Goxnode namespace as a jQuery plugin to get access from anywhere
-define(['socket.io', 'jquery'],
+define(['socket.io', 'jquery', 'main'],
   function(io, $) {
 
     $.ajax('/client.json')
@@ -122,8 +122,13 @@ define(['socket.io', 'jquery'],
       }
 
       function onPrivateInfo(info) {
+        console.log('onPrivateInfo() ', arguments);
         // create (or update) Model which contains PrivateInfo
+      }
 
+      function onOrdersInfo(info) {
+        console.log('onOrdersInfo() ', arguments);
+        // create (or update) Model which contains PrivateInfo
       }
 
       socket.on('connect',    onConnect);
@@ -132,6 +137,7 @@ define(['socket.io', 'jquery'],
       socket.on('message',    onMessage);
       socket.on('config',     onConfig);
       socket.on('privateinfo',onPrivateInfo);
+      socket.on('ordersinfo', onOrdersInfo);
 
       return socket;
     }

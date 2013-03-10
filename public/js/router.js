@@ -10,9 +10,7 @@ define([
     return Backbone.Router.extend({
 
       routes: {
-        "": 'startpage',
-        "list(/:opt)": 'startpage',
-        "details/:id": 'details'
+        "(:stock)(/:cur)(/:base)": 'startpage'
       },
 
       initialize: function () {
@@ -20,20 +18,27 @@ define([
       },
 
 
-      startpage: function (opt) {
-        console.log('startpage...');
+      startpage: function (stock, cur, base) {
+        stock = stock || 'mtgox';
+        cur = (cur || 'USD').toUpperCase();
+        base = (base || 'BTC').toUpperCase();
+
+        console.log('startpage...', stock, cur, base);
         $.mobile.showPageLoadingMsg();
-        var webView = this,
-          back = opt == 'back';
+        var webView = this;
 
         var newMessages = 0;
 
-        var model = new StartupModel();
+        var model = new StartupModel({}, {
+          stock: stock,
+          cur: cur,
+          base: base
+        });
 
         var page = new StartupPage({
           model: model
         });
-        webView.changePage(page, back);
+        webView.changePage(page);
         $.mobile.hidePageLoadingMsg();
 
 /*

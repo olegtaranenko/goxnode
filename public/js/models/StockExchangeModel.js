@@ -239,6 +239,7 @@ define([
 
 
     defaults: {
+      name: 'MtGox',
       base: 'BTC',
       cur: 'USD',
       stockFee: 0.994,
@@ -247,8 +248,7 @@ define([
     },
 
 
-    initialize: function() {
-
+    initialize: function(attributes, options) {
     }
   })
 });

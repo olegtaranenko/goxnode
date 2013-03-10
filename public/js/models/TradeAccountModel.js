@@ -40,12 +40,18 @@ define([
 
     defaults: {
       strategies: [ "100", "50", "30"],
-      BTC: 5000230000,
-      USD: 100003240
+//      BTC: 5000230000,
+//      USD: 100003240
     },
 
-    initialize: function() {
+    initialize: function(attributes, options) {
+      var cur = attributes.cur,
+        base = attributes.base,
+        modelOptions = {};
 
+      modelOptions[cur] = 0;
+      modelOptions[base] = 0;
+      _.extend(attributes, modelOptions);
     }
   })
 });

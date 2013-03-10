@@ -17,8 +17,8 @@ define([
       privateInfo: new PrivateInfoModel({
         owner: this
       }),
-      tradeAccount: new TradeAccountModel(),
-      stockExchange: new StockExchangeModel(),
+      tradeAccount: null,
+      stockExchange: null,
       stockTicker: new StockTickerModel(),
       activeTradeActions: new TradeActions(),  // active Trade Actions pool
 
@@ -26,7 +26,32 @@ define([
       now: 0              // time in millis
     },
 
-    initialize: function() {
+    initialize: function(data, options) {
+      var stock = options.stock,
+        cur = options.cur,
+        base = options.base,
+        silent = {silent: true};
+
+      var stockExchange = new StockExchangeModel({
+            base: base,
+            cur: cur
+          },
+          silent
+        ),
+        tradeAccountData = {};
+
+      tradeAccountData[base] = 0;
+      tradeAccountData[cur] = 0;
+
+
+      var tradeAccount = new TradeAccountModel(tradeAccountData, silent);
+
+      this.set({
+          stockExchange: stockExchange,
+          tradeAccount: tradeAccount
+        },
+        silent
+      );
 
     }
   })
