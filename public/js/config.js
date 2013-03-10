@@ -121,11 +121,17 @@ define(['socket.io', 'jquery'],
         console.log('onConfig() ', arguments);
       }
 
+      function onPrivateInfo(info) {
+        // create (or update) Model which contains PrivateInfo
+
+      }
+
       socket.on('connect',    onConnect);
       socket.on('disconnect', onDisconnect);
       socket.on('error',      onError);
       socket.on('message',    onMessage);
       socket.on('config',     onConfig);
+      socket.on('privateinfo',onPrivateInfo);
 
       return socket;
     }

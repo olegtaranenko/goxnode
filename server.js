@@ -27,24 +27,8 @@ var clientMtgox = mtgox.connect({
   secret: secret
 });
 
-var privateInfo = '1/generic/private/info';
-clientMtgox.queryHttps(privateInfo, function(err, result) {
-  if (err) {
-    Log.error('Error by call to ', privateInfo, 'error => ', err);
-    return;
-  }
 
-  var ordersPath = '1/generic/private/orders';
-  clientMtgox.queryHttps(ordersPath, function(err, orders) {
-    if (err) {
-      Log.error('Error by call to ', ordersPath, 'error => ', err);
-      return;
-    }
-    Log.info('Open Orders  => ', orders, '\n', JSON.stringify(orders));
-  });
-});
-
-
+retrievePrivateInfo();
 
 clientMtgox.on('connect', function() {
   Log.info('Connected to MtGox via socket.io!');
@@ -55,6 +39,7 @@ clientMtgox.on('connect', function() {
 
   this.subscribePrivateChannel();
 
+  retrieveOpenOrders();
 //  this.queryApi('private/info');
 
 // load configuration for the web server instance
@@ -114,8 +99,38 @@ var io = require('socket.io').listen(server, {
 
 // additional configuration after connecting via socket.io channel
 // may send sensitive data, such credentials, etc.
+var serverSocket;
 io.sockets.on('connection', function (socket) {
+  serverSocket = socket;
   socket.emit('config', {
     config: config
   });
 });
+
+
+
+////////////////// Closure functions //////////////////////
+
+function retrieveOpenOrders() {
+  var ordersPath = '1/generic/private/orders';
+  clientMtgox.queryHttps(ordersPath, function (err, orders) {
+    if (err) {
+      Log.error('Error by call to ', ordersPath, 'error => ', err);
+      return;
+    }
+    Log.info('Open Orders  => ', orders, '\n', JSON.stringify(orders));
+  });
+}
+
+
+function retrievePrivateInfo() {
+  var privateInfo = '1/generic/private/info';
+  clientMtgox.queryHttps(privateInfo, function (err, result) {
+    if (err) {
+      Log.error('Error by call to ', privateInfo, 'error => ', err);
+      return;
+    }
+    socket.emit('privateinfo', result);
+    retrieveOpenOrders();
+  });
+}

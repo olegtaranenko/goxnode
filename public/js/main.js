@@ -17,11 +17,15 @@ require.config({
     text: 'lib/plugins/text',
     StartupPage: 'views/StartupPage',
     StartupModel: 'models/StartupModel',
+    CurrencyValueModel: 'models/CurrencyValueModel',
+    PrivateInfoModel: 'models/PrivateInfoModel',
+    WalletModel: 'models/WalletModel',
     TradeAccountModel: 'models/TradeAccountModel',
     TradeAction: 'models/TradeAction',
     StockExchangeModel: 'models/StockExchangeModel',
     StockTickerModel: 'models/StockTickerModel',
-    TradeActions: 'collections/TradeActions'
+    TradeActions: 'collections/TradeActions',
+    Wallets: 'collections/Wallets'
   }
 });
 
