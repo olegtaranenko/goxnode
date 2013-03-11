@@ -4,7 +4,6 @@
   },
   "mtgox": {
     "url": "https://socketio.mtgox.com:80/mtgox"
-  },
-  "strategies": [ "100", "50", "30", "2"]
+  }
 }
 

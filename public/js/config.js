@@ -22,8 +22,7 @@ define(['socket.io', 'jquery'],
 
     var statics = {
 
-      config: {
-      },
+      config: {},
       mobile   : mobile,
 
       tapEvent : tapEvent,

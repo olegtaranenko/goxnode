@@ -15,10 +15,15 @@ var fs = require('fs');
 var mylogger = require('./lib/mylogger'),
   Log = new mylogger();
 
-var configFile = __dirname + '/config.json',
-  config = require(configFile),
+var configJson = __dirname + '/config.json',
+  config = require(configJson),
   apiKey = config.security.apiKey,
-  secret = config.security.secret;
+  secret = config.security.secret,
+  strategies = config.strategies,
+  clientJson = __dirname + '/client.json',
+  client = require(clientJson);
+
+client.strategies = strategies;
 
 // library from mtgox-socket-client
 var mtgox = require('./lib/mtgox');
@@ -68,12 +73,8 @@ app.configure(function() {
   }));
 
   app.use('/client.json', function(req, res) {
-    fs.readFile('./client.json', function(err, data) {
-      if (!err) {
-        res.write(data);
-        res.end();
-      }
-    });
+      res.write(JSON.stringify(client));
+      res.end();
   });
   app.use(express.static(pub_dir));
 });
