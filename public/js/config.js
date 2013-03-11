@@ -5,7 +5,7 @@ define(['socket.io', 'jquery'],
     $.ajax('/client.json')
       .done(function(data){
         try {
-          var clientConfig = eval('statics.config.socketio = ' + data);
+          var clientConfig = eval('statics.config = ' + data);
           console.log('Client configuration loaded successful => ', clientConfig);
         } catch (e) {
           console.error('Failure parsing client.json', e);
@@ -13,9 +13,8 @@ define(['socket.io', 'jquery'],
       })
       .fail(function() {
         console.error('Error reading client configuration', arguments);
-      })
-      .always(function(data, result, response){
-        console.log('always', typeof response);
+//      })
+//      .always(function(data, result, response){
       });
 
     var mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase())),
@@ -24,7 +23,6 @@ define(['socket.io', 'jquery'],
     var statics = {
 
       config: {
-        socketio: {}
       },
       mobile   : mobile,
 

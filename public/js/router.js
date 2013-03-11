@@ -97,8 +97,8 @@ define([
           model: model
         });
 
-        var socketIoConfig = $G.config.socketio;
-        socketConnect(socketIoConfig.node.url, model, page);
+        var clientConfig = $G.config;
+        socketConnect(clientConfig.node.url, model, page);
 
         webView.changePage(page);
         $.mobile.hidePageLoadingMsg();

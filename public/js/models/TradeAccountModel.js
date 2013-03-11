@@ -40,7 +40,7 @@ define([
 
 
     defaults: {
-      strategies: [ "100", "50", "30", "2"],
+      strategies: $G.config.strategies,
       owner: null // reference to startupModel
 //      BTC: 5000230000,
 //      USD: 100003240

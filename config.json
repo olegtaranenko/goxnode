@@ -1,9 +1,4 @@
 {
-  "account": {
-    "account": "olegtaranenko",
-    "currencies": "USD"
-  },
-
   "security": {
     "apiKey": "870a601b-ccab-475b-83a9-170abef4c19f",
     "secret": "DZd2AIpau4Sy8j4lz6xdZUN3HJSEE+VnOd/8phWShRJe+P6Nw6dzzN7+wbUa3HXprtdoLFtqcBV+zsmbOnleJA=="
