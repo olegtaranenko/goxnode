@@ -99,9 +99,10 @@ require([
 function(Backbone, AppRouter) {
   $(document).ready(function () {
     console.log('document ready');
-    app = new AppRouter({
+    var app = new AppRouter({
       pushState: true
     });
     Backbone.history.start();
+    return app;
   });
 });

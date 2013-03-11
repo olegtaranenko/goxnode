@@ -95,11 +95,19 @@ var io = require('socket.io').listen(server, {
 // additional configuration after connecting via socket.io channel
 // may send sensitive data, such credentials, etc.
 io.sockets.on('connection', function (socket) {
-  executeClosure(socket, [retrievePrivateInfo, subscribePrivateChannel, retrieveOpenOrders], this);
+  var clients = io.sockets.clients();
+  Log.debug('All clients => ', clients);
+  if (!socket.customData) {
+    socket.customData = {};
+  } else {
+    Log.debug('socket.customData => ', socket.customData);
+  }
+
+  executeClosure(socket, [retrievePrivateInfo, subscribePrivateChannel, retrieveOpenOrders], this, {});
 });
 
 
-function executeClosure(socket, funcs, scope) {
+function executeClosure(socket, funcs, scope, options) {
   if (funcs instanceof Array && funcs.length) {
     var cb = funcs.splice(0, 1)[0];
     cb.apply(scope||this, arguments);
@@ -108,7 +116,7 @@ function executeClosure(socket, funcs, scope) {
 
 ////////////////// Closure functions //////////////////////
 
-function retrievePrivateInfo(socket, cb, scope) {
+function retrievePrivateInfo(socket, cb, scope, options) {
   var args = arguments;
   var privateInfo = '1/generic/private/info';
   clientMtgox.queryHttps(privateInfo, function (err, result) {
@@ -116,13 +124,17 @@ function retrievePrivateInfo(socket, cb, scope) {
       Log.error('Error by call to ', privateInfo, 'error => ', err);
       return;
     }
+    socket.customData.Id = options.Id = result.Id;
+
     socket.emit('privateinfo', result);
+
+
     executeClosure.apply(scope|| this, args);
   });
 }
 
 
-function retrieveOpenOrders(socket, cb, scope) {
+function retrieveOpenOrders(socket, cb, scope, options) {
   var args = arguments;
   var ordersPath = '1/generic/private/orders';
   clientMtgox.queryHttps(ordersPath, function (err, orders) {
@@ -136,7 +148,7 @@ function retrieveOpenOrders(socket, cb, scope) {
   });
 }
 
-function subscribePrivateChannel(socket, cb, scope) {
+function subscribePrivateChannel(socket, cb, scope, options) {
   var args = arguments;
   var idKeyPath = '1/generic/private/idkey';
   clientMtgox.queryHttps(idKeyPath, function (err, result) {
@@ -145,7 +157,7 @@ function subscribePrivateChannel(socket, cb, scope) {
       return;
     }
     Log.info('Got new idKey => ', result);
-    clientMtgox.subscribePrivate(result);
+    clientMtgox.subscribePrivate(result, options.Id);
     executeClosure.apply(scope || this, args);
   });
 }

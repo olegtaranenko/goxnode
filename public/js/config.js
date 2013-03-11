@@ -1,5 +1,5 @@
 // Use Goxnode namespace as a jQuery plugin to get access from anywhere
-define(['socket.io', 'jquery', 'main'],
+define(['socket.io', 'jquery'],
   function(io, $) {
 
     $.ajax('/client.json')
@@ -54,7 +54,7 @@ define(['socket.io', 'jquery', 'main'],
       generateTapEvents: function(events, originalEvents) {
         var ret = originalEvents || {} ;
         $.each(events, function(key, value) {
-          console.log(arguments);
+//          console.log(arguments);
           var eventKey = tapEvent + ' ' + key;
           ret[eventKey] = value;
         });
