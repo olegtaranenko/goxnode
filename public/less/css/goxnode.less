@@ -77,7 +77,7 @@
 #gox {
   padding-top: 62px;
   cursor: default;
-  .usd {
+  .left {
     padding-top: 5px;
     padding-bottom: 5px;
     border-right: @m-border;
@@ -88,7 +88,7 @@
     float: left;
     width: 50%;
   }
-  .btc {
+  .right {
     padding-top: 5px;
     padding-bottom: 5px;
     border-bottom: @m-border;
@@ -115,12 +115,12 @@
   }
 
   .currency-state, .attempt {
-    & > .usd {
+    & > .left {
       &.current-bid {
         color: red;
       }
     }
-    & > .btc {
+    & > .right {
       &.current-ask, &.order {
         margin-right: -1px;
         border-left: @m-border;

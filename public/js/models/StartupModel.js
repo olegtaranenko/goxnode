@@ -38,13 +38,19 @@ define([
           },
           silent
         ),
-        tradeAccountData = {};
+        tradeAccountData = {},
+        tradeAccountOptions = {
+          silent: true,
+          base: base,
+          cur: cur
+        };
 
       tradeAccountData[base] = 0;
       tradeAccountData[cur] = 0;
+      tradeAccountData.owner = this;
 
 
-      var tradeAccount = new TradeAccountModel(tradeAccountData, silent);
+      var tradeAccount = new TradeAccountModel(tradeAccountData, tradeAccountOptions);
 
       this.set({
           stockExchange: stockExchange,

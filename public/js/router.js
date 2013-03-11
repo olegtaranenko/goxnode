@@ -7,6 +7,66 @@ define([
 ],
   function(Backbone, $, _, StartupPage, StartupModel) {
 
+
+    var $G = $.Goxnode();
+
+    function socketConnect(url, startupModel, page) {
+
+      var socket = io.connect(url);
+
+      function onConnect() {
+        console.log('onConnect() ', arguments);
+      }
+
+      function onDisconnect() {
+        console.log('onDisconnect() ', arguments);
+      }
+
+      function onError() {
+        console.log('onError() ', arguments);
+      }
+
+      function onMessage() {
+
+        console.log('onMessage() ', arguments);
+      }
+
+      function onConfig() {
+        console.log('onConfig() ', arguments);
+      }
+
+      function onPrivateInfo(info) {
+        console.log('onPrivateInfo() ', arguments);
+        var tradeAccount = startupModel.get('tradeAccount'),
+          stockExchange = startupModel.get('stockExchange'),
+          base = stockExchange.get('base'),
+          cur = stockExchange.get('cur'),
+          wallets = info.Wallets,
+          baseWallet = wallets[base],
+          curWallet = wallets[cur],
+          baseFond = baseWallet.Balance.value_int,
+          curFond = curWallet.Balance.value_int;
+
+        tradeAccount.set(base, baseFond);
+        tradeAccount.set(cur, curFond);
+      }
+
+      function onOrdersInfo(info) {
+        console.log('onOrdersInfo() ', arguments);
+        // create (or update) Model which contains PrivateInfo
+      }
+
+      socket.on('connect',    onConnect);
+      socket.on('disconnect', onDisconnect);
+      socket.on('error',      onError);
+      socket.on('message',    onMessage);
+      socket.on('config',     onConfig);
+      socket.on('privateinfo',onPrivateInfo);
+      socket.on('ordersinfo', onOrdersInfo);
+
+      return socket;
+    }
+
     return Backbone.Router.extend({
 
       routes: {
@@ -27,8 +87,6 @@ define([
         $.mobile.showPageLoadingMsg();
         var webView = this;
 
-        var newMessages = 0;
-
         var model = new StartupModel({}, {
           stock: stock,
           cur: cur,
@@ -38,58 +96,13 @@ define([
         var page = new StartupPage({
           model: model
         });
+
+        var socketIoConfig = $G.config.socketio;
+        socketConnect(socketIoConfig.node.url, model, page);
+
         webView.changePage(page);
         $.mobile.hidePageLoadingMsg();
 
-/*
-        $.mobile.showPageLoadingMsg();
-
-        var lastVisited = $.cookies.get('lastvisited'),
-          initialLoad = lastVisited == null;
-
-        var webView = this,
-          back = opt == 'back';
-
-        var threads = new ThreadsCollection();
-
-        threads.fetch({
-          params: {
-            offset: 0,
-            count: 20
-          },
-
-          success: function(collection, response, options) {
-
-            console.log('threads loaded:', response);
-
-            var newMessages = 0;
-            if (initialLoad) {
-              newMessages = collection.length;
-            } else {
-              var now = (new Date()).getTime();
-
-              collection.each(function(thread) {
-                var updated = thread.get('updated');
-                if (updated > lastVisited) {
-                  newMessages++;
-                }
-              });
-            }
-
-
-            var page = new StartPage({
-              threads: collection.models,
-              newMessages: newMessages
-            });
-            webView.changePage(page, back);
-
-            $.mobile.hidePageLoadingMsg();
-          },
-          error: function() {
-            console.error('error loading threads!');
-          }
-        });
-*/
       },
 
       /**

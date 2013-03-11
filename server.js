@@ -95,8 +95,8 @@ var io = require('socket.io').listen(server, {
 // additional configuration after connecting via socket.io channel
 // may send sensitive data, such credentials, etc.
 io.sockets.on('connection', function (socket) {
-  var clients = io.sockets.clients();
-  Log.debug('All clients => ', clients);
+//  var clients = io.sockets.clients();
+//  Log.debug('All clients => ', clients);
   if (!socket.customData) {
     socket.customData = {};
   } else {

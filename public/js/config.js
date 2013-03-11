@@ -5,10 +5,8 @@ define(['socket.io', 'jquery'],
     $.ajax('/client.json')
       .done(function(data){
         try {
-          var clientConfig = eval('statics.socketio.config = ' + data);
+          var clientConfig = eval('statics.config.socketio = ' + data);
           console.log('Client configuration loaded successful => ', clientConfig);
-          socketConnect(clientConfig.node.url);
-//          socketConnect(clientConfig.mtgox.url);
         } catch (e) {
           console.error('Failure parsing client.json', e);
         }
@@ -25,8 +23,8 @@ define(['socket.io', 'jquery'],
 
     var statics = {
 
-      socketio : {
-        config: {}
+      config: {
+        socketio: {}
       },
       mobile   : mobile,
 
@@ -96,51 +94,6 @@ define(['socket.io', 'jquery'],
 
 
 
-    function socketConnect(url) {
-
-      var socket = io.connect(url);
-
-      function onConnect() {
-        console.log('onConnect() ', arguments);
-      }
-
-      function onDisconnect() {
-        console.log('onDisconnect() ', arguments);
-      }
-
-      function onError() {
-        console.log('onError() ', arguments);
-      }
-
-      function onMessage() {
-
-        console.log('onMessage() ', arguments);
-      }
-
-      function onConfig() {
-        console.log('onConfig() ', arguments);
-      }
-
-      function onPrivateInfo(info) {
-        console.log('onPrivateInfo() ', arguments);
-        // create (or update) Model which contains PrivateInfo
-      }
-
-      function onOrdersInfo(info) {
-        console.log('onOrdersInfo() ', arguments);
-        // create (or update) Model which contains PrivateInfo
-      }
-
-      socket.on('connect',    onConnect);
-      socket.on('disconnect', onDisconnect);
-      socket.on('error',      onError);
-      socket.on('message',    onMessage);
-      socket.on('config',     onConfig);
-      socket.on('privateinfo',onPrivateInfo);
-      socket.on('ordersinfo', onOrdersInfo);
-
-      return socket;
-    }
 
   }
 

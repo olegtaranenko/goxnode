@@ -91,7 +91,14 @@ define([
           basePrice: 29.8121,
           cur:  1,
           curPrice: 29.1234
+        },
+        "2": {
+          base: 1,
+          basePrice: 29.8721,
+          cur:  1,
+          curPrice: 29.1234
         }
+
       }
     },
 

@@ -59,12 +59,13 @@ function($, _, Backbone,
       }
 
       var actionNature = null; //(tradeUrgent ? 'instant' : 'order');
-      var currency = null;
+      var currency = null,
+        side;
       _.each(classes, function(cls) {
         switch (cls) {
-          case 'usd':
-          case 'btc':
-            currency = cls.toUpperCase();
+          case 'left':
+          case 'right':
+            side = cls;
             break;
           case 'order':
           case 'instant':
@@ -80,6 +81,8 @@ function($, _, Backbone,
         stockExchange = model.get('stockExchange'),
         stockTicker = model.get('stockTicker');
 
+
+      currency = side == 'left' ? 'USD' : 'BTC';
       var params = stockExchange.getNatureBaseSize(tradeAccount, stockTicker, actionNature, strategy, currency);
 
       var tradeAction = new TradeAction({
