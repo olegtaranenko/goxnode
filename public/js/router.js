@@ -56,6 +56,11 @@ define([
         // create (or update) Model which contains PrivateInfo
       }
 
+      function onTicker(ticker) {
+        console.log('onTicker() ', arguments);
+        // create (or update) Model which contains PrivateInfo
+      }
+
       socket.on('connect',    onConnect);
       socket.on('disconnect', onDisconnect);
       socket.on('error',      onError);
@@ -63,6 +68,7 @@ define([
       socket.on('config',     onConfig);
       socket.on('privateinfo',onPrivateInfo);
       socket.on('ordersinfo', onOrdersInfo);
+      socket.on('ticker',     onTicker);
 
       return socket;
     }

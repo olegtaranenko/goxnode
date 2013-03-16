@@ -7,6 +7,10 @@ var pub_dir = path.join(__dirname, 'public'),
   less_dir = path.join(pub_dir, 'less'),
   css_dir = pub_dir;
 
+var sqlite3 = require('sqlite3').verbose();
+var db = new sqlite3.Database(':memory:');
+
+
 // web server
 var server = http.createServer(app);
 var fs = require('fs');
@@ -53,7 +57,7 @@ clientMtgox.on('connect', function() {
   Log.info('Connected to MtGox via socket.io!');
 
   this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
-  this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
+//  this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
   this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
 
   lastPrivateChannel.subscribed = false;
@@ -73,6 +77,23 @@ clientMtgox.on('connect', function() {
 
 });
 
+var lastTicker = {
+  buy: 0,
+  sell: 0
+};
+
+// Subscription to ticker channel
+clientMtgox.on('ticker', function(data) {
+  // avoid repeat of the same data
+  var ticker = data.ticker;
+  var buy = ticker.buy.value;
+  var sell = ticker.sell.value;
+  if (buy != lastTicker.buy || sell != lastTicker.sell) {
+    lastTicker.buy = buy;
+    lastTicker.sell = sell;
+    io.sockets.emit('ticker', lastTicker);
+  }
+});
 
 // on-fly preprocessor for less/css bowels
 var lessMiddleware = require('less-middleware');
