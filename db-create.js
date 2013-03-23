@@ -16,36 +16,45 @@ fs.unlink(db_file, function() {
       db.run("CREATE TABLE depth (price INTEGER PRIMARY KEY, size INTEGER)", function() {
         db.run ("insert into depth(price, size) values (10, 5)", function() {
           db.run ("insert into depth(price, size) values (11, 1)", function(){
-            submitTrade(11, -2);
-            submitTrade(9, 20);
-            submitTrade(10, 5);
-            submitTrade(10, -1);
-            submitTrade(10, 100);
-            submitTrade(10, 1000);
+
+              submitTrade(11, -2);
+              submitTrade(9, 20);
+              submitTrade(10, 5);
+              submitTrade(10, -1);
+              submitTrade(10, 100);
+              submitTrade(10, 1000);
+
+              db.each('select * from depth where price > 0',
+                function(err, row) {
+                  console.log('Row ->', row)
+                }, function(err, rowNumber) {
+                  console.log('rowNumber ->', rowNumber);
+                }
+              );
+              db.close();
+
+
           });
         });
       });
     });
 
-
-
-    db.close();
   });
 
-//  var s = db.prepare('select size from depth where price = (?)', function() {
-//    console.log('statement prepared');
-//  });
 
-  function submitTrade(price, size, cb) {
+
+
+
+  function submitTrade(price, size) {
     var loop = 'select size from depth where price = (?)';
 
     var doUpdate = false, doDelete = false;
     var updatedSize = size;
     db.each(loop, price,
-      function (err, result) {
-//        console.log('Callback args => ', arguments);
+      function (err, row) {
+        console.log('Callback args => ', arguments);
         //callback
-        var currentSize = result.size;
+        var currentSize = row.size;
         updatedSize = size + currentSize;
         if (updatedSize <= 0) {
           doDelete = true;
@@ -56,12 +65,11 @@ fs.unlink(db_file, function() {
       },
       function (err, rows) {
         if (err) {
-          console.log('Error in prepare', err);
-          s.reset();
+          console.log('Error in complete', err);
           return;
         }
-//        console.log('Complete args => ', rows, doUpdate, doDelete);
-//        console.log('updatedSize => ', updatedSize);
+        console.log('Complete args => ', rows, doUpdate, doDelete);
+        console.log('updatedSize => ', updatedSize);
         //complete
         if (doUpdate) {
           db.run('update depth set size = (?) where price = (?)', updatedSize, price)
@@ -73,6 +81,11 @@ fs.unlink(db_file, function() {
       }
     );
   }
+
+//  var s = db.prepare('select size from depth where price = (?)', function() {
+//    console.log('statement prepared');
+//  });
+
 
 
 /*

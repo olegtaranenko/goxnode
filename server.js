@@ -8,7 +8,7 @@ var pub_dir = path.join(__dirname, 'public'),
   css_dir = pub_dir;
 
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(':memory:');
+var goxdb = require('./goxdb');
 
 
 // web server
@@ -56,8 +56,8 @@ var clientMtgox = mtgox.connect({
 clientMtgox.on('connect', function() {
   Log.info('Connected to MtGox via socket.io!');
 
-  this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');
-//  this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f');
+  this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');   //
+//  this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f'); // ticker
   this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
 
   lastPrivateChannel.subscribed = false;
