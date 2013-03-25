@@ -59,6 +59,7 @@ define([
       function onTicker(ticker) {
         console.log('onTicker() ', arguments);
         // create (or update) Model which contains PrivateInfo
+
       }
 
       socket.on('connect',    onConnect);
@@ -104,9 +105,10 @@ define([
         });
 
         var clientConfig = $G.config;
-        socketConnect(clientConfig.node.url, model, page);
 
         webView.changePage(page);
+
+        socketConnect(clientConfig.node.url, model, page);
         $.mobile.hidePageLoadingMsg();
 
       },
@@ -119,7 +121,7 @@ define([
        * @param back {boolean} to manage slide direction
        */
       changePage: function (page, back) {
-        var element = $(page.el);
+        var element = page.$el;
 
         element.attr('data-role', 'page');
         element.attr('data-theme', 'g');

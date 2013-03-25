@@ -28,35 +28,24 @@ var $G = $.Goxnode();
 
 <div id="gox">
   <div class="currency-header">
-    <span class="left usd"><%= cur %></span>
-    <span class="right btc"><%= base %></span>
+    <span class="bid usd"><%= cur %></span>
+    <span class="ask btc"><%= base %></span>
   </div>
   <div class="currency-state field4">
-    <span class="left usd"><%= fondCur %></span>
-    <span class="left current-bid">@<%= bid %></span>
-    <span class="right current-ask">@<%= ask %></span>
-    <span class="right btc"><%= fondBase %></span>
+    <span class="bid usd"><%= fondCur %></span>
+    <span class="bid current-bid">@<%= bid %></span>
+    <span class="ask current-ask">@<%= ask %></span>
+    <span class="ask btc"><%= fondBase %></span>
   </div>
 
   <%
     _.each(strategies, function (strategy) {
-      //debugger;
-      var percentFloat = parseInt(strategy) / 100;
-
-      var strategyFonds = stockExchange.getStrategyFonds(fonds, percentFloat);
-
-      var orderFonds = stockExchange.getOrderFonds(strategyFonds, ticker);
-
-      var slips = stockTicker.getStrategySlips(strategy);
-
-      var instantFonds = stockExchange.getInstantFonds(strategyFonds, ticker, slips);
-
   %>
   <div class="attempt p<%= strategy %> field4">
-    <span class="left instant"><%= $G.roundFond(instantFonds.cur, cur) %></span>
-    <span class="left order"><%= $G.roundFond(orderFonds.cur, cur) %></span>
-    <span class="right order"><%= $G.roundFond(orderFonds.base, base) %></span>
-    <span class="right instant"><%= $G.roundFond(instantFonds.base, base) %></span>
+    <span class="bid instant">&nbsp;</span>
+    <span class="bid order">&nbsp;</span>
+    <span class="ask order">&nbsp;</span>
+    <span class="ask instant">&nbsp;</span>
   </div>
   <%
     });

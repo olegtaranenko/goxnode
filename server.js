@@ -56,9 +56,9 @@ var clientMtgox = mtgox.connect({
 clientMtgox.on('connect', function() {
   Log.info('Connected to MtGox via socket.io!');
 
-  this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');   //
+  this.unsubscribe('dbf1dee9-4f2e-4a08-8cb7-748919a71b21');   // trade
 //  this.unsubscribe('d5f06780-30a8-4a48-a2f8-7ed181b4a13f'); // ticker
-  this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');
+  this.unsubscribe('24e67e0d-1cad-4cc0-9e7a-f8523ef460fe');   // depth
 
   lastPrivateChannel.subscribed = false;
 
@@ -112,10 +112,10 @@ app.configure(function() {
     debug: false
   }));
 
-  app.use('/client.json', function(req, res) {
-      res.write(JSON.stringify(client));
-      res.end();
+  app.get('/js/settings.js', function(req, res) {
+    res.send('define([], function() { return ' + JSON.stringify(client) + '})');
   });
+
   app.use(express.static(pub_dir));
 });
 

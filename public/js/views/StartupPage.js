@@ -143,6 +143,8 @@ function($, _, Backbone,
      * Reference to created DOM element is stored to TradeAction model
      *
      * @param tradeAction {TradeAction} model
+     * @param stockTicker
+     * @param stockExchange
      */
     createTradeAction: function(tradeAction, stockExchange, stockTicker) {
       var model = this.model, //StartupModel

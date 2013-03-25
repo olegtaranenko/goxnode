@@ -71,6 +71,7 @@ define([
 
 
     defaults: {
+      owner: null, // reference to startupModel
       bid: 29.1234,
       ask: 29.8721,
       slips: {
@@ -103,7 +104,15 @@ define([
     },
 
     initialize: function() {
+/*
+      var changeEvent = 'change:' + currency,
+        goxEl = owner.el,
+        selector = '.currency-state .' + currency.toLowerCase();
 
+      me.on(changeEvent, function(model) {
+
+      });
+*/
     }
   })
 });

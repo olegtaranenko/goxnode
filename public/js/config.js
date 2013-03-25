@@ -1,7 +1,8 @@
 // Use Goxnode namespace as a jQuery plugin to get access from anywhere
-define(['socket.io', 'jquery'],
-  function(io, $) {
+define(['socket.io', 'jquery', "settings"],
+  function(io, $, clientConfig) {
 
+/*
     $.ajax('/client.json')
       .done(function(data){
         try {
@@ -16,13 +17,14 @@ define(['socket.io', 'jquery'],
 //      })
 //      .always(function(data, result, response){
       });
+*/
 
     var mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase())),
       tapEvent = mobile ? 'touchstart' : 'vclick';
 
     var statics = {
 
-      config: {},
+      config: clientConfig,
       mobile   : mobile,
 
       tapEvent : tapEvent,
@@ -72,8 +74,6 @@ define(['socket.io', 'jquery'],
       }
     });
 
-
-
     $(document).bind("mobileinit", function () {
       $.mobile.ajaxEnabled = false;
       $.mobile.linkBindingEnabled = false;
@@ -88,11 +88,6 @@ define(['socket.io', 'jquery'],
         $(event.currentTarget).remove();
       });
     });
-
-
-
-
   }
-
 );
 
