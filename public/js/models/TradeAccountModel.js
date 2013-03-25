@@ -44,62 +44,6 @@ define([
       owner: null // reference to startupModel
     },
 
-    evaluateStrategies: function (owner, currency, side) {
-      
-      var tradeAccount = owner.get('tradeAccount');
-      var goxEl = owner.get('el');
-      var selector = '.currency-state .' + currency.toLowerCase();
-      var div = $(selector, goxEl),
-        fond = tradeAccount.getFreeFonds(currency),
-        fondRounded = $G.roundFond(fond, currency);
-
-      div.text(fondRounded);
-
-      var strategies = tradeAccount.get('strategies'),
-        stockExchange = owner.get('stockExchange'),
-        stockTicker = owner.get('stockTicker'),
-        ticker = stockTicker.getTicker();
-
-      if (stockExchange == null) {
-        // skip triggering on init phase
-            return;
-      }
-
-      _.each(strategies, function (strategy) {
-
-        var rowSelector = '.attempt.p' + strategy,
-          rowDiv = $(rowSelector, goxEl);
-
-//            debugger;
-        var percentFloat = parseInt(strategy) / 100;
-        var pair = stockExchange.getCurrencyPair();
-        var freeFonds = tradeAccount.getFreeFonds(pair);
-        var fonds = stockExchange.getTradeFonds(freeFonds);
-
-        fonds.strategy = stockExchange.getStrategyFonds(fonds, percentFloat);
-
-        fonds.order = stockExchange.getOrderFonds(fonds.strategy, ticker);
-
-        fonds.slips = stockTicker.getStrategySlips(strategy);
-
-        fonds.instant = stockExchange.getInstantFonds(fonds.strategy, ticker, fonds.slips);
-
-        var tradeType = side == 'bid' ? 'cur' : 'base';
-        var tradeCurrency = side == 'bid' ? 'USD' : 'BTC';
-
-        _.each(['instant', 'order'], function (instant) {
-          var columnSelector = '.' + side + '.' + instant,
-            cellSpan = $(columnSelector, rowDiv),
-            curValue = fonds[instant][tradeType],
-            rounded = $G.roundFond(curValue, tradeCurrency);
-
-          cellSpan.text(rounded);
-        });
-      });
-
-    },
-
-
     initialize: function(attributes, options) {
       var me = this,
         owner = me.get('owner'),
@@ -117,7 +61,7 @@ define([
 
         me.on(changeEvent, function(model) {
           _.each(['bid', 'ask'], function (tradeSide) {
-            me.evaluateStrategies(owner, currency, tradeSide);
+            $G.evaluateStrategies(owner, currency, tradeSide);
           });
         });
 

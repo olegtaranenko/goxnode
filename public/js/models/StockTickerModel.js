@@ -14,10 +14,14 @@ define([
 
   return Backbone.Model.extend({
 
-    getTicker: function () {
-      return {
-        ask: this.get('ask'),
-        bid: this.get('bid')
+    getTicker: function (side) {
+      if (side === undefined) {
+        return {
+          ask: parseFloat(this.get('ask')),
+          bid: parseFloat(this.get('bid'))
+        }
+      } else {
+        return this.get(side);
       }
     },
 
@@ -69,11 +73,19 @@ define([
       return ret;
     },
 
+    isInited: function() {
+      var bid = this.get('bid'),
+        ask = this.get('ask');
+
+      return !(bid == null || ask == null);
+
+    },
+
 
     defaults: {
       owner: null, // reference to startupModel
-      bid: 29.1234,
-      ask: 29.8721,
+      bid: null,
+      ask: null,
       slips: {
         "100": {
           base: 0.95,
@@ -103,16 +115,21 @@ define([
       }
     },
 
-    initialize: function() {
-/*
-      var changeEvent = 'change:' + currency,
-        goxEl = owner.el,
-        selector = '.currency-state .' + currency.toLowerCase();
+    initialize: function(attributes, options) {
+      var me = this,
+        owner = me.get('owner'),
+        cur = options.cur,
+        base = options.base;
 
-      me.on(changeEvent, function(model) {
+      _.each(['bid', 'ask'], function (tradeSide) {
+        var changeEvent = 'change:' + tradeSide;
+        me.on(changeEvent, function(model) {
+          _.each([cur, base], function(currency) {
+            $G.evaluateStrategies(owner, currency, tradeSide);
+          });
+        });
 
       });
-*/
     }
   })
 });

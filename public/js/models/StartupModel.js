@@ -19,7 +19,7 @@ define([
       }),
       tradeAccount: null,
       stockExchange: null,
-      stockTicker: new StockTickerModel(),
+      stockTicker: null,
       activeTradeActions: new TradeActions(),  // active Trade Actions pool
 
       el: null,           // #gox
@@ -39,7 +39,7 @@ define([
           silent
         ),
         tradeAccountData = {},
-        tradeAccountOptions = {
+        initOptions = {
           silent: true,
           base: base,
           cur: cur
@@ -49,12 +49,20 @@ define([
       tradeAccountData[cur] = 0;
       tradeAccountData.owner = this;
 
+      var tradeAccount = new TradeAccountModel(tradeAccountData, initOptions);
 
-      var tradeAccount = new TradeAccountModel(tradeAccountData, tradeAccountOptions);
+      var stockTicker = new StockTickerModel({
+          owner: this,
+          ask: null,
+          bid: null
+        },
+        initOptions
+      );
 
       this.set({
           stockExchange: stockExchange,
-          tradeAccount: tradeAccount
+          tradeAccount: tradeAccount,
+          stockTicker: stockTicker
         },
         silent
       );

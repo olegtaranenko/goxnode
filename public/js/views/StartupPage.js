@@ -63,8 +63,8 @@ function($, _, Backbone,
         side;
       _.each(classes, function(cls) {
         switch (cls) {
-          case 'left':
-          case 'right':
+          case 'bid':
+          case 'ask':
             side = cls;
             break;
           case 'order':
@@ -82,7 +82,7 @@ function($, _, Backbone,
         stockTicker = model.get('stockTicker');
 
 
-      currency = side == 'left' ? 'USD' : 'BTC';
+      currency = side == 'bid' ? 'USD' : 'BTC';
       var params = stockExchange.getNatureBaseSize(tradeAccount, stockTicker, actionNature, strategy, currency);
 
       var tradeAction = new TradeAction({

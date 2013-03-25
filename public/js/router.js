@@ -59,7 +59,12 @@ define([
       function onTicker(ticker) {
         console.log('onTicker() ', arguments);
         // create (or update) Model which contains PrivateInfo
+        var stockTicker = startupModel.get('stockTicker');
 
+        stockTicker.set({
+          ask: parseFloat(ticker.sell),
+          bid: parseFloat(ticker.buy)
+        })
       }
 
       socket.on('connect',    onConnect);

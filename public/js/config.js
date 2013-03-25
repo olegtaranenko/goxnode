@@ -42,6 +42,71 @@ define(['socket.io', 'jquery', "settings"],
       },
 
 
+      evaluateStrategies: function (owner, currency, side) {
+        var $G = this;
+        var tradeAccount = owner.get('tradeAccount'),
+          stockTicker = owner.get('stockTicker'),
+          stockExchange = owner.get('stockExchange');
+
+        if (stockExchange == null) {
+          // skip triggering on init phase
+          return;
+        }
+
+        var goxEl = owner.get('el');
+        var fondSelector = '.currency-state .' + currency.toLowerCase();
+        var fondDiv = $(fondSelector, goxEl),
+          fond = tradeAccount.getFreeFonds(currency),
+          fondRounded = $G.roundFond(fond, currency);
+
+        fondDiv.text(fondRounded);
+
+        if (!stockTicker.isInited()) {
+          return;
+        }
+
+        var ticker = stockTicker.getTicker();
+        var tickerSelector = '.currency-state .ticker-' + side.toLowerCase();
+        var tickerDiv = $(tickerSelector, goxEl);
+
+        tickerDiv.text('@' + ticker[side]);
+
+        var strategies = tradeAccount.get('strategies');
+          _.each(strategies, function (strategy) {
+
+          var rowSelector = '.attempt.p' + strategy,
+            rowDiv = $(rowSelector, goxEl);
+
+//            debugger;
+          var percentFloat = parseInt(strategy) / 100;
+          var pair = stockExchange.getCurrencyPair();
+          var freeFonds = tradeAccount.getFreeFonds(pair);
+          var fonds = stockExchange.getTradeFonds(freeFonds);
+
+          fonds.strategy = stockExchange.getStrategyFonds(fonds, percentFloat);
+
+          fonds.order = stockExchange.getOrderFonds(fonds.strategy, ticker);
+
+          fonds.slips = stockTicker.getStrategySlips(strategy);
+
+          fonds.instant = stockExchange.getInstantFonds(fonds.strategy, ticker, fonds.slips);
+
+          var tradeType = side == 'bid' ? 'cur' : 'base';
+          var tradeCurrency = side == 'bid' ? 'USD' : 'BTC';
+
+          _.each(['instant', 'order'], function (instant) {
+            var columnSelector = '.' + side + '.' + instant,
+              cellSpan = $(columnSelector, rowDiv),
+              curValue = fonds[instant][tradeType],
+              rounded = $G.roundFond(curValue, tradeCurrency);
+
+            cellSpan.text(rounded);
+          });
+        });
+
+      },
+
+
       roundFond: function(fond, currency) {
         var digits = this.digits[currency] || 100;
         return Math.round(fond * digits) / digits;
