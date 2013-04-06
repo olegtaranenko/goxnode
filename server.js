@@ -138,7 +138,7 @@ io.sockets.on('connection', function (socket) {
     Log.debug('socket.customData => ', socket.customData);
   }
 
-  executeClosure(socket, [retrievePrivateInfo, retrieveOpenOrders], this, {});
+  executeClosure(socket, [retrieveLastTicker, retrievePrivateInfo, retrieveOpenOrders], this, {});
 });
 
 
@@ -149,14 +149,17 @@ function subscribePrivateChannel(last) {
 
   if (!subscribed) {
     var args = arguments;
-    var idKeyPath = '1/generic/private/idkey';
-    clientMtgox.queryHttps(idKeyPath, function (err, result) {
-      if (err) {
-        Log.error('Error by call to ', idKeyPath, 'error => ', err);
-        return;
+    var command = 'idkey';
+    clientMtgox.queryHttps({
+      command: command,
+      cb: function (err, result) {
+        if (err) {
+          Log.error('Error by call to "', command, '", error => ', err);
+          return;
+        }
+        Log.info('Got new idKey => ', result);
+        clientMtgox.subscribePrivate(result);
       }
-      Log.info('Got new idKey => ', result);
-      clientMtgox.subscribePrivate(result);
     });
   }
 }
@@ -172,33 +175,57 @@ function executeClosure(socket, funcs, scope, options) {
 
 function retrievePrivateInfo(socket, cb, scope, options) {
   var args = arguments;
-  var privateInfo = '1/generic/private/info';
-  clientMtgox.queryHttps(privateInfo, function (err, result) {
-    if (err) {
-      Log.error('Error by call to ', privateInfo, 'error => ', err);
-      return;
+  var command = 'info';
+  clientMtgox.queryHttps({
+    command: command,
+    cb: function (err, result) {
+      if (err) {
+        Log.error('Error by call to "', command, '", error => ', err);
+        return;
+      }
+
+      socket.emit('ticker', result);
+      executeClosure.apply(scope|| this, args);
     }
-    socket.customData.Id = options.Id = result.Id;
-
-    socket.emit('privateinfo', result);
-
-
-    executeClosure.apply(scope|| this, args);
   });
 }
 
 
 function retrieveOpenOrders(socket, cb, scope, options) {
   var args = arguments;
-  var ordersPath = '1/generic/private/orders';
-  clientMtgox.queryHttps(ordersPath, function (err, orders) {
-    if (err) {
-      Log.error('Error by call to ', ordersPath, 'error => ', err);
-      return;
-    }
+  var command = 'orders';
+  clientMtgox.queryHttps({
+    command: command,
+      cb: function (err, orders) {
+        if (err) {
+          Log.error('Error by call to "', command, '", error => ', err);
+          return;
+        }
+        socket.emit('ordersinfo', orders);
+        executeClosure.apply(scope || this, args);
+      }
+    });
+}
+
+
+function retrieveLastTicker(socket, cb, scope, options) {
+  var args = arguments;
+  var command = 'ticker';
+  clientMtgox.queryHttps({
+    command: command,
+    cb: function (err, ticker) {
+      if (err) {
+        Log.error('Error by call to "', command, '", error => ', err);
+        return;
+      }
+      lastTicker = {
+        buy: 0,
+        sell: 0
+      };
 //    Log.info('Open Orders  => ', orders, '\n', JSON.stringify(orders));
-    socket.emit('ordersinfo', orders);
-    executeClosure.apply(scope || this, args);
+      socket.emit('ticker', ticker);
+      executeClosure.apply(scope || this, args);
+    }
   });
 }
 
