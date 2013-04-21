@@ -20,11 +20,13 @@ require.config({
     CurrencyValueModel: 'models/CurrencyValueModel',
     PrivateInfoModel: 'models/PrivateInfoModel',
     WalletModel: 'models/WalletModel',
+    OrderModel: 'models/OrderModel',
     TradeAccountModel: 'models/TradeAccountModel',
     TradeAction: 'models/TradeAction',
     StockExchangeModel: 'models/StockExchangeModel',
     StockTickerModel: 'models/StockTickerModel',
     TradeActions: 'collections/TradeActions',
+    Orders: 'collections/Orders',
     Wallets: 'collections/Wallets'
   }
 });

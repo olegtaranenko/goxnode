@@ -139,7 +139,7 @@ io.sockets.on('connection', function (socket) {
     Log.debug('socket.customData => ', socket.customData);
   }
 
-  executeClosure(socket, [retrievePrivateInfo, retrieveOpenOrders], this, {});
+  executeClosure(socket, [retrievePrivateInfo, retrieveOpenOrders, setLastTicker], this, {});
 });
 
 
@@ -230,3 +230,7 @@ function retrieveLastTicker(socket, cb, scope, options) {
   });
 }
 
+function setLastTicker(socket, cb, scope, options) {
+    socket.emit('ticker', lastTicker);
+    executeClosure.apply(scope || this, args);
+}

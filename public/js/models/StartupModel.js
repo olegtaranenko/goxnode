@@ -6,8 +6,11 @@
  * Created at: 21.02.13 11:22
  */
 define([
-  'backbone', 'TradeActions', 'TradeAccountModel', 'StockTickerModel', 'StockExchangeModel', 'PrivateInfoModel'
-], function(Backbone, TradeActions, TradeAccountModel, StockTickerModel, StockExchangeModel, PrivateInfoModel) {
+  'backbone', 'TradeActions', 'TradeAccountModel', 'StockTickerModel', 'StockExchangeModel', 'PrivateInfoModel',
+  'Orders'
+], function(Backbone, TradeActions, TradeAccountModel, StockTickerModel, StockExchangeModel, PrivateInfoModel,
+            Orders
+  ) {
 
   return Backbone.Model.extend({
     defaults: {
@@ -21,6 +24,7 @@ define([
       stockExchange: null,
       stockTicker: null,
       activeTradeActions: new TradeActions(),  // active Trade Actions pool
+      orders: new Orders(), // currently open orders. First loaded from mtgox by startup via OrdersInfo event
 
       el: null,           // #gox
       now: 0              // time in millis

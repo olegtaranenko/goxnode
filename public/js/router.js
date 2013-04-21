@@ -3,9 +3,13 @@
  */
 define([
   'backbone', 'jquery', 'underscore',
-  'StartupPage', 'StartupModel'
+  'StartupPage', 'StartupModel',
+  'OrderModel'
 ],
-  function(Backbone, $, _, StartupPage, StartupModel) {
+  function(Backbone, $, _,
+           StartupPage, StartupModel,
+           OrderModel
+    ) {
 
 
     var $G = $.Goxnode();
@@ -52,8 +56,16 @@ define([
       }
 
       function onOrdersInfo(info) {
-        console.log('onOrdersInfo() ', arguments);
+        console.log('onOrdersInfo()', info);
         // create (or update) Model which contains PrivateInfo
+        var ordersCollection = startupModel.get('orders'),
+          models = [];
+
+        _.each(info, function(orderInfo) {
+          var order = new OrderModel(orderInfo);
+          models.push(order);
+        });
+        ordersCollection.set(models, {silent: true});
       }
 
       function onTicker(ticker) {
