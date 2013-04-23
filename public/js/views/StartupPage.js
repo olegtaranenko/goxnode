@@ -114,7 +114,8 @@ function($, _, Backbone,
     cancelTradeAction: function(e) {
       var me = e.data.me,
         model = me.model,
-        goxEl = model.get('el'),
+        tradeAccount = model.get('tradeAccount'),
+        actionsEl = tradeAccount.getContentEl(),
         tradeActions = model.get('activeTradeActions'),
         target = e.target;
 
@@ -132,7 +133,7 @@ function($, _, Backbone,
         var tradeAction = tradeActions.get(targetId),
           actionEl = tradeAction.get('el');
 
-        goxEl.removeChild(actionEl);
+        actionsEl.removeChild(actionEl);
         tradeActions.remove(tradeAction);
       }
     },
@@ -148,11 +149,12 @@ function($, _, Backbone,
      */
     createTradeAction: function(tradeAction, stockExchange, stockTicker) {
       var model = this.model, //StartupModel
+        tradeAccount = model.get('tradeAccount'),
         tradeActions = model.get('activeTradeActions');
 
       tradeActions.add(tradeAction);
 
-      var goxEl = model.get('el'),
+      var actionsEl = tradeAccount.getContentEl(),
         orderUI = this.orderTemplate({
           tradeAction: tradeAction,
           stockExchange: stockExchange,
@@ -161,10 +163,10 @@ function($, _, Backbone,
 
 
       // jqm enhancement
-      $(goxEl).append(orderUI).trigger('create');
+      $(actionsEl).append(orderUI).trigger('create');
 
       // trick to get new created DOM element
-      var actionEl = goxEl.lastElementChild;
+      var actionEl = actionsEl.lastElementChild;
 
       // let save it to model
       tradeAction.set({
@@ -197,13 +199,18 @@ function($, _, Backbone,
      * @returns {*}
      */
     render: function() {
-      var model = this.model;
+      var me = this,
+        $el = me.$el,
+        model = me.model;
+
       var tradeAccount = model.get('tradeAccount'),
         strategies = tradeAccount.get('strategies'),
         stockExchange = model.get('stockExchange'),
-        stockTicker = model.get('stockTicker');
+        stockTicker = model.get('stockTicker'),
+        orders = model.get('orders');
 
-      $(this.el).html(this.template({
+
+      $el.html(this.template({
         strategies: strategies,
         tradeAccount: tradeAccount,
         stockExchange: stockExchange,
@@ -214,6 +221,16 @@ function($, _, Backbone,
 
       model.set({
         el: goxnode
+      });
+
+      $el.on('pageinit', function() {
+        var collapsibleEl = $(goxnode).find('[data-role=collapsible-set]'),
+          collapsibleList = collapsibleEl.children(),
+          strategiesEl = collapsibleList[1],
+          ordersEl = collapsibleList[0];
+
+        tradeAccount.set({el: strategiesEl});
+        orders.el = ordersEl;
       });
 
       return this;

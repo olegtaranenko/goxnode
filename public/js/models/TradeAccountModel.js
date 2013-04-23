@@ -41,7 +41,14 @@ define([
 
     defaults: {
       strategies: $G.config.strategies,
+      el: null, // reference to the collapsible element with strategies
       owner: null // reference to startupModel
+    },
+
+    getContentEl: function() {
+      var collapsibleEl = this.get('el');
+
+      return $(collapsibleEl).find('.ui-collapsible-content')[0];
     },
 
     initialize: function(attributes, options) {

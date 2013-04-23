@@ -37,20 +37,33 @@ var $G = $.Goxnode();
     <span class="ask ticker-ask">@<%= ask %></span>
     <span class="ask btc"><%= fondBase %></span>
   </div>
-
-  <%
-    _.each(strategies, function (strategy) {
-  %>
-  <div class="attempt p<%= strategy %> field4">
-    <span class="bid instant">&nbsp;</span>
-    <span class="bid order">&nbsp;</span>
-    <span class="ask order">&nbsp;</span>
-    <span class="ask instant">&nbsp;</span>
-  </div>
-  <%
-    });
-  %>
   <div style="clear: both"></div>
+
+  <div data-role="collapsible-set">
+
+    <div data-role="collapsible" data-collapsed="true">
+      <h3>Orders</h3>
+    </div>
+
+    <div data-role="collapsible" data-collapsed="false">
+      <h3>Strategy</h3>
+
+      <%
+      _.each(strategies, function (strategy) {
+      %>
+      <div class="attempt p<%= strategy %> field4">
+        <span class="bid instant">&nbsp;</span>
+        <span class="bid order">&nbsp;</span>
+        <span class="ask order">&nbsp;</span>
+        <span class="ask instant">&nbsp;</span>
+      </div>
+      <%
+      });
+      %>
+      <div style="clear: both"></div>
+
+    </div>
+  </div>
 
 </div>
 
