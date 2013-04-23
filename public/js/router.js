@@ -67,7 +67,7 @@ define([
           var order = new OrderModel(orderInfo);
           models.push(order);
         });
-        ordersCollection.set(models, {silent: true});
+        ordersCollection.set(models, {silent: false});
       }
 
       function onTicker(ticker) {

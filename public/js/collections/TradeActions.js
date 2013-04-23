@@ -4,7 +4,12 @@
  * mailto:olegtaranenko@gmail.com
  */
 
-define(['TradeAction'], function(TradeAction) {
+define([
+  'backbone', 'TradeAction'
+],
+  function(
+    Backbone, TradeAction
+  ) {
 
     return Backbone.Collection.extend({
       model: TradeAction

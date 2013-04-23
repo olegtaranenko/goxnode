@@ -7,17 +7,18 @@
  */
 define([
   'jquery', 'underscore', 'backbone',
-  'text!/templates/startup.html', 'text!/templates/orderui.html',
+  'text!/templates/startup.html', 'text!/templates/actionui.html', 'text!/templates/orderui.html',
   'StartupModel', 'TradeAction'
 ],
 
 function($, _, Backbone,
-          tpl, orderUI,
+          tpl, actionUI, orderUI,
           StartupModel, TradeAction
 ) {
 
   return Backbone.View.extend({
     template: _.template(tpl),
+    actionTemplate: _.template(actionUI),
     orderTemplate: _.template(orderUI),
 
     /**
@@ -140,7 +141,7 @@ function($, _, Backbone,
 
 
     /**
-     * Using template orderui.html constructs the markup for new Trade Action and append it to #gox form.
+     * Using template actionui.html constructs the markup for new Trade Action and append it to #gox form.
      * Reference to created DOM element is stored to TradeAction model
      *
      * @param tradeAction {TradeAction} model
@@ -148,14 +149,14 @@ function($, _, Backbone,
      * @param stockExchange
      */
     createTradeAction: function(tradeAction, stockExchange, stockTicker) {
-      var model = this.model, //StartupModel
-        tradeAccount = model.get('tradeAccount'),
-        tradeActions = model.get('activeTradeActions');
+      var startupModel = this.model, //StartupModel
+        tradeAccount = startupModel.get('tradeAccount'),
+        tradeActions = startupModel.get('activeTradeActions');
 
       tradeActions.add(tradeAction);
 
       var actionsEl = tradeAccount.getContentEl(),
-        orderUI = this.orderTemplate({
+        actionUI = this.actionTemplate({
           tradeAction: tradeAction,
           stockExchange: stockExchange,
           stockTicker: stockTicker
@@ -163,7 +164,7 @@ function($, _, Backbone,
 
 
       // jqm enhancement
-      $(actionsEl).append(orderUI).trigger('create');
+      $(actionsEl).append(actionUI).trigger('create');
 
       // trick to get new created DOM element
       var actionEl = actionsEl.lastElementChild;
@@ -174,6 +175,27 @@ function($, _, Backbone,
       });
 
       return actionEl;
+    },
+
+
+    createOrder: function(model, el) {
+      var startupModel = this.model;
+
+        if (!el) {
+          var orders = startupModel.get('orders');
+
+          el = orders.getContentEl();
+        }
+        orderUI = this.orderTemplate({
+          model: model
+        });
+
+      $(el).append(orderUI).trigger('create');
+
+      // trick to get new created DOM element
+      // let save it to model
+
+      return model.el = el.lastElementChild;
     },
 
 
@@ -231,6 +253,7 @@ function($, _, Backbone,
 
         tradeAccount.set({el: strategiesEl});
         orders.el = ordersEl;
+        orders.owner = me;
       });
 
       return this;

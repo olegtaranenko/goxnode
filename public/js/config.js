@@ -30,6 +30,7 @@ define(['socket.io', 'jquery', "settings"],
       tapEvent : tapEvent,
 
       actionDateFormat: '%H:%M:%S.%i',
+      orderDateFormat: '%d.%m.%Y %X',
 
       multipliers: {
         BTC: 100000000,

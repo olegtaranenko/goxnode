@@ -1,0 +1,76 @@
+<%
+  var $G = $.Goxnode();
+
+  var cid = tradeAction.cid,
+    timestamp = tradeAction.get('timestamp'),
+    strategy = tradeAction.get('strategy'),
+    nature = tradeAction.get('nature').toUpperCase(),
+    sizeInt = tradeAction.get('sizeInt'),
+    now = new Date(timestamp),
+    actionDateFormat = $G.actionDateFormat,
+    currency = tradeAction.get('currency'),
+    baseSize = tradeAction.get('size'),
+    baseBrutto = tradeAction.get('brutto'),
+    curSize = tradeAction.get('curSize'),
+    curBrutto = tradeAction.get('curBrutto'),
+    base = stockExchange.getBaseCurrency(),
+    cur = stockExchange.getCurCurrency(),
+    curIncrease = '-', baseIncrease = '-',
+    msg, orderType;
+
+
+  if (nature == 'ORDER') {
+    if (currency == 'USD') {
+      orderType = 'ASK';
+      curIncrease = '+';
+    } else {
+      orderType = 'BID';
+      baseIncrease = '+';
+    }
+  } else if (nature == 'INSTANT') {
+    if (currency == 'USD') {
+      orderType = 'SELL';
+      curIncrease = '+';
+    } else {
+      orderType = 'BUY';
+      baseIncrease = '+';
+    }
+  }
+
+  if (baseIncrease == '+') {
+    curSize = curBrutto;
+  } else {
+    baseSize = baseBrutto;
+  }
+  
+%>
+
+<div class="trade-action" data-theme="c">
+  <fieldset data-role="controlgroup" data-type="horizontal" style="float: left;">
+    <a href="#" id="<%= cid %>" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
+  </fieldset>
+
+  <fieldset data-mini="true" data-role="controlgroup" style="float: right;" >
+    <% if (nature == 'ORDER') { %>
+    <input type="checkbox" id="autoPop" name="autoPop" />
+    <label for="autoPop" data-theme="c">Auto pop</label>
+    <!--<button date-icon="search">Search</button>-->
+    <!--<input type="checkbox" id="stopLoss" name="stopLoss" checked="on"/>-->
+    <!--<label for="stopLoss" data-theme="c">Stop Loss</label>-->
+    <% } %>
+  </fieldset>
+  <div class="trade-info">
+    <div class="trade-action-info">
+      <span><small><i><%= _.strftime(now, actionDateFormat) %></i></small> <strong><%= nature %>, <%= strategy %>%, <%= currency %></strong></span>
+    </div>
+    <div class="trade-action-info">
+      <span><strong><%= orderType %> <%= $G.roundFond(baseBrutto, base) %>@<%= tradeAction.get('price') %></strong></span>
+    </div>
+    <div class="trade-action-info">
+      <span style="float:left"> <%= curIncrease %> <%= $G.roundFond(curSize, cur) %>  </span>
+      <span style="float:right"><%= baseIncrease %> <%= $G.roundFond(baseSize, base) %></span>
+    </div>
+    <div style="clear: both"></div>
+    <hr/>
+  </div>
+</div>

@@ -13,6 +13,16 @@ define([
       "display": '$0.00000',    //"$10,000.00000",
       "display_short": '$0.00', //"$10,000.00",
       "currency": ''            //"USD"
+    },
+
+    toAmount: function() {
+      var value_int = this.get('value_int');
+      return value_int / 1E8;
+    },
+
+    toPrice: function() {
+      var value_int = this.get('value_int');
+      return value_int / 1E5;
     }
   })
 });
