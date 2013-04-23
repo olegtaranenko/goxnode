@@ -42,7 +42,6 @@ function($, _, Backbone,
      * @param e
      */
     tradeAction: function(e) {
-      var $G = $.Goxnode();
 
       var target = e.target,
         targetsClasses = target.className,
@@ -101,9 +100,6 @@ function($, _, Backbone,
       var tradeActionEl = this.createTradeAction(tradeAction, stockExchange, stockTicker, {
         ui: true
       });
-      var cancelEl = $('a', tradeActionEl);
-      var tapEvent = $G.tapEvent;
-      $(cancelEl).on(tapEvent, {me: this}, this.cancelTradeAction);
     },
 
     /**
@@ -149,9 +145,10 @@ function($, _, Backbone,
      * @param stockExchange
      */
     createTradeAction: function(tradeAction, stockExchange, stockTicker) {
-      var startupModel = this.model, //StartupModel
-        tradeAccount = startupModel.get('tradeAccount'),
-        tradeActions = startupModel.get('activeTradeActions');
+      var $G = $.Goxnode();
+      var model = this.model, //StartupModel
+        tradeAccount = model.get('tradeAccount'),
+        tradeActions = model.get('activeTradeActions');
 
       tradeActions.add(tradeAction);
 
@@ -174,11 +171,44 @@ function($, _, Backbone,
         el: actionEl
       });
 
+      var cancelEl = $('a', actionEl);
+      var tapEvent = $G.tapEvent;
+      $(cancelEl).on(tapEvent, {me: this}, this.cancelTradeAction);
+
       return actionEl;
+    },
+
+    cancelOrder: function(e) {
+      var me = e.data.me,
+        model = me.model,
+        orders = model.get('orders'),
+        ordersEl = orders.getContentEl(),
+        target = e.target;
+
+      do {
+        var targetId = target.id,
+          done = target.tagName == 'A';
+
+        target = target.parentElement;
+        if (!done) {
+          done = !target;
+        }
+      } while (!done);
+
+      debugger;
+
+      if (targetId) {
+        var tradeOrder = orders.get(targetId),
+          orderEl = tradeOrder.el;
+
+        ordersEl.removeChild(orderEl);
+        orders.remove(tradeOrder);
+      }
     },
 
 
     createOrder: function(model, el) {
+      var $G = $.Goxnode();
       var startupModel = this.model;
 
         if (!el) {
@@ -195,7 +225,11 @@ function($, _, Backbone,
       // trick to get new created DOM element
       // let save it to model
 
-      return model.el = el.lastElementChild;
+      var orderEl = model.el = el.lastElementChild
+      var cancelEl = $('a', orderEl);
+      var tapEvent = $G.tapEvent;
+      $(cancelEl).on(tapEvent, {me: this}, this.cancelOrder);
+
     },
 
 
