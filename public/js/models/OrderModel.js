@@ -8,14 +8,14 @@ define([
     defaults: {
       "oid": '', // guid
       "actions": null,
-      "amount": new CurrencyValueModel(), //  CurrencyValueModel
+      "amount": null, //  CurrencyValueModel
       "currency": null, // 'USD', 'EUR', ...
 
       "date": null, // millis
-      "effective_amount": new CurrencyValueModel(), //  CurrencyValueModel
-      "invalid_amount": new CurrencyValueModel(), //  CurrencyValueModel
+      "effective_amount": null, //  CurrencyValueModel
+      "invalid_amount": null, //  CurrencyValueModel
       "item": null, //  BTC
-      "price": new CurrencyValueModel(),
+      "price": null,
       "priority": 0, // nanos
       "status": '', // 'open', 'invalid', ...
       "type": '' // 'ask', 'bid'

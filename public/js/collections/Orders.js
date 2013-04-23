@@ -8,7 +8,10 @@ define([
     return Backbone.Collection.extend({
       model: OrderModel,
       comparator: function(model) {
-        return model.get('price').value_int
+        var price = model.get('price'),
+          type = model.get('type');
+        var value = price.get('value_int');
+        return type == 'bid' ? Number.MAX_VALUE - value :  -1 * value;
       },
 
       initialize: function() {

@@ -6,6 +6,8 @@ define([
   'backbone'
 ], function(Backbone) {
 
+  var _super = Backbone.Model.prototype;
+
   return Backbone.Model.extend({
     defaults: {
       "value": 0.0,             //"10000.00000",
@@ -23,7 +25,22 @@ define([
     toPrice: function() {
       var value_int = this.get('value_int');
       return value_int / 1E5;
+    },
+
+    constructor: function(attributes) {
+      var me = this;
+
+      if (attributes != null) {
+        var value_int = attributes.value_int;
+        if (isNaN(value_int)) {
+          value_int = 0;
+        }
+        attributes.value_int = value_int;
+      }
+
+      _super.constructor.apply(me, arguments);
     }
+
   })
 });
 
