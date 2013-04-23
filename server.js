@@ -87,12 +87,22 @@ var lastTicker = {
 clientMtgox.on('ticker', function(data) {
   // avoid repeat of the same data
   var ticker = data.ticker;
-  var buy = ticker.buy.value;
-  var sell = ticker.sell.value;
-  if (buy != lastTicker.buy || sell != lastTicker.sell) {
-    lastTicker.buy = buy;
-    lastTicker.sell = sell;
+  if (isChangedFuzzy()) {
     io.sockets.emit('ticker', lastTicker);
+  }
+
+  function isChangedFuzzy() {
+    var ret = false;
+    ['buy', 'sell'].forEach(function(term) {
+      var lastValue = lastTicker[term],
+        value = ticker[term].value;
+
+      if (Math.round(Math.abs(lastValue - value) * 100) / 100 > 0.01) {
+        ret = true;
+      }
+      lastTicker[term] = value;
+    }, this);
+    return ret;
   }
 });
 
@@ -231,6 +241,8 @@ function retrieveLastTicker(socket, cb, scope, options) {
 }
 
 function setLastTicker(socket, cb, scope, options) {
-    socket.emit('ticker', lastTicker);
-    executeClosure.apply(scope || this, args);
+  var args = arguments;
+
+  socket.emit('ticker', lastTicker);
+  executeClosure.apply(scope || this, args);
 }
