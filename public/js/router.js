@@ -81,6 +81,13 @@ define([
         })
       }
 
+      function onOrdersCancelled(oid) {
+        console.log('onOrdersCancelled() ', arguments);
+        var orders = startupModel.get('orders');
+
+        orders.remove(oid);
+      }
+
       socket.on('connect',    onConnect);
       socket.on('disconnect', onDisconnect);
       socket.on('error',      onError);
@@ -89,6 +96,7 @@ define([
       socket.on('privateinfo',onPrivateInfo);
       socket.on('ordersinfo', onOrdersInfo);
       socket.on('ticker',     onTicker);
+      socket.on('cancelled',  onOrdersCancelled);
 
       return socket;
     }
@@ -127,7 +135,7 @@ define([
 
         webView.changePage(page);
 
-        socketConnect(clientConfig.node.url, page);
+        $G.socket = socketConnect(clientConfig.node.url, page);
         $.mobile.hidePageLoadingMsg();
 
       },

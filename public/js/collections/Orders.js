@@ -7,6 +7,10 @@ define([
 
     return Backbone.Collection.extend({
       model: OrderModel,
+      comparator: function(model) {
+        return model.get('price').value_int
+      },
+
       initialize: function() {
         var me = this;
 
@@ -18,9 +22,19 @@ define([
 
           page.createOrder(model, contentEl);
         });
+
+
         me.on("remove", function(model, me, options) {
           console.log("in Orders collection ---- REMOVE");
+          var orderEl = model.el,
+            ordersEl = me.getContentEl();
+
+          if (orderEl && ordersEl) {
+            ordersEl.removeChild(orderEl);
+          }
         });
+
+
         me.on("change", function(model, options) {
           var changedAttributes = model.changed;
 

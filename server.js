@@ -149,6 +149,25 @@ io.sockets.on('connection', function (socket) {
     Log.debug('socket.customData => ', socket.customData);
   }
 
+  socket.on('cancelOrder', function(oid) {
+    Log.debug('cancelOrder', oid);
+    clientMtgox.queryHttps({
+      command: 'cancel',
+      payload: {
+        oid: oid
+      },
+      cb: function(err, result) {
+        Log.info('Cancel Order', arguments);
+        if (err == null) {
+          var oid = result.oid;
+
+          socket.emit('cancelled', oid)
+        } else {
+          Log.error('Fail by Order Cancelling, oid', oid);
+        }
+      }
+    })
+  });
   executeClosure(socket, [retrievePrivateInfo, retrieveOpenOrders, setLastTicker], this, {});
 });
 

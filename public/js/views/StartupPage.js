@@ -182,7 +182,6 @@ function($, _, Backbone,
       var me = e.data.me,
         model = me.model,
         orders = model.get('orders'),
-        ordersEl = orders.getContentEl(),
         target = e.target;
 
       do {
@@ -195,14 +194,11 @@ function($, _, Backbone,
         }
       } while (!done);
 
-      debugger;
-
       if (targetId) {
-        var tradeOrder = orders.get(targetId),
-          orderEl = tradeOrder.el;
+        var $G = $.Goxnode(),
+          socket = $G.socket;
 
-        ordersEl.removeChild(orderEl);
-        orders.remove(tradeOrder);
+        socket.emit('cancelOrder', targetId);
       }
     },
 
