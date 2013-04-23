@@ -19,8 +19,16 @@ define([
       "type": '' // 'ask', 'bid'
     },
 
-    initialize: function(attributes) {
+    constructor: function(attributes) {
+      var me = this;
 
+      _.each(['amount', 'effective_amount', 'invalid_amount', 'price'], function(property) {
+        var props = attributes[property];
+
+        if (props) {
+          attributes[property] = new CurrencyValueModel(props);
+        }
+      })
     }
   })
 });

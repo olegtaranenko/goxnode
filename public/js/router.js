@@ -14,7 +14,9 @@ define([
 
     var $G = $.Goxnode();
 
-    function socketConnect(url, startupModel, page) {
+    function socketConnect(url, page) {
+      var startupModel = page.model;
+
 
       var socket = io.connect(url);
 
@@ -125,7 +127,7 @@ define([
 
         webView.changePage(page);
 
-        socketConnect(clientConfig.node.url, model, page);
+        socketConnect(clientConfig.node.url, page);
         $.mobile.hidePageLoadingMsg();
 
       },
