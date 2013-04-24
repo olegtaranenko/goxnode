@@ -6,8 +6,8 @@
  * Created at: 26.02.13 16:41
  */
 define([
-  'backbone'
-], function(Backbone) {
+  'backbone', 'config'
+], function(Backbone, config) {
 
   var $G = $.Goxnode(),
     $m = $G.multipliers;

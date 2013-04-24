@@ -186,7 +186,7 @@ function($, _, Backbone,
 
       do {
         var targetId = target.id,
-          done = target.tagName == 'A';
+          done = target.tagName == 'FIELDSET';
 
         target = target.parentElement;
         if (!done) {
@@ -205,7 +205,10 @@ function($, _, Backbone,
 
     createOrder: function(model, el) {
       var $G = $.Goxnode();
-      var startupModel = this.model;
+      var startupModel = this.model,
+        tradeAccount = startupModel.get('tradeAccount'),
+        stockExchange = startupModel.get('stockExchange'),
+        stockTicker = startupModel.get('stockTicker');
 
         if (!el) {
           var orders = startupModel.get('orders');
@@ -213,7 +216,10 @@ function($, _, Backbone,
           el = orders.getContentEl();
         }
         orderUI = this.orderTemplate({
-          model: model
+          model: model,
+          stockTicker: stockTicker,
+          stockExchange: stockExchange,
+          tradeAccount: tradeAccount
         });
 
       $(el).append(orderUI).trigger('create');
@@ -222,7 +228,7 @@ function($, _, Backbone,
       // let save it to model
 
       var orderEl = model.el = el.lastElementChild
-      var cancelEl = $('a', orderEl);
+      var cancelEl = $('a[data-icon=delete]', orderEl);
       var tapEvent = $G.tapEvent;
       $(cancelEl).on(tapEvent, {me: this}, this.cancelOrder);
 
