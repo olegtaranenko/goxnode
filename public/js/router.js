@@ -88,6 +88,12 @@ define([
         orders.remove(oid);
       }
 
+      function onUserOrder(oid) {
+        console.log('onOrdersCancelled() ', arguments);
+        var orders = startupModel.get('orders');
+
+      }
+
       socket.on('connect',    onConnect);
       socket.on('disconnect', onDisconnect);
       socket.on('error',      onError);
@@ -96,7 +102,8 @@ define([
       socket.on('privateinfo',onPrivateInfo);
       socket.on('ordersinfo', onOrdersInfo);
       socket.on('ticker',     onTicker);
-      socket.on('cancelled',  onOrdersCancelled);
+      socket.on('order_cancel', onOrdersCancelled);
+      socket.on('user_order',  onUserOrder);
 
       return socket;
     }

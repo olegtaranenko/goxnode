@@ -8,7 +8,7 @@ var pub_dir = path.join(__dirname, 'public'),
   css_dir = pub_dir;
 
 var sqlite3 = require('sqlite3').verbose();
-var goxdb = require('./goxdb');
+//var goxdb = require('./goxdb');
 
 
 // web server
@@ -106,6 +106,24 @@ clientMtgox.on('ticker', function(data) {
   }
 });
 
+
+// All changes with User's order book
+clientMtgox.on('user_order', function(data) {
+  // avoid repeat of the same data
+  var user_order = data.user_order,
+    status = user_order.status,
+    oid = user_order.oid,
+    channel = data.channel;
+
+  if (status == null) {
+    io.sockets.emit('order_cancel', oid);
+  } else {
+    io.sockets.emit('user_order', user_order);
+  }
+});
+
+
+
 // on-fly preprocessor for less/css bowels
 var lessMiddleware = require('less-middleware');
 
@@ -155,16 +173,6 @@ io.sockets.on('connection', function (socket) {
       command: 'cancel',
       payload: {
         oid: oid
-      },
-      cb: function(err, result) {
-        Log.info('Cancel Order', arguments);
-        if (err == null) {
-          var oid = result.oid;
-
-          socket.emit('cancelled', oid)
-        } else {
-          Log.error('Fail by Order Cancelling, oid', oid);
-        }
       }
     })
   });

@@ -178,27 +178,49 @@ function($, _, Backbone,
       return actionEl;
     },
 
-    cancelOrder: function(e) {
-      var me = e.data.me,
-        model = me.model,
-        orders = model.get('orders'),
-        target = e.target;
+
+    findOrderId: function (e) {
+      var target = e.target,
+        targetId;
 
       do {
-        var targetId = target.id,
-          done = target.tagName == 'FIELDSET';
+        var done = target.tagName == 'FIELDSET';
 
         target = target.parentElement;
         if (!done) {
           done = !target;
+        } else {
+          targetId = target.id; // parent of FIELDSET
         }
       } while (!done);
+
+      return targetId;
+    },
+
+
+    cancelOrder: function(e) {
+      var me = e.data.me,
+        targetId = me.findOrderId(e);
+
 
       if (targetId) {
         var $G = $.Goxnode(),
           socket = $G.socket;
 
         socket.emit('cancelOrder', targetId);
+      }
+    },
+
+
+    confirmOrder: function(e) {
+      var me = e.data.me,
+        model = me.model,
+        orders = model.get('orders');
+
+      var targetId = me.findOrderId(e);
+      if (targetId) {
+        var $G = $.Goxnode(),
+          socket = $G.socket;
       }
     },
 
@@ -215,6 +237,7 @@ function($, _, Backbone,
 
           el = orders.getContentEl();
         }
+
         orderUI = this.orderTemplate({
           model: model,
           stockTicker: stockTicker,
@@ -227,11 +250,31 @@ function($, _, Backbone,
       // trick to get new created DOM element
       // let save it to model
 
-      var orderEl = model.el = el.lastElementChild
-      var cancelEl = $('a[data-icon=delete]', orderEl);
+      var orderEl = model.el = el.lastElementChild;
       var tapEvent = $G.tapEvent;
+      var cancelEl = $('a[data-icon=delete]', orderEl);
       $(cancelEl).on(tapEvent, {me: this}, this.cancelOrder);
 
+      var confirmEl = $('a[data-icon=check]', orderEl);
+      $(confirmEl).on(tapEvent, {me: this}, this.confirmOrder);
+
+      // register sliders event handlers
+      var sliders = $('.ui-slider input', orderEl),
+        priceDigits = sliders[0],
+        priceCents = sliders[1],
+        size = sliders[2];
+
+      $(size).slider({
+        controlchange: function() {
+//          console.log('slider change event', arguments);
+        },
+        start: function(jqEvent) {
+          console.log('slider start event', jqEvent);
+        },
+        stop: function(jqEvent) {
+          console.log('slider stop event', jqEvent);
+        }
+      })
     },
 
 

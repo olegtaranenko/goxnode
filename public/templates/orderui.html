@@ -28,20 +28,25 @@
 
 
   if (orderType == 'ask') {
+    orderTheme = 'a';
   } else {
+    orderTheme = 'h';
   }
 %>
 
-<div class="trade-action" data-theme="c">
-  <fieldset id="<%= cid %>" data-role="controlgroup" data-type="horizontal" style="float: right;">
+<div class="order-action" data-theme="<%= orderTheme %>" id="<%= cid %>">
+  <fieldset data-role="controlgroup" data-type="horizontal" style="float: right;">
     <a href="#" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
-    <a href="#" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
+  </fieldset>
+
+  <fieldset data-role="controlgroup" data-type="horizontal" style="float: right; margin-right: 20px">
+    <a href="#" data-theme="b" data-role="button" data-icon="check" data-inline="true" data-iconpos="notext" style="height: 57px; visibility: hidden"></a>
   </fieldset>
 
   <div class="trade-info">
     <div class="trade-action-info">
       <span>
-        <small><i><%= _.strftime(orderDate, orderDateFormat) %></i></small>
+        <!--<small><i><%= _.strftime(orderDate, orderDateFormat) %></i></small>-->
 
         <strong><%= model.get('type').toUpperCase() %>  <%= model.get('status') %>  </strong>
         <br/>
