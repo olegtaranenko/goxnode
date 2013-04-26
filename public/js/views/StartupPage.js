@@ -224,7 +224,7 @@ function($, _, Backbone,
     },
 
 
-    createOrder: function(model, el) {
+    createOrder: function(model, insertedEl) {
       var $G = $.Goxnode();
       var startupModel = this.model,
         tradeAccount = startupModel.get('tradeAccount'),
@@ -233,36 +233,32 @@ function($, _, Backbone,
         orderBase = model.get('item'),
         orderCur = model.get('currency'),
         base = stockExchange.getBaseCurrency(),
-        cur = stockExchange.getCurCurrency();
-
-      if (!(orderBase == base && orderCur == cur)) {
-        return;
-      }
-
-      if (!el) {
-        var orders = startupModel.get('orders');
-
+        cur = stockExchange.getCurCurrency(),
+        orders = startupModel.get('orders'),
         el = orders.getContentEl();
-      }
 
-      if (!el) {
+      if (!el || !(orderBase == base && orderCur == cur)) {
         return;
       }
-        orderUI = this.orderTemplate({
-          model: model,
-          stockTicker: stockTicker,
-          stockExchange: stockExchange,
-          tradeAccount: tradeAccount
-        });
 
-      $(el).append(orderUI).trigger('create');
+      orderUI = this.orderTemplate({
+        model: model,
+        stockTicker: stockTicker,
+        stockExchange: stockExchange,
+        tradeAccount: tradeAccount
+      });
 
+      var ct = $(el).append(orderUI).trigger('create');
 
       // trick to get new created DOM element
       // let save it to model
-
       var orderEl = model.el = el.lastElementChild,
         $order = $(orderEl);
+
+      if (insertedEl != null) {
+        $(insertedEl).before($order);
+      }
+
 
       var tapEvent = $G.tapEvent;
       var cancelEl = $('a[data-icon=delete]', orderEl);

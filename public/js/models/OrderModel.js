@@ -21,23 +21,59 @@ define([
       "type": '' // 'ask', 'bid'
     },
 
-    buildHeaderUI: function() {
-      var type = this.get('type').toUpperCase(),
-        status = this.get('status'),
-        amount = this.get('amount').toAmount(),
+    getOrderTotal: function() {
+      var
         price = this.get('price').toPrice(),
+        effective = this.get('effective_amount').toAmount();
+
+    },
+
+    buildHeaderUI: function() {
+      var $G = $.Goxnode(),
+        type = this.get('type').toUpperCase(),
+        status = this.get('status'),
+        price = this.get('price').toPrice(),
+
+        amountModel = this.get('amount'),
+        amount = amountModel.toAmount(),
+
         effectiveModel = this.get('effective_amount'),
         effective = effectiveModel.toAmount(),
-        displayEffective = effectiveModel.get('display_short'),
+
+        model = effective > 0 ? effectiveModel : amountModel,
+        total = $G.roundFond(model.toAmount() * price),
+
+        display = model.get('display_short'),
         header = type + ' ' + status + ' <u>' + price + '</u> * ';
 
-      header += ' ' + displayEffective;
-      if (amount != effective) {
-        header += '[' + amount + ']';
+      header += ' ' + display;
+      if (amount != effective && effective > 0) {
+        header += ' [' + amountModel.get('display_short') + ']';
       }
 
+      header += '<span style="float:right">' + total + '</span>';
       return header;
     },
+
+
+    getOrderSwatchTheme: function() {
+      var orderType = this.get('type'),
+        orderStatus = this.get('status'),
+        orderTheme;
+
+      if (orderStatus == 'invalid') {
+        orderTheme = 'c';
+      } else {
+        if (orderType == 'ask') {
+          orderTheme = 'e';
+        } else {
+          orderTheme = 'b';
+        }
+      }
+
+      return orderTheme;
+    },
+
 
     constructor: function(attributes) {
       var me = this;
@@ -60,14 +96,37 @@ define([
         var changeEvent = 'change:' + property;
 
         me.on(changeEvent, function(model, options) {
-          var el = model.el,
-            headerEl = $(el).find('h2'),
-            header = model.buildHeaderUI();
-
-          headerEl.html(header);
+          changeHeader(model);
         });
 
       });
+
+      me.on('change:status', function(model, options) {
+//        changeHeader(model);
+        changeTheme(model);
+      });
+
+      function changeHeader(model) {
+        var el = model.el,
+          headerEl = $(el).find('h2'),
+          header = model.buildHeaderUI(),
+          innerEl = headerEl.find('span.ui-btn-text');
+
+        $(innerEl).html(header);
+      }
+
+      function changeTheme(model) {
+        var el = model.el,
+          status = model.get('status'),
+          theme = model.getOrderSwatchTheme(),
+          buttonEl = $(el).find('h2 a');
+
+        if (status == 'invalid' || status == 'open') {
+          $(buttonEl).buttonMarkup({theme: theme});
+        }
+      }
+
+
     }
   })
 });

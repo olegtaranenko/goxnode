@@ -9,9 +9,10 @@ define([
       model: OrderModel,
       comparator: function(model) {
         var price = model.get('price'),
-          type = model.get('type');
-        var value = price.get('value_int');
-        return type == 'bid' ? Number.MAX_VALUE - value :  -1 * value;
+          type = model.get('type'),
+          value = parseInt(price.get('value_int'));
+
+        return type == 'bid' ? 10000000000 - value :  -1 * value;
       },
 
       initialize: function() {
@@ -19,11 +20,18 @@ define([
 
         me.on("add", function(model, me, options) {
           console.log("in Orders collection ---- ADD", model);
-          var previousModels = options.previousModels,
-            contentEl = me.getContentEl(),
-            page = me.owner;
+          var contentEl = me.getContentEl(),
+            page = me.owner,
+            index = me.indexOf(model),
+            orderEls = $(contentEl).find('.trade-order'),
+            appendedOrderUIs = orderEls.length,
+            insertEl;
 
-          page.createOrder(model, contentEl);
+          if (index <= appendedOrderUIs) {
+            insertEl = orderEls[index];
+          }
+
+          page.createOrder(model, insertEl);
         });
 
 
@@ -43,21 +51,6 @@ define([
 
           console.log("in Orders collection ---- CHANGE");
         });
-/*
-        me.on("reset", function(models, options) {
-          var previousModels = options.previousModels,
-            contentEl = me.getContentEl();
-
-          _.each(models, function(orderModel) {
-            console.log("in Orders collection", orderModel);
-            var isNew = false;
-
-            _.each(previousModels, function(prevModel) {
-
-            });
-          });
-        });
-*/
       },
 
       getContentEl: function() {

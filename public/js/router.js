@@ -88,10 +88,27 @@ define([
         orders.remove(oid);
       }
 
-      function onUserOrder(oid) {
-        console.log('onUserOrder() ', oid);
-        var orders = startupModel.get('orders');
+      function onUserOrder(orderRaw) {
+        console.log('onUserOrder() ', orderRaw);
+        var orders = startupModel.get('orders'),
+          oid = orderRaw.oid,
+          model = orders.get(oid);
 
+        orders.add(orderRaw, {
+          merge: true
+        });
+
+/*
+        if (model) {
+          model.set(orderRaw);
+        } else {
+          model = new OrderModel(orderRaw);
+          var index = orders.add(model);
+        }
+*/
+//          order = new OrderModel();
+
+//        orders.add()
       }
 
       socket.on('connect',    onConnect);

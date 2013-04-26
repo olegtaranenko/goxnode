@@ -5,12 +5,11 @@
   var orderDateFormat = $G.orderDateFormat,
     orderDate = new Date(model.get('date') * 1000),
     amount = model.get('amount').toAmount(),
-    effective = model.get('effective_amount').toAmount(),
 
     price = model.get('price').toPrice(),
     priceDigits = Math.floor(price),
     priceCents = price - priceDigits,
-    total = $G.roundFond(effective * price),
+    total = model.getOrderTotal(),
     base = stockExchange.getBaseCurrency(),
     cur = stockExchange.getCurCurrency(),
     cid = model.id;
@@ -24,21 +23,15 @@
     ask = ticker.ask,
     bid = ticker.bid;
 
-  var orderType = model.get('type'),
-    minDigits = priceDigits - digitsScale,
-    maxDigits = priceDigits + digitsScale;
+  var minDigits = priceDigits - digitsScale,
+    maxDigits = priceDigits + digitsScale,
+    orderTheme = model.getOrderSwatchTheme();
 
-
-  if (orderType == 'ask') {
-    orderTheme = 'e';
-  } else {
-    orderTheme = 'b';
-  }
 %>
 
 <div data-role="collapsible" class="trade-order" data-theme="<%= orderTheme %>" id="<%= cid %>">
   <h2>
-    <%= model.buildHeaderUI() %> <span style="float:right"><%= total %></span>
+    <%= model.buildHeaderUI() %>
   </h2>
 
   <fieldset data-role="controlgroup" data-type="horizontal" style="float: right;">

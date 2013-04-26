@@ -108,6 +108,12 @@ define(['socket.io', 'jquery', "settings"],
       },
 
 
+      /**
+       *
+       * @param fond
+       * @param [currency]
+       * @returns {number}
+       */
       roundFond: function(fond, currency) {
         var digits = this.digits[currency] || 100;
         return Math.round(fond * digits) / digits;
