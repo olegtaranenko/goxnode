@@ -232,12 +232,15 @@ function($, _, Backbone,
         stockExchange = startupModel.get('stockExchange'),
         stockTicker = startupModel.get('stockTicker');
 
-        if (!el) {
-          var orders = startupModel.get('orders');
+      if (!el) {
+        var orders = startupModel.get('orders');
 
-          el = orders.getContentEl();
-        }
+        el = orders.getContentEl();
+      }
 
+      if (!el) {
+        return;
+      }
         orderUI = this.orderTemplate({
           model: model,
           stockTicker: stockTicker,
@@ -326,9 +329,9 @@ function($, _, Backbone,
 
       $el.on('pageinit', function() {
         var collapsibleEl = $(goxnode).find('[data-role=collapsible-set]'),
-          collapsibleList = collapsibleEl.children(),
-          strategiesEl = collapsibleList[1],
-          ordersEl = collapsibleList[0];
+//          collapsibleList = collapsibleEl.children(),
+          strategiesEl = $(collapsibleEl).find('.strategies'),
+          ordersEl = $(collapsibleEl).find('.orders');
 
         tradeAccount.set({el: strategiesEl});
         orders.el = ordersEl;
