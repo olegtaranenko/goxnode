@@ -184,13 +184,13 @@ function($, _, Backbone,
         targetId;
 
       do {
-        var done = target.tagName == 'FIELDSET';
+        var done = $(target).hasClass('trade-order');
+
+        targetId = target.id;
 
         target = target.parentElement;
         if (!done) {
           done = !target;
-        } else {
-          targetId = target.id; // parent of FIELDSET
         }
       } while (!done);
 
@@ -200,14 +200,13 @@ function($, _, Backbone,
 
     cancelOrder: function(e) {
       var me = e.data.me,
-        targetId = me.findOrderId(e);
+        orderId = me.findOrderId(e);
 
-
-      if (targetId) {
+      if (orderId) {
         var $G = $.Goxnode(),
           socket = $G.socket;
 
-        socket.emit('cancelOrder', targetId);
+        socket.emit('cancelOrder', orderId);
       }
     },
 
@@ -230,7 +229,15 @@ function($, _, Backbone,
       var startupModel = this.model,
         tradeAccount = startupModel.get('tradeAccount'),
         stockExchange = startupModel.get('stockExchange'),
-        stockTicker = startupModel.get('stockTicker');
+        stockTicker = startupModel.get('stockTicker'),
+        orderBase = model.get('item'),
+        orderCur = model.get('currency'),
+        base = stockExchange.getBaseCurrency(),
+        cur = stockExchange.getCurCurrency();
+
+      if (!(orderBase == base && orderCur == cur)) {
+        return;
+      }
 
       if (!el) {
         var orders = startupModel.get('orders');
@@ -250,10 +257,13 @@ function($, _, Backbone,
 
       $(el).append(orderUI).trigger('create');
 
+
       // trick to get new created DOM element
       // let save it to model
 
-      var orderEl = model.el = el.lastElementChild;
+      var orderEl = model.el = el.lastElementChild,
+        $order = $(orderEl);
+
       var tapEvent = $G.tapEvent;
       var cancelEl = $('a[data-icon=delete]', orderEl);
       $(cancelEl).on(tapEvent, {me: this}, this.cancelOrder);
@@ -262,10 +272,9 @@ function($, _, Backbone,
       $(confirmEl).on(tapEvent, {me: this}, this.confirmOrder);
 
       // register sliders event handlers
-      var sliders = $('.ui-slider input', orderEl),
-        priceDigits = sliders[0],
-        priceCents = sliders[1],
-        size = sliders[2];
+      var priceDigits = $order.find('input.digits'),
+        priceCents = $order.find('input.cents'),
+        size = $order.find('input.size');
 
       $(size).slider({
         controlchange: function() {
@@ -275,7 +284,13 @@ function($, _, Backbone,
           console.log('slider start event', jqEvent);
         },
         stop: function(jqEvent) {
-          console.log('slider stop event', jqEvent);
+//          console.log('slider stop event', jqEvent);
+          var val = $(size).val();
+
+          model.set( size, val, {
+            silent: false,
+            fromControl: true
+          });
         }
       })
     },

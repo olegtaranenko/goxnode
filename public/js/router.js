@@ -82,14 +82,14 @@ define([
       }
 
       function onOrdersCancelled(oid) {
-        console.log('onOrdersCancelled() ', arguments);
+        console.log('onOrdersCancelled() ', oid);
         var orders = startupModel.get('orders');
 
         orders.remove(oid);
       }
 
       function onUserOrder(oid) {
-        console.log('onOrdersCancelled() ', arguments);
+        console.log('onUserOrder() ', oid);
         var orders = startupModel.get('orders');
 
       }

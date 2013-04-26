@@ -5,10 +5,12 @@
   var orderDateFormat = $G.orderDateFormat,
     orderDate = new Date(model.get('date') * 1000),
     amount = model.get('amount').toAmount(),
+    effective = model.get('effective_amount').toAmount(),
+
     price = model.get('price').toPrice(),
     priceDigits = Math.floor(price),
     priceCents = price - priceDigits,
-    total = $G.roundFond(amount * price),
+    total = $G.roundFond(effective * price),
     base = stockExchange.getBaseCurrency(),
     cur = stockExchange.getCurCurrency(),
     cid = model.id;
@@ -28,13 +30,17 @@
 
 
   if (orderType == 'ask') {
-    orderTheme = 'a';
+    orderTheme = 'e';
   } else {
-    orderTheme = 'h';
+    orderTheme = 'b';
   }
 %>
 
-<div class="order-action" data-theme="<%= orderTheme %>" id="<%= cid %>">
+<div data-role="collapsible" class="trade-order" data-theme="<%= orderTheme %>" id="<%= cid %>">
+  <h2>
+    <%= model.buildHeaderUI() %> <span style="float:right"><%= total %></span>
+  </h2>
+
   <fieldset data-role="controlgroup" data-type="horizontal" style="float: right;">
     <a href="#" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
   </fieldset>
@@ -49,17 +55,15 @@
       <span>
         <!--<small><i><%= _.strftime(orderDate, orderDateFormat) %></i></small>-->
 
-        <strong><%= model.get('type').toUpperCase() %>  <%= model.get('status') %>  </strong>
-        <br/>
-        <strong><%= amount %> * <%= price %> = <%= total %>  </strong>
+
       </span>
     </div>
 
     <div style="clear: both"></div>
     <div>
-      <input type="range" name="priceDigits" value="<%= priceDigits %>" min="<%= minDigits %>" max="<%= maxDigits %>" />
-      <input type="range" name="priceCents" value="<%= priceCents %>" min="0" max="0.99999" data-mini="true" step="0.0001"/>
-      <input type="range" name="size" value="<%= amount %>" min="0" max="30" step="0.1"/>
+      <input type="range" class="digits" name="priceDigits" value="<%= priceDigits %>" min="<%= minDigits %>" max="<%= maxDigits %>" />
+      <input type="range" class="cents" name="priceCents" value="<%= priceCents %>" min="0" max="0.99999" data-mini="true" step="0.0001"/>
+      <input type="range" class="size" name="size" value="<%= amount %>" min="0" max="30" step="0.1"/>
     </div>
     <hr/>
   </div>
