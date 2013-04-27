@@ -32,6 +32,7 @@ define([
       var $G = $.Goxnode(),
         type = this.get('type').toUpperCase(),
         status = this.get('status'),
+        editing = status == 'editing',
         price = this.get('price').toPrice(),
 
         amountModel = this.get('amount'),
@@ -40,14 +41,14 @@ define([
         effectiveModel = this.get('effective_amount'),
         effective = effectiveModel.toAmount(),
 
-        model = effective > 0 ? effectiveModel : amountModel,
+        model = (effective > 0 && !editing)? effectiveModel : amountModel,
         total = $G.roundFond(model.toAmount() * price),
 
         display = model.get('display_short'),
         header = type + ' ' + status + ' <u>' + price + '</u> * ';
 
       header += ' ' + display;
-      if (amount != effective && effective > 0) {
+      if (!editing && (amount != effective && effective > 0)) {
         header += ' [' + amountModel.get('display_short') + ']';
       }
 
@@ -55,6 +56,18 @@ define([
       return header;
     },
 
+
+    cancelButtonEl: function() {
+      var orderEl = this.el;
+
+      return $('a[data-icon=delete]', orderEl);
+    },
+
+    confirmButtonEl: function() {
+      var orderEl = this.el;
+
+      return $('a[data-icon=check]', orderEl);
+    },
 
     getOrderSwatchTheme: function() {
       var orderType = this.get('type'),
@@ -92,19 +105,27 @@ define([
     initialize: function(options) {
       var me = this;
 
-      _.each(['size', 'amount', 'effective_amount'], function(property) {
+      _.each(['amount', 'effective_amount', 'price'], function(property) {
         var changeEvent = 'change:' + property;
 
-        me.on(changeEvent, function(model, options) {
+        me.on(changeEvent, function(model, value, options) {
           changeHeader(model);
         });
 
       });
 
-      me.on('change:status', function(model, options) {
+      me.on('change:status', function(model, value, options) {
 //        changeHeader(model);
         changeTheme(model);
+        tweakConfirmButton(value == 'editing');
       });
+
+
+      function tweakConfirmButton(editing) {
+        var confirmEl = $(me.confirmButtonEl());
+
+        $(confirmEl).css('visibility', editing ? 'visible' : 'hidden');
+      }
 
       function changeHeader(model) {
         var el = model.el,

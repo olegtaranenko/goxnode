@@ -8,12 +8,12 @@
 define([
   'jquery', 'underscore', 'backbone',
   'text!/templates/startup.html', 'text!/templates/actionui.html', 'text!/templates/orderui.html',
-  'StartupModel', 'TradeAction'
+  'StartupModel', 'TradeAction', 'CurrencyValueModel'
 ],
 
 function($, _, Backbone,
           tpl, actionUI, orderUI,
-          StartupModel, TradeAction
+          StartupModel, TradeAction, CurrencyValueModel
 ) {
 
   return Backbone.View.extend({
@@ -200,13 +200,25 @@ function($, _, Backbone,
 
     cancelOrder: function(e) {
       var me = e.data.me,
-        orderId = me.findOrderId(e);
+        orderId = me.findOrderId(e),
+        startupModel = me.model,
+        orders = startupModel.get('orders'),
+        order = orders.get(orderId),
+        status = order.get('status'),
+        editing = status == 'editing';
 
-      if (orderId) {
-        var $G = $.Goxnode(),
-          socket = $G.socket;
 
-        socket.emit('cancelOrder', orderId);
+      if (!editing) {
+        if (orderId) {
+          var $G = $.Goxnode(),
+            socket = $G.socket;
+
+          socket.emit('cancelOrder', orderId);
+        }
+      } else {
+        // revert changes to before edit
+        var revertAttributes = order.previousAttributes();
+        
       }
     },
 
@@ -261,32 +273,37 @@ function($, _, Backbone,
 
 
       var tapEvent = $G.tapEvent;
-      var cancelEl = $('a[data-icon=delete]', orderEl);
+
+      var cancelEl = model.cancelButtonEl();
       $(cancelEl).on(tapEvent, {me: this}, this.cancelOrder);
 
-      var confirmEl = $('a[data-icon=check]', orderEl);
+      var confirmEl = model.confirmButtonEl();
       $(confirmEl).on(tapEvent, {me: this}, this.confirmOrder);
 
       // register sliders event handlers
       var priceDigits = $order.find('input.digits'),
         priceCents = $order.find('input.cents'),
-        size = $order.find('input.size');
+        amount = $order.find('input.amount');
 
-      $(size).slider({
+      $(amount).slider({
         controlchange: function() {
 //          console.log('slider change event', arguments);
+          model.set('status', 'editing');
         },
         start: function(jqEvent) {
-          console.log('slider start event', jqEvent);
+//          console.log('slider start event', jqEvent);
         },
         stop: function(jqEvent) {
 //          console.log('slider stop event', jqEvent);
-          var val = $(size).val();
+          var val = $(amount).val(),
+            valueModel = new CurrencyValueModel({
+              value: val,
+              currency: stockExchange.getBaseCurrency()
+            }, {
+              ui: true
+            });
 
-          model.set( size, val, {
-            silent: false,
-            fromControl: true
-          });
+          model.set('amount', valueModel);
         }
       })
     },

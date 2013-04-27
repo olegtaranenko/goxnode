@@ -42,7 +42,6 @@ define(['socket.io', 'jquery', "settings"],
         USD: 100
       },
 
-
       evaluateStrategies: function (owner, currency, side) {
         var $G = this;
         var tradeAccount = owner.get('tradeAccount'),
@@ -107,6 +106,12 @@ define(['socket.io', 'jquery', "settings"],
 
       },
 
+
+      convertToIntValue: function(value, currency) {
+        var multiplier = this.multipliers[currency];
+
+        return Math.round(value * multiplier);
+      },
 
       /**
        *

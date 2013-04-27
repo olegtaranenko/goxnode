@@ -4,9 +4,11 @@
  */
 define([
   'backbone'
-], function(Backbone) {
+  ,'config'
+], function(Backbone, config) {
 
-  var _super = Backbone.Model.prototype;
+  var _super = Backbone.Model.prototype,
+    $G = $.Goxnode();
 
   return Backbone.Model.extend({
     defaults: {
@@ -27,15 +29,28 @@ define([
       return value_int / 1E5;
     },
 
-    constructor: function(attributes) {
+    constructor: function(attributes, options) {
       var me = this;
 
       if (attributes != null) {
-        var value_int = attributes.value_int;
-        if (isNaN(value_int)) {
-          value_int = 0;
+          // assume we supply value from the UI control. Value or Size
+        var ui = options && options.ui;
+        if (ui) {
+          var value = attributes.value,
+            currency = attributes.currency,
+            valueFloat = parseFloat(value);
+
+          attributes.value_int = $G.convertToIntValue(valueFloat, currency);
+          attributes.value = valueFloat;
+          attributes.display_short = valueFloat + ' ' + currency;
+        } else {
+          var value_int = attributes.value_int;
+
+          if (isNaN(value_int)) {
+            value_int = 0;
+          }
+          attributes.value_int = value_int;
         }
-        attributes.value_int = value_int;
       }
 
       _super.constructor.apply(me, arguments);
