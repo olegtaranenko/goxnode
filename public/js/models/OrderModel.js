@@ -109,17 +109,42 @@ define([
         var changeEvent = 'change:' + property;
 
         me.on(changeEvent, function(model, value, options) {
+//          console.log('changeEvent %s, value ', changeEvent, value);
           changeHeader(model);
         });
 
       });
 
       me.on('change:status', function(model, value, options) {
-//        changeHeader(model);
         changeTheme(model);
         tweakConfirmButton(value == 'editing');
-      });
 
+        var previousStatus = this.previous('status');
+
+        if (value == 'editing') {
+          this.original = {
+            status: previousStatus,
+            price: this.get('price'),
+            amount: this.get('amount')
+          };
+
+        } if (previousStatus == 'editing' && value == 'revert') {
+//          console.log('revert sliderVal, original', this.original);
+          model.set(this.original);
+
+          var sliders = model.allSliders;
+
+          _.each(sliders, function(sliderOptions, root) {
+            var sliderEl = sliderOptions.el,
+              sliderVal = sliderOptions.value;
+
+            $(sliderEl).val(sliderVal);
+            $(sliderEl).slider("refresh");
+          });
+
+          delete this.original;
+        }
+      });
 
       function tweakConfirmButton(editing) {
         var confirmEl = $(me.confirmButtonEl());

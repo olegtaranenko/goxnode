@@ -217,8 +217,8 @@ function($, _, Backbone,
         }
       } else {
         // revert changes to before edit
-        var revertAttributes = order.previousAttributes();
-        
+        order.set('status', 'revert');
+
       }
     },
 
@@ -280,32 +280,74 @@ function($, _, Backbone,
       var confirmEl = model.confirmButtonEl();
       $(confirmEl).on(tapEvent, {me: this}, this.confirmOrder);
 
-      // register sliders event handlers
-      var priceDigits = $order.find('input.digits'),
-        priceCents = $order.find('input.cents'),
-        amount = $order.find('input.amount');
+      function calculateChangeOptions($slider, sliderRoot) {
+        var valueModel, currency,
+          changeProperty, value,
+          changeOptions = {};
 
-      $(amount).slider({
-        controlchange: function() {
-//          console.log('slider change event', arguments);
-          model.set('status', 'editing');
-        },
-        start: function(jqEvent) {
-//          console.log('slider start event', jqEvent);
-        },
-        stop: function(jqEvent) {
-//          console.log('slider stop event', jqEvent);
-          var val = $(amount).val(),
-            valueModel = new CurrencyValueModel({
-              value: val,
-              currency: stockExchange.getBaseCurrency()
-            }, {
-              ui: true
-            });
+        var sliderValue = $slider.val(),
+          sliderValueNumber = parseFloat(sliderValue),
+          valueOptions = {
+            ui: true
+          };
 
-          model.set('amount', valueModel);
+
+        if (sliderRoot == 'amount') {
+          currency = stockExchange.getBaseCurrency();
+          value = sliderValue;
+          changeProperty = 'amount';
+        } else {
+          var orderPriceNum = parseFloat(model.get('price').get('value')),
+            digitsValue = Math.ceil(orderPriceNum);
+
+          changeProperty = 'price';
+          currency = stockExchange.getCurCurrency();
+
+          if (sliderRoot == 'cents') {
+            value = digitsValue + sliderValueNumber;
+          } else {
+            var centsValue = orderPriceNum - digitsValue;
+            value = sliderValueNumber + centsValue;
+          }
         }
-      })
+
+        var valueAttributes = {
+          value: value,
+          currency: currency
+        };
+
+        valueModel = new CurrencyValueModel(valueAttributes,valueOptions);
+        changeOptions[changeProperty] = valueModel;
+
+        return changeOptions;
+      }
+
+      var allSliders = {};
+      _.each(['digits', 'cents', 'amount'], function(sliderRoot) {
+
+        var sliderEl = $order.find('input.' + sliderRoot),
+          $slider = $(sliderEl),
+          initialValue = $slider.val();
+
+        allSliders[sliderRoot] = {
+          el: sliderEl,
+          value: initialValue
+        };
+
+        $slider.slider({
+          stop: function(jqEvent) {
+//          console.log('slider stop event', jqEvent);
+            var changeOptions = calculateChangeOptions($slider, sliderRoot);
+
+            // should call separate, otherwise wrong original values
+            model.set('status', 'editing');
+            model.set(changeOptions);
+          }
+        })
+      });
+
+      model.allSliders = allSliders;
+
     },
 
 
