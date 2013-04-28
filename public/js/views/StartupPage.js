@@ -234,6 +234,8 @@ function($, _, Backbone,
         orderModel = orders.get(targetId),
         orderType = orderModel.get('type'),
         orderPrice = orderModel.get('price').get('value'),
+        orderPriceInt = orderModel.get('price').get('value_int'),
+        orderAmountInt = orderModel.get('amount').get('value_int'),
         isBid = orderType == 'bid',
         absoluteEdge = !isBid ? 0 : Number.MAX_VALUE,
         warningEdge = isBid ? ask : bid;
@@ -270,7 +272,16 @@ function($, _, Backbone,
 
       if (targetId) {
         var $G = $.Goxnode(),
-          socket = $G.socket;
+          socket = $G.socket,
+          createOptions = {
+            oid: targetId,
+            type: orderType,
+            price_int: orderPriceInt,
+            amount_int: orderAmountInt
+          };
+          console.log('about to create order with params', createOptions);
+
+        socket.emit('createOrder', createOptions);
       }
     },
 
@@ -321,12 +332,12 @@ function($, _, Backbone,
 
       function findSlider(root) {
         var ret = null;
-        _.each(allSliders, function(sliderInfo, name) {
+        _.some(allSliders, function(sliderInfo, name) {
           if (name == root) {
             ret = sliderInfo.el;
-            return _.break;
+            return true;
           }
-          return null;
+          return false;
         });
         return ret;
       }
@@ -348,7 +359,7 @@ function($, _, Backbone,
           changeProperty = 'amount';
         } else {
           var orderPriceNum = parseFloat(model.get('price').get('value')),
-            digitsValue = Math.ceil(orderPriceNum);
+            digitsValue = Math.floor(orderPriceNum);
 
           changeProperty = 'price';
           currency = stockExchange.getCurCurrency();
@@ -395,12 +406,12 @@ function($, _, Backbone,
             },
             direction = 0;
 
-          _.each(range, function (value, side) {
+          _.some(range, function (value, side) {
             if (value == checkValue) {
               direction = side == 'max' ? 1 : -1;
-              return _.break;
+              return true;
             }
-            return null;
+            return false;
           });
 
           if (direction) {

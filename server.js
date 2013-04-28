@@ -176,6 +176,38 @@ io.sockets.on('connection', function (socket) {
       }
     })
   });
+
+
+  socket.on('createOrder', function(params) {
+    Log.debug('createOrder', params);
+    var oid = params.oid,
+      command = 'cancel';
+    if (oid) {
+      clientMtgox.queryHttps({
+        command: command,
+        payload: {
+          oid: oid
+        },
+        cb: function (err) {
+          if (err) {
+            Log.error('Error by call to "', command, '", error => ', err);
+            return;
+          }
+          add();
+        }
+      })
+    } else {
+      add();
+    }
+
+    function add() {
+      delete params.oid;
+      clientMtgox.queryHttps({
+        command: 'add',
+        payload: params
+      })
+    }
+  });
   executeClosure(socket, [retrievePrivateInfo, retrieveOpenOrders, setLastTicker], this, {});
 });
 
