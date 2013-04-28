@@ -1,7 +1,0 @@
-{
-  "security": {
-    "apiKey": "4f81a8fd-2ec0-470a-80e6-d6caf67854be",
-    "secret": "bMaGPeXRF7XVzs5guvLM6tclEzxqKNnboc3M1r/dXVzjR9vr2Bley8JSMLoqLCUbOUODXbVW7hqD1ZDohBVpVA=="
-  },
-  "strategies": [ "100", "50", "30", "2"]
-}

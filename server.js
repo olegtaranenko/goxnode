@@ -26,15 +26,13 @@ var io = require('socket.io').listen(server, {
 });
 
 
-var configJson = __dirname + '/config.json',
-  config = require(configJson),
-  apiKey = config.security.apiKey,
-  secret = config.security.secret,
-  strategies = config.strategies,
+var
+//  configJson = __dirname + '/config.json',
+//  config = require(configJson),
   clientJson = __dirname + '/client.json',
-  client = require(clientJson);
-
-client.strategies = strategies;
+  client = require(clientJson),
+  apiKey = client.security.apiKey,
+  secret = client.security.secret;
 
 var lastPrivateChannel = {
   started: null, // date
