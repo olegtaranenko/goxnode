@@ -225,10 +225,49 @@ function($, _, Backbone,
 
     confirmOrder: function(e) {
       var me = e.data.me,
-        model = me.model,
-        orders = model.get('orders');
+        startupModel = me.model,
+        orders = startupModel.get('orders'),
+        ticker = startupModel.get('stockTicker'),
+        bid = ticker.get('bid'),
+        ask = ticker.get('ask'),
+        targetId = me.findOrderId(e),
+        orderModel = orders.get(targetId),
+        orderType = orderModel.get('type'),
+        orderPrice = orderModel.get('price').get('value'),
+        isBid = orderType == 'bid',
+        absoluteEdge = !isBid ? 0 : Number.MAX_VALUE,
+        warningEdge = isBid ? ask : bid;
 
-      var targetId = me.findOrderId(e);
+      orders.each(function(order) {
+        var type = order.get('type');
+
+        if (type != orderType) {
+          var price = order.get('price').get('value_int');
+
+          if ((isBid && price < absoluteEdge) || (!isBid && price > absoluteEdge)) {
+            absoluteEdge = price;
+          }
+        }
+      });
+
+      var warning, noGo = false,
+        warningType, warningSeverity = 0;
+
+      if ((isBid && warningEdge > absoluteEdge) || (!isBid && warningEdge < absoluteEdge)) {
+        warningSeverity = 3;
+      } else if ((isBid && orderPrice > absoluteEdge) || (!isBid && orderPrice < absoluteEdge)) {
+        warning = 'First remove Orders';
+        warningSeverity = 2;
+      } else if ((isBid && orderPrice > warningEdge) || (!isBid && orderPrice < warningEdge)) {
+        warning = (isBid ? 'BUY' : 'SELL') + ' RIGHT NOW?';
+        warningSeverity = 1;
+      }
+
+      if (warningSeverity) {
+        var dialog = $('#dialogPage');
+        $.mobile.changePage( "#dialogPage", { role: "dialog" } );
+      }
+
       if (targetId) {
         var $G = $.Goxnode(),
           socket = $G.socket;

@@ -128,13 +128,17 @@ define([
     return Backbone.Router.extend({
 
       routes: {
-        "(:stock)(/:cur)(/:base)": 'startpage'
+        "(:stock)(/:cur)(/:base)": 'startpage',
+        "orderWarning": 'orderWarning'
       },
 
       initialize: function () {
         this.firstPage = true;
       },
 
+      orderWarning: function() {
+
+      },
 
       startpage: function (stock, cur, base) {
         stock = stock || 'mtgox';
