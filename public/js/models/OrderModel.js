@@ -136,9 +136,15 @@ define([
 
           _.each(sliders, function(sliderOptions, root) {
             var sliderEl = sliderOptions.el,
-              sliderVal = sliderOptions.value;
+              $slider = $(sliderEl),
+              sliderVal = sliderOptions.value,
+              attr = sliderOptions.attr;
 
+            _.each(attr, function(value, key) {
+              $slider.attr(key, value)
+            });
             $(sliderEl).val(sliderVal);
+
             $(sliderEl).slider("refresh");
           });
 

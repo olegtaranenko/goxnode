@@ -140,6 +140,8 @@ app.configure(function() {
   }));
 
   app.get('/js/settings.js', function(req, res) {
+    delete client.security;
+
     res.send('define([], function() { return ' + JSON.stringify(client) + '})');
   });
 

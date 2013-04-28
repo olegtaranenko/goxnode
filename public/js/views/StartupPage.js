@@ -264,8 +264,8 @@ function($, _, Backbone,
       }
 
       if (warningSeverity) {
-        var dialog = $('#dialogPage');
-        $.mobile.changePage( "#dialogPage", { role: "dialog" } );
+//        var dialog = $('#dialogPage');
+//        $.mobile.changePage( "#dialogPage", { role: "dialog" } );
       }
 
       if (targetId) {
@@ -319,7 +319,19 @@ function($, _, Backbone,
       var confirmEl = model.confirmButtonEl();
       $(confirmEl).on(tapEvent, {me: this}, this.confirmOrder);
 
-      function calculateChangeOptions($slider, sliderRoot) {
+      function findSlider(root) {
+        var ret = null;
+        _.each(allSliders, function(sliderInfo, name) {
+          if (name == root) {
+            ret = sliderInfo.el;
+            return _.break;
+          }
+          return null;
+        });
+        return ret;
+      }
+
+      function calculateChangeOptions($slider, sliderName) {
         var valueModel, currency,
           changeProperty, value,
           changeOptions = {};
@@ -330,8 +342,7 @@ function($, _, Backbone,
             ui: true
           };
 
-
-        if (sliderRoot == 'amount') {
+        if (sliderName == 'amount') {
           currency = stockExchange.getBaseCurrency();
           value = sliderValue;
           changeProperty = 'amount';
@@ -341,13 +352,30 @@ function($, _, Backbone,
 
           changeProperty = 'price';
           currency = stockExchange.getCurCurrency();
+          var slidersToUpdate = [];
 
-          if (sliderRoot == 'cents') {
+          if (sliderName == 'cents') {
             value = digitsValue + sliderValueNumber;
+            if (sliderValueNumber == 1) {
+              var digitsSlider = findSlider('digits'),
+                digits = parseInt(digitsSlider.val()) + 1;
+
+              $slider.val(0);
+              digitsSlider.val(digits);
+              checkDigitBounds(digitsSlider, digits);
+
+              slidersToUpdate.push($slider, digitsSlider);
+            }
           } else {
             var centsValue = orderPriceNum - digitsValue;
             value = sliderValueNumber + centsValue;
+
+            checkDigitBounds($slider, sliderValueNumber);
           }
+
+          _.each(slidersToUpdate, function(slider) {
+            slider.slider('refresh');
+          })
         }
 
         var valueAttributes = {
@@ -359,6 +387,31 @@ function($, _, Backbone,
         changeOptions[changeProperty] = valueModel;
 
         return changeOptions;
+
+        function checkDigitBounds(dSlider, checkValue) {
+          var range = {
+              max: parseInt(dSlider.attr('max')),
+              min: parseInt(dSlider.attr('min'))
+            },
+            direction = 0;
+
+          _.each(range, function (value, side) {
+            if (value == checkValue) {
+              direction = side == 'max' ? 1 : -1;
+              return _.break;
+            }
+            return null;
+          });
+
+          if (direction) {
+            var step = (range.max - range.min) / 2;
+
+            _.each(range, function (value, side) {
+              dSlider.attr(side, range[side] + step * direction);
+            });
+            slidersToUpdate.push(dSlider);
+          }
+        }
       }
 
       var allSliders = {};
@@ -370,7 +423,12 @@ function($, _, Backbone,
 
         allSliders[sliderRoot] = {
           el: sliderEl,
-          value: initialValue
+          value: initialValue,
+          attr: {
+            max: $slider.attr('max'),
+            min: $slider.attr('min'),
+            step: $slider.attr('step')
+          }
         };
 
         $slider.slider({

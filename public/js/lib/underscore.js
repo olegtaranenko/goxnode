@@ -1,6 +1,7 @@
 //     Underscore.js 1.4.4
 //     http://underscorejs.org
-//     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
+//     (c) 2009-2011 Jeremy Ashkenas, DocumentCloud Inc.
+//     (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
 
 (function() {
@@ -50,6 +51,9 @@
     if (!(this instanceof _)) return new _(obj);
     this._wrapped = obj;
   };
+
+  // allow break the loop, is being used in _.each() callback
+  _.break = breaker;
 
   // Export the Underscore object for **Node.js**, with
   // backwards-compatibility for the old `require()` API. If we're in
