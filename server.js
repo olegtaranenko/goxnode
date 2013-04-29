@@ -181,7 +181,9 @@ io.sockets.on('connection', function (socket) {
   socket.on('createOrder', function(params) {
     Log.debug('createOrder', params);
     var oid = params.oid,
+      collapsed = params.collapsed,
       command = 'cancel';
+
     if (oid) {
       clientMtgox.queryHttps({
         command: command,
@@ -204,7 +206,14 @@ io.sockets.on('connection', function (socket) {
       delete params.oid;
       clientMtgox.queryHttps({
         command: 'add',
-        payload: params
+        payload: params,
+        cb: function (err) {
+          if (err) {
+            Log.error('Error by call to "', command, '", error => ', err);
+            return;
+          }
+          Log.debug('Order added, arguments', arguments);
+        }
       })
     }
   });

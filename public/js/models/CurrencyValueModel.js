@@ -29,6 +29,68 @@ define([
       return value_int / 1E5;
     },
 
+    fromParsedPrice: function(parsed) {
+      var ret = 0;
+      _.each(parsed, function(value) {
+        ret += value;
+      });
+      return ret;
+    },
+
+    toParsedPrice: function(price) {
+      if (price == null) {
+        price = this.toPrice();
+      }
+
+      var digits = this.toPriceDigits(price),
+        cents = this.toPriceCents(price, digits),
+        millis = this.toPriceMillis(price, digits, cents);
+
+      return {
+//        price: price,
+        digits: digits,
+        cents: cents,
+        millis: millis
+      }
+    },
+
+    toPriceDigits: function(price) {
+      if (price == null) {
+        price = this.toPrice();
+      }
+
+      return Math.floor(price * 10) / 10;
+    },
+
+    toPriceCents: function(price, digits) {
+      if (price == null ) {
+        price = this.toPrice();
+      }
+      if (digits == null) {
+        digits = this.toPriceDigits(price);
+      }
+
+      var rest = price - digits;
+
+      return Math.round(rest * 1000) / 1000;
+    },
+
+    toPriceMillis: function(price, digits, cents) {
+      if (price == null ) {
+        price = this.toPrice();
+      }
+      if (digits == null) {
+        digits = this.toPriceDigits(price);
+      }
+      if (cents == null) {
+        cents = this.toPriceCents(price);
+      }
+
+      var rest = price - digits - cents;
+
+      return Math.round(rest * 100000) / 100000;
+    },
+
     constructor: function(attributes, options) {
       var me = this;
 

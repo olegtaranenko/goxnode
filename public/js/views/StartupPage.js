@@ -236,6 +236,7 @@ function($, _, Backbone,
         orderPrice = orderModel.get('price').get('value'),
         orderPriceInt = orderModel.get('price').get('value_int'),
         orderAmountInt = orderModel.get('amount').get('value_int'),
+        collapsed = orderModel.get('collapsed'),
         isBid = orderType == 'bid',
         absoluteEdge = !isBid ? 0 : Number.MAX_VALUE,
         warningEdge = isBid ? ask : bid;
@@ -277,7 +278,8 @@ function($, _, Backbone,
             oid: targetId,
             type: orderType,
             price_int: orderPriceInt,
-            amount_int: orderAmountInt
+            amount_int: orderAmountInt,
+            collapsed: collapsed
           };
           console.log('about to create order with params', createOptions);
 
@@ -358,31 +360,25 @@ function($, _, Backbone,
           value = sliderValue;
           changeProperty = 'amount';
         } else {
-          var orderPriceNum = parseFloat(model.get('price').get('value')),
-            digitsValue = Math.floor(orderPriceNum);
+          var priceModel = model.get('price');
+          var orderPrice = priceModel.toPrice(),
+            parsedPrice = priceModel.toParsedPrice(orderPrice);
 
           changeProperty = 'price';
           currency = stockExchange.getCurCurrency();
           var slidersToUpdate = [];
 
-          if (sliderName == 'cents') {
-            value = digitsValue + sliderValueNumber;
-            if (sliderValueNumber == 1) {
-              var digitsSlider = findSlider('digits'),
-                digits = parseInt(digitsSlider.val()) + 1;
-
-              $slider.val(0);
-              digitsSlider.val(digits);
-              checkDigitBounds(digitsSlider, digits);
-
-              slidersToUpdate.push($slider, digitsSlider);
-            }
+          if (sliderName == 'millis') {
+            value = checkMillisBounds($slider);
+          } else if (sliderName == 'cents') {
+            value = checkCentsBounds($slider);
           } else {
-            var centsValue = orderPriceNum - digitsValue;
-            value = sliderValueNumber + centsValue;
-
-            checkDigitBounds($slider, sliderValueNumber);
+            value = checkDigitsBounds($slider, sliderValueNumber);
           }
+          slidersToUpdate.push($slider);
+          parsedPrice[sliderName] = value;
+
+          value = priceModel.fromParsedPrice(parsedPrice);
 
           _.each(slidersToUpdate, function(slider) {
             slider.slider('refresh');
@@ -399,10 +395,52 @@ function($, _, Backbone,
 
         return changeOptions;
 
-        function checkDigitBounds(dSlider, checkValue) {
+
+
+        function checkMillisBounds(slider) {
+          const boundValue = -0.0005;
+          var ret = sliderValueNumber;
+          if (sliderValueNumber == 0.0005) {
+            var centsSlider = findSlider('cents'),
+              cents = parseFloat(centsSlider.val()) + 0.001;
+
+            ret = boundValue;
+            parsedPrice.cents = cents;
+            slider.val(boundValue);
+            centsSlider.val(cents);
+            checkCentsBounds(centsSlider);
+
+            slidersToUpdate.push(centsSlider);
+          }
+          return ret;
+        }
+
+        function checkCentsBounds(slider) {
+          const boundValue = 0,
+            incrementValue = 0.1;
+
+          var value = sliderValueNumber;
+
+          if (sliderValueNumber == incrementValue) {
+            var digitsSlider = findSlider('digits'),
+              digits = parsedPrice.digits + incrementValue;
+
+            value = boundValue;
+            parsedPrice.digits = digits;
+            parsedPrice.cents = boundValue;
+            slider.val(boundValue);
+            digitsSlider.val(digits);
+            checkDigitsBounds(digitsSlider, digits);
+
+            slidersToUpdate.push(digitsSlider);
+          }
+          return value;
+        }
+
+        function checkDigitsBounds(slider, checkValue) {
           var range = {
-              max: parseInt(dSlider.attr('max')),
-              min: parseInt(dSlider.attr('min'))
+              max: parseInt(slider.attr('max')),
+              min: parseInt(slider.attr('min'))
             },
             direction = 0;
 
@@ -418,15 +456,15 @@ function($, _, Backbone,
             var step = (range.max - range.min) / 2;
 
             _.each(range, function (value, side) {
-              dSlider.attr(side, range[side] + step * direction);
+              slider.attr(side, range[side] + step * direction);
             });
-            slidersToUpdate.push(dSlider);
           }
+          return checkValue;
         }
       }
 
       var allSliders = {};
-      _.each(['digits', 'cents', 'amount'], function(sliderRoot) {
+      _.each(['digits', 'cents', 'amount', 'millis'], function(sliderRoot) {
 
         var sliderEl = $order.find('input.' + sliderRoot),
           $slider = $(sliderEl),

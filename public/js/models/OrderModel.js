@@ -6,6 +6,8 @@ define([
   return Backbone.Model.extend({
     idAttribute: "oid",
     defaults: {
+      "collapsed": true,
+
       "oid": '', // guid
       "actions": null,
       "amount": null, //  CurrencyValueModel
