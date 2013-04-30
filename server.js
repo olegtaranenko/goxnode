@@ -120,6 +120,14 @@ clientMtgox.on('user_order', function(data) {
   }
 });
 
+// All changes with User's Wallet
+clientMtgox.on('wallet', function(data) {
+  // avoid repeat of the same data
+  var wallet = data.wallet;
+
+  io.sockets.emit('wallet', wallet);
+});
+
 
 
 // on-fly preprocessor for less/css bowels

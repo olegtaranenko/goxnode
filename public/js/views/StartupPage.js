@@ -399,36 +399,42 @@ function($, _, Backbone,
 
         function checkMillisBounds(slider) {
           const boundValue = -0.0005;
-          var ret = sliderValueNumber;
-          if (sliderValueNumber == 0.0005) {
+          var ret = sliderValueNumber,
+            absValue = Math.abs(ret),
+            direction = absValue == ret ? 1 : -1;
+          if (absValue == 0.0005) {
             var centsSlider = findSlider('cents'),
-              cents = parseFloat(centsSlider.val()) + 0.001;
+              cents = parseFloat(centsSlider.val()) + direction * 0.001;
 
-            ret = boundValue;
+            ret = direction * boundValue;
             parsedPrice.cents = cents;
-            slider.val(boundValue);
+            slider.val(ret);
             centsSlider.val(cents);
-            checkCentsBounds(centsSlider);
+            checkCentsBounds(centsSlider, cents);
 
             slidersToUpdate.push(centsSlider);
           }
           return ret;
         }
 
-        function checkCentsBounds(slider) {
-          const boundValue = 0,
-            incrementValue = 0.1;
+        function checkCentsBounds(slider, value) {
+          const incrementValue = 0.1,
+            step = 0.001;
 
-          var value = sliderValueNumber;
+          if (value == null) {
+            value = sliderValueNumber;
+          }
 
-          if (sliderValueNumber == incrementValue) {
-            var digitsSlider = findSlider('digits'),
-              digits = parsedPrice.digits + incrementValue;
+          if (value == incrementValue || value < 0) {
+            var direction = value < 0 ? -1 : 1,
+              digitsSlider = findSlider('digits'),
+              digitsChange = direction * incrementValue,
+              digits = parsedPrice.digits + digitsChange;
 
-            value = boundValue;
+            value = direction == 1 ? 0 : incrementValue - step;
+
             parsedPrice.digits = digits;
-            parsedPrice.cents = boundValue;
-            slider.val(boundValue);
+            parsedPrice.cents = value;
             digitsSlider.val(digits);
             checkDigitsBounds(digitsSlider, digits);
 
@@ -439,8 +445,8 @@ function($, _, Backbone,
 
         function checkDigitsBounds(slider, checkValue) {
           var range = {
-              max: parseInt(slider.attr('max')),
-              min: parseInt(slider.attr('min'))
+              max: parseFloat(slider.attr('max')),
+              min: parseFloat(slider.attr('min'))
             },
             direction = 0;
 

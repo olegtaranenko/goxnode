@@ -8,12 +8,6 @@ define(['WalletModel'],
 
     return Backbone.Collection.extend({
       model: WalletModel
-
-//      url: '/api/v0/threads.json',
-//
-//      parse: function(response) {
-//        return response.threads
-//      }
     });
   }
 );

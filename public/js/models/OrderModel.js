@@ -23,73 +23,6 @@ define([
       "type": '' // 'ask', 'bid'
     },
 
-    getOrderTotal: function() {
-      var
-        price = this.get('price').toPrice(),
-        effective = this.get('effective_amount').toAmount();
-
-    },
-
-    buildHeaderUI: function() {
-      var $G = $.Goxnode(),
-        type = this.get('type').toUpperCase(),
-        status = this.get('status'),
-        editing = status == 'editing',
-        price = this.get('price').toPrice(),
-
-        amountModel = this.get('amount'),
-        amount = amountModel.toAmount(),
-
-        effectiveModel = this.get('effective_amount'),
-        effective = effectiveModel.toAmount(),
-
-        model = (effective > 0 && !editing)? effectiveModel : amountModel,
-        total = $G.roundFond(model.toAmount() * price),
-
-        display = model.get('display_short'),
-        header = type + ' ' + status + ' <u>' + price + '</u> * ';
-
-      header += ' ' + display;
-      if (!editing && (amount != effective && effective > 0)) {
-        header += ' [' + amountModel.get('display_short') + ']';
-      }
-
-      header += '<span style="float:right">' + total + '</span>';
-      return header;
-    },
-
-
-    cancelButtonEl: function() {
-      var orderEl = this.el;
-
-      return $('a[data-icon=delete]', orderEl);
-    },
-
-    confirmButtonEl: function() {
-      var orderEl = this.el;
-
-      return $('a[data-icon=check]', orderEl);
-    },
-
-    getOrderSwatchTheme: function() {
-      var orderType = this.get('type'),
-        orderStatus = this.get('status'),
-        orderTheme;
-
-      if (orderStatus == 'invalid') {
-        orderTheme = 'c';
-      } else {
-        if (orderType == 'ask') {
-          orderTheme = 'e';
-        } else {
-          orderTheme = 'b';
-        }
-      }
-
-      return orderTheme;
-    },
-
-
     constructor: function(attributes) {
       var me = this;
 
@@ -103,6 +36,7 @@ define([
 
       _super.constructor.apply(me, arguments);
     },
+
 
     initialize: function(options) {
       var me = this;
@@ -181,6 +115,72 @@ define([
       }
 
 
+    },
+
+    getOrderTotal: function() {
+      var
+        price = this.get('price').toPrice(),
+        effective = this.get('effective_amount').toAmount();
+
+    },
+
+    buildHeaderUI: function() {
+      var $G = $.Goxnode(),
+        type = this.get('type').toUpperCase(),
+        status = this.get('status'),
+        editing = status == 'editing',
+        price = this.get('price').toPrice(),
+
+        amountModel = this.get('amount'),
+        amount = amountModel.toAmount(),
+
+        effectiveModel = this.get('effective_amount'),
+        effective = effectiveModel.toAmount(),
+
+        model = (effective > 0 && !editing)? effectiveModel : amountModel,
+        total = $G.roundFond(model.toAmount() * price),
+
+        display = model.get('display_short'),
+        header = type + ' ' + status + ' <u>' + price + '</u> * ';
+
+      header += ' ' + display;
+      if (!editing && (amount != effective && effective > 0)) {
+        header += ' [' + amountModel.get('display_short') + ']';
+      }
+
+      header += '<span style="float:right">' + total + '</span>';
+      return header;
+    },
+
+
+    cancelButtonEl: function() {
+      var orderEl = this.el;
+
+      return $('a[data-icon=delete]', orderEl);
+    },
+
+    confirmButtonEl: function() {
+      var orderEl = this.el;
+
+      return $('a[data-icon=check]', orderEl);
+    },
+
+    getOrderSwatchTheme: function() {
+      var orderType = this.get('type'),
+        orderStatus = this.get('status'),
+        orderTheme;
+
+      if (orderStatus == 'invalid') {
+        orderTheme = 'c';
+      } else {
+        if (orderType == 'ask') {
+          orderTheme = 'e';
+        } else {
+          orderTheme = 'b';
+        }
+      }
+
+      return orderTheme;
     }
   })
 });

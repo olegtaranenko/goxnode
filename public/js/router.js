@@ -91,24 +91,18 @@ define([
       function onUserOrder(orderRaw) {
 //        console.log('onUserOrder() ', orderRaw);
         var orders = startupModel.get('orders'),
-          oid = orderRaw.oid,
-          model = orders.get(oid);
+          oid = orderRaw.oid;
 
         orders.add(orderRaw, {
           merge: true
         });
 
-/*
-        if (model) {
-          model.set(orderRaw);
-        } else {
-          model = new OrderModel(orderRaw);
-          var index = orders.add(model);
-        }
-*/
-//          order = new OrderModel();
+      }
 
-//        orders.add()
+      function onWallet(data) {
+        console.log('onWallet() ', data);
+        var stockTicker = startupModel.get('stockTicker');
+
       }
 
       socket.on('connect',    onConnect);
@@ -121,6 +115,8 @@ define([
       socket.on('ticker',     onTicker);
       socket.on('order_cancel', onOrdersCancelled);
       socket.on('user_order',  onUserOrder);
+
+      socket.on('wallet',  onWallet);
 
       return socket;
     }

@@ -59,7 +59,7 @@ define([
         price = this.toPrice();
       }
 
-      return Math.floor(price * 10) / 10;
+      return Math.floor((price) * 10) / 10;
     },
 
     toPriceCents: function(price, digits) {
@@ -72,7 +72,7 @@ define([
 
       var rest = price - digits;
 
-      return Math.round(rest * 1000) / 1000;
+      return Math.floor((rest) * 1000) / 1000;
     },
 
     toPriceMillis: function(price, digits, cents) {

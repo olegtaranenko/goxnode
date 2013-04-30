@@ -14,6 +14,38 @@ define([
 
   return Backbone.Model.extend({
 
+    defaults: {
+      wallets: null, // Wallets collection
+      strategies: $G.config.strategies,
+      el: null, // reference to the collapsible element with strategies
+      owner: null // reference to startupModel
+    },
+
+    initialize: function(attributes, options) {
+      var me = this,
+        owner = me.get('owner'),
+        cur = options.cur,
+        base = options.base,
+        modelOptions = {};
+
+
+      modelOptions[cur] = 0;
+      modelOptions[base] = 0;
+      _.extend(attributes, modelOptions);
+
+      _.each([cur, base], function(currency) {
+        var changeEvent = 'change:' + currency;
+
+        me.on(changeEvent, function(model) {
+          _.each(['bid', 'ask'], function (tradeSide) {
+            $G.evaluateStrategies(owner, currency, tradeSide);
+          });
+        });
+
+      });
+    },
+
+
     getFreeFonds: function(pair) {
       var me = this,
         ret = {},
@@ -39,40 +71,10 @@ define([
     },
 
 
-    defaults: {
-      strategies: $G.config.strategies,
-      el: null, // reference to the collapsible element with strategies
-      owner: null // reference to startupModel
-    },
-
     getContentEl: function() {
       var collapsibleEl = this.get('el');
 
       return $(collapsibleEl).find('.ui-collapsible-content')[0];
-    },
-
-    initialize: function(attributes, options) {
-      var me = this,
-        owner = me.get('owner'),
-        cur = options.cur,
-        base = options.base,
-        modelOptions = {};
-
-
-      modelOptions[cur] = 0;
-      modelOptions[base] = 0;
-      _.extend(attributes, modelOptions);
-
-      _.each([cur, base], function(currency) {
-        var changeEvent = 'change:' + currency;
-
-        me.on(changeEvent, function(model) {
-          _.each(['bid', 'ask'], function (tradeSide) {
-            $G.evaluateStrategies(owner, currency, tradeSide);
-          });
-        });
-
-      });
     }
   })
 });

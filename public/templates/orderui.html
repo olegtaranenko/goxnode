@@ -9,9 +9,10 @@
 
     priceModel = model.get('price'),
     price = priceModel.toPrice(),
-    priceDigits = priceModel.toPriceDigits(price),
-    priceCents = priceModel.toPriceCents(price, priceDigits),
-    priceMillis = priceModel.toPriceMillis(price, priceDigits),
+    parsedPrice = priceModel.toParsedPrice(price),
+    priceDigits = parsedPrice.digits,
+    priceCents = parsedPrice.cents,
+    priceMillis = parsedPrice.millis,
     total = model.getOrderTotal(),
     base = stockExchange.getBaseCurrency(),
     cur = stockExchange.getCurCurrency(),
