@@ -332,10 +332,10 @@ function($, _, Backbone,
       var confirmEl = model.confirmButtonEl();
       $(confirmEl).on(tapEvent, {me: this}, this.confirmOrder);
 
-      function findSlider(root) {
+      function findSlider(sliderName) {
         var ret = null;
         _.some(allSliders, function(sliderInfo, name) {
-          if (name == root) {
+          if (name == sliderName) {
             ret = sliderInfo.el;
             return true;
           }
@@ -361,8 +361,12 @@ function($, _, Backbone,
           changeProperty = 'amount';
         } else {
           var priceModel = model.get('price');
-          var orderPrice = priceModel.toPrice(),
-            parsedPrice = priceModel.toParsedPrice(orderPrice);
+          var millisInfo = findSlider('millis'),
+            startMillis = millisInfo.start,
+            lower = startMillis < 0,
+            parsedPrice = priceModel.toParsedPrice({
+              lower: lower
+            });
 
           changeProperty = 'price';
           currency = stockExchange.getCurCurrency();
@@ -375,14 +379,20 @@ function($, _, Backbone,
           } else {
             value = checkDigitsBounds($slider, sliderValueNumber);
           }
+
           slidersToUpdate.push($slider);
-          parsedPrice[sliderName] = value;
-
-          value = priceModel.fromParsedPrice(parsedPrice);
-
           _.each(slidersToUpdate, function(slider) {
             slider.slider('refresh');
-          })
+          });
+
+          value = 0.0;
+          _.each(allSliders, function(info, sliderName) {
+            var slider = $(info.el);
+
+            if (info.isPrice) {
+              value += parseFloat(slider.val());
+            }
+          });
         }
 
         var valueAttributes = {
@@ -402,6 +412,13 @@ function($, _, Backbone,
           var ret = sliderValueNumber,
             absValue = Math.abs(ret),
             direction = absValue == ret ? 1 : -1;
+
+          if (sliderValueNumber < 0) {
+            parsedPrice = priceModel.toParsedPrice({
+              lower: true
+            })
+          }
+
           if (absValue == 0.0005) {
             var centsSlider = findSlider('cents'),
               cents = parseFloat(centsSlider.val()) + direction * 0.001;
@@ -435,6 +452,8 @@ function($, _, Backbone,
 
             parsedPrice.digits = digits;
             parsedPrice.cents = value;
+
+            slider.val(value);
             digitsSlider.val(digits);
             checkDigitsBounds(digitsSlider, digits);
 
@@ -470,15 +489,16 @@ function($, _, Backbone,
       }
 
       var allSliders = {};
-      _.each(['digits', 'cents', 'amount', 'millis'], function(sliderRoot) {
+      _.each(['digits', 'cents', 'amount', 'millis'], function(sliderName) {
 
-        var sliderEl = $order.find('input.' + sliderRoot),
+        var sliderEl = $order.find('input.' + sliderName),
           $slider = $(sliderEl),
           initialValue = $slider.val();
 
-        allSliders[sliderRoot] = {
+        allSliders[sliderName] = {
           el: sliderEl,
           value: initialValue,
+          isPrice: sliderName != 'amount',
           attr: {
             max: $slider.attr('max'),
             min: $slider.attr('min'),
@@ -487,13 +507,28 @@ function($, _, Backbone,
         };
 
         $slider.slider({
-          stop: function(jqEvent) {
-//          console.log('slider stop event', jqEvent);
-            var changeOptions = calculateChangeOptions($slider, sliderRoot);
+          beforestart: function(jqEvent) {
+            var value = $slider.val(),
+              sliderInfo = findSlider(sliderName);
 
-            // should call separate, otherwise wrong original values
-            model.set('status', 'editing');
-            model.set(changeOptions);
+            if (sliderInfo) {
+              sliderInfo.start = value;
+              console.log('Save start value', value);
+            }
+          },
+          stop: function(jqEvent) {
+
+            var stop = $slider.val(),
+              sliderInfo = findSlider(sliderName),
+              start = sliderInfo.start;
+
+            if (start != stop) {
+              var changeOptions = calculateChangeOptions($slider, sliderName);
+
+              // should call separate, otherwise wrong original values
+              model.set('status', 'editing');
+              model.set(changeOptions);
+            }
           }
         })
       });
