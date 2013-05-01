@@ -176,9 +176,9 @@ define([
         orderTheme = 'c';
       } else {
         if (orderType == 'ask') {
-          orderTheme = 'e';
-        } else {
           orderTheme = 'b';
+        } else {
+          orderTheme = 'e';
         }
       }
 
