@@ -9,13 +9,11 @@ define([
   'backbone', 'config'
 ], function(Backbone, config) {
 
-  var $G = $.Goxnode(),
-    $m = $G.multipliers;
+  var $G = $.Goxnode();
 
   return Backbone.Model.extend({
 
     defaults: {
-      wallets: null, // Wallets collection
       strategies: $G.config.strategies,
       el: null, // reference to the collapsible element with strategies
       owner: null // reference to startupModel
@@ -23,7 +21,6 @@ define([
 
     initialize: function(attributes, options) {
       var me = this,
-        owner = me.get('owner'),
         cur = options.cur,
         base = options.base,
         modelOptions = {};
@@ -37,6 +34,26 @@ define([
         var changeEvent = 'change:' + currency;
 
         me.on(changeEvent, function(model) {
+          console.log('Change event in TradeAccount', changeEvent, model);
+          var owner = me.owner;  // StartupModel
+/*
+          if (owner) {
+            var personalInfo = owner.get('personalInfo'),
+              wallets = personalInfo ? personalInfo.get('Wallets') : false;
+
+            if (wallets) {
+              var wallet = wallets.get(currency);
+
+              if (wallet) {
+                var showFondEl = wallet.getTablaEl();
+              }
+            }
+
+          }
+*/
+
+
+//          $(showFondEl).html();
           _.each(['bid', 'ask'], function (tradeSide) {
             $G.evaluateStrategies(owner, currency, tradeSide);
           });
@@ -57,13 +74,15 @@ define([
       }
 
       _.each(pair, function(currency, part) {
-        var multiplier = $m[currency],
-          fond = me.get(currency) / multiplier;
+        var balance = me.get(currency),
+          amount = balance ? balance.get('value') : 0,
+          multipliers = $G.multipliers,
+          value = amount / multipliers[currency];
 
         if (!partial) {
-          ret[part] = fond;
+          ret[part] = amount;
         } else {
-          ret = fond;
+          ret = amount;
         }
       });
 

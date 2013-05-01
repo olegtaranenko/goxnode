@@ -12,14 +12,15 @@ define([
             Orders
   ) {
 
+  var _super = Backbone.Model.prototype;
+
   return Backbone.Model.extend({
+
     defaults: {
       id: 0,
       login: '',
       status: 'inactive',
-      privateInfo: new PrivateInfoModel({
-        owner: this
-      }),
+      privateInfo: null, //new PrivateInfoModel({owner: this}),
       tradeAccount: null,
       stockExchange: null,
       stockTicker: null,
@@ -30,17 +31,21 @@ define([
       now: 0              // time in millis
     },
 
-    initialize: function(data, options) {
+    constructor: function(attributes, options) {
+      var me = this;
+
       var stock = options.stock,
         cur = options.cur,
         base = options.base,
         silent = {silent: true};
 
+
+      console.log('StartupModel constructor', attributes, options);
       var stockExchange = new StockExchangeModel({
+            name: stock,
             base: base,
             cur: cur
-          },
-          silent
+          }
         ),
         tradeAccountData = {},
         initOptions = {
@@ -51,25 +56,33 @@ define([
 
       tradeAccountData[base] = 0;
       tradeAccountData[cur] = 0;
-      tradeAccountData.owner = this;
+//      tradeAccountData.owner = this;
 
       var tradeAccount = new TradeAccountModel(tradeAccountData, initOptions);
 
       var stockTicker = new StockTickerModel({
-          owner: this,
           ask: null,
           bid: null
         },
         initOptions
       );
 
-      this.set({
+      _.extend(attributes, {
           stockExchange: stockExchange,
           tradeAccount: tradeAccount,
           stockTicker: stockTicker
-        },
-        silent
+        }
       );
+
+      _super.constructor.apply(me, arguments);
+    },
+
+    initialize: function(data, options) {
+      var tradeAccount = this.get('tradeAccount'),
+        stockTicker = this.get('stockTicker');
+
+      tradeAccount.owner = this;
+      stockTicker.owner = this;
 
     }
   })

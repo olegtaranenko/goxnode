@@ -83,7 +83,6 @@ define([
 
 
     defaults: {
-      owner: null, // reference to startupModel
       bid: null,
       ask: null,
       slips: {
@@ -117,7 +116,6 @@ define([
 
     initialize: function(attributes, options) {
       var me = this,
-        owner = me.get('owner'),
         cur = options.cur,
         base = options.base;
 
@@ -125,7 +123,11 @@ define([
         var changeEvent = 'change:' + tradeSide;
         me.on(changeEvent, function(model) {
           _.each([cur, base], function(currency) {
-            $G.evaluateStrategies(owner, currency, tradeSide);
+            var owner = me.owner;
+
+            if (owner) {
+              $G.evaluateStrategies(owner, currency, tradeSide);
+            }
           });
         });
 

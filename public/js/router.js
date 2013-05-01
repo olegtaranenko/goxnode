@@ -4,11 +4,11 @@
 define([
   'backbone', 'jquery', 'underscore',
   'StartupPage', 'StartupModel',
-  'OrderModel'
+  'PrivateInfoModel', 'OrderModel', 'CurrencyValueModel'
 ],
   function(Backbone, $, _,
            StartupPage, StartupModel,
-           OrderModel
+           PrivateInfoModel, OrderModel, CurrencyValueModel
     ) {
 
 
@@ -43,16 +43,21 @@ define([
 
       function onPrivateInfo(info) {
         console.log('onPrivateInfo() ', arguments);
+        info.owner = startupModel;
         var tradeAccount = startupModel.get('tradeAccount'),
           stockExchange = startupModel.get('stockExchange'),
+          privateInfo = new PrivateInfoModel(info), // startupModel.get('privateInfo'),
           base = stockExchange.get('base'),
           cur = stockExchange.get('cur'),
-          wallets = info.Wallets,
-          baseWallet = wallets[base],
-          curWallet = wallets[cur],
-          baseFond = baseWallet.Balance.value_int,
-          curFond = curWallet.Balance.value_int;
+          wallets = privateInfo.get('Wallets'),
+          baseWallet = wallets.get(base),
+          curWallet = wallets.get(cur),
+          baseFond = baseWallet.get('Balance'),
+          curFond = curWallet.get('Balance');
 
+        startupModel.set({
+          privateInfo: privateInfo
+        });
         tradeAccount.set(base, baseFond);
         tradeAccount.set(cur, curFond);
       }
@@ -101,8 +106,13 @@ define([
 
       function onWallet(data) {
         console.log('onWallet() ', data);
-        var stockTicker = startupModel.get('stockTicker');
+        var tradeAccount = startupModel.get('tradeAccount'),
+          amount = data.amount,
+          balance = data.balance,
+          balanceModel = new CurrencyValueModel(balance),
+          currency = amount.currency;
 
+        tradeAccount.set(currency, balanceModel);
       }
 
       socket.on('connect',    onConnect);

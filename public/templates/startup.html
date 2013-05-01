@@ -1,19 +1,20 @@
 <%
 
 //debugger;
-var stock = stockExchange.get('name');
-var pair = stockExchange.getCurrencyPair();
+var stock     = stockExchange.get('name');
+var pair      = stockExchange.getCurrencyPair();
 var freeFonds = tradeAccount.getFreeFonds(pair);
-var fonds = stockExchange.getTradeFonds(freeFonds);
+var fonds     = stockExchange.getTradeFonds(freeFonds);
 
 var fondBase = freeFonds.base,
-fondCur = freeFonds.cur,
-base = pair.base
-cur = pair.cur;
+  fondCur = freeFonds.cur;
+
+var base = pair.base,
+  cur = pair.cur;
 
 var ticker = stockTicker.getTicker(),
-ask = ticker.ask,
-bid = ticker.bid;
+  ask = ticker.ask,
+  bid = ticker.bid;
 
 var $G = $.Goxnode();
 

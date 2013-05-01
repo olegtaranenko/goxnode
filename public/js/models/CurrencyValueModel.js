@@ -19,6 +19,33 @@ define([
       "currency": ''            //"USD"
     },
 
+    constructor: function(attributes, options) {
+      var me = this;
+
+      if (attributes != null) {
+        // assume we supply value from the UI control. Value or Size
+        var ui = options && options.ui;
+        if (ui) {
+          var value = attributes.value,
+            currency = attributes.currency,
+            valueFloat = parseFloat(value);
+
+          attributes.value_int = $G.convertToIntValue(valueFloat, currency);
+          attributes.value = valueFloat;
+          attributes.display_short = valueFloat + ' ' + currency;
+        } else {
+          var value_int = attributes.value_int;
+
+          if (isNaN(value_int)) {
+            value_int = 0;
+          }
+          attributes.value_int = value_int;
+        }
+      }
+
+      _super.constructor.apply(me, arguments);
+    },
+
     toAmount: function() {
       var value_int = this.get('value_int');
       return value_int / 1E8;
@@ -115,18 +142,6 @@ define([
         decimalPart = '00'.substr(0, 2 - decimalPart.length) + decimalPart;
       }
       return parseFloat( '0.0' + String(decimalPart));
-/*
-      if (price == null ) {
-        price = this.toPrice();
-      }
-      if (digits == null) {
-        digits = this.toPriceDigits(price);
-      }
-
-      var rest = price - digits;
-
-      return Math.floor((rest + 0.0005) * 1000) / 1000;
-*/
     },
 
     toPriceMillis: function(options) {
@@ -146,50 +161,6 @@ define([
 
       var ret = parseFloat('0.000' + String(millisPart));
       return  ret * negative;
-
-
-/*
-      if (price == null ) {
-        price = this.toPrice();
-      }
-      if (digits == null) {
-        digits = this.toPriceDigits(price, lower);
-      }
-      if (cents == null) {
-        cents = this.toPriceCents(price, lower);
-      }
-
-      var rest = price - digits - cents;
-
-      return Math.round(rest * 100000) / 100000;
-*/
-    },
-
-    constructor: function(attributes, options) {
-      var me = this;
-
-      if (attributes != null) {
-          // assume we supply value from the UI control. Value or Size
-        var ui = options && options.ui;
-        if (ui) {
-          var value = attributes.value,
-            currency = attributes.currency,
-            valueFloat = parseFloat(value);
-
-          attributes.value_int = $G.convertToIntValue(valueFloat, currency);
-          attributes.value = valueFloat;
-          attributes.display_short = valueFloat + ' ' + currency;
-        } else {
-          var value_int = attributes.value_int;
-
-          if (isNaN(value_int)) {
-            value_int = 0;
-          }
-          attributes.value_int = value_int;
-        }
-      }
-
-      _super.constructor.apply(me, arguments);
     }
 
   })

@@ -15,6 +15,22 @@ define([
 
   return Backbone.Model.extend({
 
+
+    defaults: {
+      name: 'MtGox',
+      base: 'BTC',
+      cur: 'USD',
+      stockFee: 0.994,
+      baseQuant: 0.00001,
+      baseMinTrade: 0.01
+    },
+
+
+
+    initialize: function(attributes, options) {
+    },
+
+
     getCurrencyPair: function() {
       return {
         base: this.get('base'),
@@ -235,20 +251,6 @@ define([
         currencyFond: currencyFond,
         currencyBrutto: currencyBrutto
       };
-    },
-
-
-    defaults: {
-      name: 'MtGox',
-      base: 'BTC',
-      cur: 'USD',
-      stockFee: 0.994,
-      baseQuant: 0.00001,
-      baseMinTrade: 0.01
-    },
-
-
-    initialize: function(attributes, options) {
     }
   })
 });

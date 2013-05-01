@@ -113,9 +113,8 @@ define([
           $(buttonEl).buttonMarkup({theme: theme});
         }
       }
-
-
     },
+
 
     getOrderTotal: function() {
       var
@@ -123,6 +122,7 @@ define([
         effective = this.get('effective_amount').toAmount();
 
     },
+
 
     buildHeaderUI: function() {
       var $G = $.Goxnode(),
@@ -159,11 +159,13 @@ define([
       return $('a[data-icon=delete]', orderEl);
     },
 
+
     confirmButtonEl: function() {
       var orderEl = this.el;
 
       return $('a[data-icon=check]', orderEl);
     },
+
 
     getOrderSwatchTheme: function() {
       var orderType = this.get('type'),
