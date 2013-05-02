@@ -42,6 +42,11 @@ define(['socket.io', 'jquery', "settings"],
         USD: 100
       },
 
+      persistOrder: function(model, options) {
+        console.log('persistOrder', model, options);
+        var json = model.dehydrate(options);
+      },
+
       evaluateStrategies: function (owner, currency, side) {
         var $G = this;
         var tradeAccount = owner.get('tradeAccount'),

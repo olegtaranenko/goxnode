@@ -236,7 +236,7 @@ function($, _, Backbone,
         orderPrice = orderModel.get('price').get('value'),
         orderPriceInt = orderModel.get('price').get('value_int'),
         orderAmountInt = orderModel.get('amount').get('value_int'),
-        collapsed = orderModel.get('collapsed'),
+//        collapsed = orderModel.get('collapsed'),
         isBid = orderType == 'bid',
         absoluteEdge = !isBid ? 0 : Number.MAX_VALUE,
         warningEdge = isBid ? ask : bid;
@@ -278,11 +278,13 @@ function($, _, Backbone,
             oid: targetId,
             type: orderType,
             price_int: orderPriceInt,
-            amount_int: orderAmountInt,
-            collapsed: collapsed
+            amount_int: orderAmountInt
           };
           console.log('about to create order with params', createOptions);
 
+        orderModel.dehydrate({
+          collapsed: true
+        });
         socket.emit('createOrder', createOptions);
       }
     },
@@ -296,12 +298,13 @@ function($, _, Backbone,
         stockTicker = startupModel.get('stockTicker'),
         orderBase = model.get('item'),
         orderCur = model.get('currency'),
+        oldOid = model.get('oldOid'),
         base = stockExchange.getBaseCurrency(),
         cur = stockExchange.getCurCurrency(),
         orders = startupModel.get('orders'),
         el = orders.getContentEl();
 
-      if (!el || !(orderBase == base && orderCur == cur)) {
+      if (!el || (!(orderBase == base && orderCur == cur)) /*&& _.isEmpty(oldOid)*/) {
         return;
       }
 

@@ -9,6 +9,7 @@ define([
       "collapsed": true,
 
       "oid": '', // guid
+      "oldOid": '', // guid of previous order, which is replaced with oid
       "actions": null,
       "amount": null, //  CurrencyValueModel
       "currency": null, // 'USD', 'EUR', ...
@@ -21,6 +22,14 @@ define([
       "priority": 0, // nanos
       "status": '', // 'open', 'invalid', ...
       "type": '' // 'ask', 'bid'
+    },
+
+    dehydrate: function(options) {
+      var cloned = _.clone(this),
+        attributes = _.pick(this.attributes, 'oid', 'type');
+
+
+
     },
 
     constructor: function(attributes) {

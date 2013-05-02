@@ -4,12 +4,13 @@
 
   var orderDateFormat = $G.orderDateFormat,
     orderDate = new Date(model.get('date') * 1000),
-    amount = model.get('amount').toAmount(),
+    amountModel = model.get('amount'),
+    amount = amountModel ? amountModel.toAmount() : 0,
     collapsed = model.get('collapsed'),
 
     priceModel = model.get('price'),
-    price = priceModel.toPrice(),
-    parsedPrice = priceModel.toParsedPrice(price),
+    price = priceModel ? priceModel.toPrice() : 0,
+    parsedPrice = priceModel ? priceModel.toParsedPrice(price) : {},
     priceDigits = parsedPrice.digits,
     priceCents = parsedPrice.cents,
     priceMillis = parsedPrice.millis,

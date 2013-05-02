@@ -10,7 +10,7 @@ define([
       comparator: function(model) {
         var price = model.get('price'),
           type = model.get('type'),
-          value = parseInt(price.get('value_int'));
+          value = price != null ? parseInt(price.get('value_int')) : 0;
 
         return type == 'bid' ? 10000000000 - value :  -1 * value;
       },
