@@ -26,13 +26,15 @@ var io = require('socket.io').listen(server, {
 });
 
 
-var
-//  configJson = __dirname + '/config.json',
-//  config = require(configJson),
-  clientJson = __dirname + '/client.json',
+var clientJson = __dirname + '/client.json',
   client = require(clientJson),
+  localPort = client.node.port,
+  localServer = client.node.server,
+  url = localServer + ":" + localPort,
   apiKey = client.security.apiKey,
   secret = client.security.secret;
+
+client.url = url;
 
 var lastPrivateChannel = {
   started: null, // date
@@ -136,8 +138,8 @@ clientMtgox.on('wallet', function(data) {
 var lessMiddleware = require('less-middleware');
 
 // run node web-server
-server.listen(8001);
-debug('server started at port', server.port );
+server.listen(localPort);
+Log.info('server started at port', localPort );
 
 // configure express
 app.configure(function() {
