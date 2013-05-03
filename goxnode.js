@@ -66,6 +66,7 @@ clientMtgox.on('connect', function() {
 
 // load configuration for the web server instance
 // i.e. current user, default currency etc
+/*
   var dataJsonName = __dirname + '/api/v0/depth/fulldepth.json';
   try {
     var fullDepth = JSON.parse(fs.readFileSync(dataJsonName));
@@ -73,6 +74,7 @@ clientMtgox.on('connect', function() {
   } catch(ex) {
     Log.error('Error by parsing Depth: ', ex);
   }
+*/
 
 });
 
