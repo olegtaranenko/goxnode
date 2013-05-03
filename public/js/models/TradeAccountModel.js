@@ -89,7 +89,13 @@ define([
       };
     },
 
-    getFonds: function(pair) {
+    /**
+     * fond for cur currency in base values
+     * @param price
+     * @param {pair}
+     * @returns {Object}
+     */
+    getFonds: function(price, pair) {
       pair = pair || this.get('pair');
       var me = this,
         ret = {},
@@ -100,10 +106,13 @@ define([
         partial = true;
       }
 
-      _.each(pair, function(currency) {
+      _.each(pair, function(currency, part) {
         var balance = me.get(currency),
           amount = balance ? balance.get('value') : 0;
 
+        if (part == 'cur') {
+          amount *= price;
+        }
         if (!partial) {
           ret[currency] = amount;
         } else {

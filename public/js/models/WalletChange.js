@@ -5,17 +5,17 @@
  * Time: 11:14
  */
 define([
-  'backbone', 'CurrencyValueModel'
-], function(Backbone, CurrencyValueModel) {
+  'backbone', 'AmountModel'
+], function(Backbone, AmountModel) {
 
   var _super = Backbone.Model.prototype;
   return Backbone.Model.extend({
     defaults: {
       "op": null, // out(BTC), earned($): SELL BTC; in(BTC), spent($), fee(BTC): BUY BTC
-      "amount": null, //  CurrencyValueModel
+      "amount": null, //  AmountModel
       "info": '', // information string
       "ref": null, // ???
-      "balance": null // CurrencyValueModel
+      "balance": null // AmountModel
     },
 
     constructor: function(attributes) {
@@ -25,7 +25,7 @@ define([
         var props = attributes[property];
 
         if (props) {
-          attributes[property] = new CurrencyValueModel(props);
+          attributes[property] = new AmountModel(props);
         }
       });
 

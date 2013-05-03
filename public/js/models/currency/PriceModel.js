@@ -3,21 +3,14 @@
  * (c) 2013 oDesk Corp all rights reserved
  */
 define([
-  'backbone'
-  ,'config'
-], function(Backbone, config) {
+  'backbone','CurrencyValueModel',
+  'config'
+], function(Backbone, CurrencyValueModel, config) {
 
-  var _super = Backbone.Model.prototype,
+  var _super = CurrencyValueModel.prototype,
     $G = $.Goxnode();
 
-  return Backbone.Model.extend({
-    defaults: {
-      "value": 0.0,             //"10000.00000",
-      "value_int": 0,           //"1000000000",
-      "display": '',    //"$10,000.00000",
-      "display_short": '', //"$10,000.00",
-      "currency": ''            //"USD"
-    },
+  return CurrencyValueModel.extend({
 
     constructor: function(attributes, options) {
       var me = this;
@@ -33,22 +26,10 @@ define([
           attributes.value_int = $G.convertToIntValue(valueFloat, currency);
           attributes.value = valueFloat;
           attributes.display_short = valueFloat + ' ' + currency;
-        } else {
-          var value_int = attributes.value_int;
-
-          if (isNaN(value_int)) {
-            value_int = 0;
-          }
-          attributes.value_int = value_int;
         }
       }
 
-      _super.constructor.apply(me, [attributes]);
-    },
-
-    toAmount: function() {
-      var value_int = this.get('value_int');
-      return value_int / 1E8;
+      _super.constructor.apply(me, arguments);
     },
 
     toPrice: function() {

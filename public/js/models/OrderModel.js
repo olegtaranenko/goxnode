@@ -1,6 +1,6 @@
 define([
-  'backbone', 'CurrencyValueModel'
-], function(Backbone, CurrencyValueModel) {
+  'backbone', 'CurrencyValueModel', 'AmountModel', 'PriceModel'
+], function(Backbone, CurrencyValueModel, AmountModel, PriceModel) {
 
   var _super = Backbone.Model.prototype;
   return Backbone.Model.extend({
@@ -12,14 +12,14 @@ define([
       "oid": '', // guid
       "oldOid": '', // guid of previous order, which is replaced with oid
       "actions": null,
-      "amount": new CurrencyValueModel(), //  CurrencyValueModel
+      "amount": new AmountModel(), //  CurrencyValueModel
       "currency": null, // 'USD', 'EUR', ...
 
       "date": null, // millis
       "effective_amount": null, //  CurrencyValueModel
       "invalid_amount": null, //  CurrencyValueModel
       "item": null, //  BTC
-      "price": new CurrencyValueModel(),
+      "price": new PriceModel(),
       "priority": 0, // nanos
       "status": '', // 'open', 'invalid', ...
       "type": '' // 'ask', 'bid'
@@ -38,7 +38,11 @@ define([
 
         if (props) {
           if (!(props instanceof CurrencyValueModel)) {
-            attributes[property] = new CurrencyValueModel(props);
+            if (property == 'price') {
+              attributes[property] = new PriceModel(props);
+            } else {
+              attributes[property] = new AmountModel(props);
+            }
           }
         }
       });

@@ -18,7 +18,7 @@
     cur = stockExchange.getCurCurrency(),
     cid = model.id,
     status = model.get('status'),
-    confirmVisibility = status == 'editing' || status == 'new',
+    confirmVisibility = (status == 'editing' || status == 'new') ? 'visible' : 'hidden',
     sliderSizeMetrics = tradeAccount.getFondScales(stockTicker);
 
   var stock = stockExchange.get('name');

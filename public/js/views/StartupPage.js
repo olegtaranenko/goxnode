@@ -8,12 +8,12 @@
 define([
   'jquery', 'underscore', 'backbone',
   'text!/templates/startup.html', 'text!/templates/actionui.html', 'text!/templates/orderui.html',
-  'StartupModel', 'TradeAction', 'CurrencyValueModel', 'OrderModel'
+  'StartupModel', 'TradeAction', 'PriceModel', 'AmountModel', 'OrderModel'
 ],
 
 function($, _, Backbone,
           tpl, actionUI, orderUI,
-          StartupModel, TradeAction, CurrencyValueModel, OrderModel
+          StartupModel, TradeAction, PriceModel, AmountModel, OrderModel
 ) {
 
   return Backbone.View.extend({
@@ -70,23 +70,27 @@ function($, _, Backbone,
       var currency = typeOrder == 'bid' ? 'USD' : 'BTC',
         oppositeCurrency = currency == 'USD' ? 'BTC' : 'USD';
 
-      var fonds = tradeAccount.getFonds(),
+      var fonds = tradeAccount.getFonds(stockTicker.get('bid')),
         fond = fonds[currency],
         noNullFond = fond <= 0.01 ? 0.01 : fond,
-        options = {ui: true},
-        valueModel = new CurrencyValueModel({
+        amountModel = new AmountModel({
           value: noNullFond,
           currency: currency
-        }, options),
-        priceModel = new CurrencyValueModel({
+        }, {
+          ui: true,
+          amount: true
+        }),
+        priceModel = new PriceModel({
           value: ((actionNature == 'ORDER' && typeOrder == 'ask') || (actionNature == 'INSTANT' && typeOrder == 'bid')) ? stockTicker.get('ask') : stockTicker.get('bid'),
           currency: 'USD'
-        }, options),
+        }, {
+          ui: true
+        }),
         params = {
           oid: Math.uuid().toLowerCase(),
           phantom: true,
           type: typeOrder,
-          amount: valueModel,
+          amount: amountModel,
           status: 'new',
           collapsed: false,
           price: priceModel,
@@ -411,7 +415,7 @@ function($, _, Backbone,
 
       function calculateChangeOptions($slider, sliderName) {
         var valueModel, currency,
-          changeProperty, value,
+          changeProperty, value, valueAttributes,
           changeOptions = {};
 
         var sliderValue = $slider.val(),
@@ -421,9 +425,14 @@ function($, _, Backbone,
           };
 
         if (sliderName == 'amount') {
-          currency = stockExchange.getBaseCurrency();
           value = sliderValue;
           changeProperty = 'amount';
+
+          valueAttributes = {
+            value: value
+          };
+
+          valueModel = new AmountModel(valueAttributes,valueOptions);
         } else {
           var priceModel = model.get('price');
           var millisInfo = findSlider('millis'),
@@ -458,14 +467,15 @@ function($, _, Backbone,
               value += parseFloat(slider.val());
             }
           });
+
+          valueAttributes = {
+            value: value,
+            currency: currency
+          };
+
+          valueModel = new PriceModel(valueAttributes, valueOptions);
         }
 
-        var valueAttributes = {
-          value: value,
-          currency: currency
-        };
-
-        valueModel = new CurrencyValueModel(valueAttributes,valueOptions);
         changeOptions[changeProperty] = valueModel;
 
         return changeOptions;

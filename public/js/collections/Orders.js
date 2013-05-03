@@ -29,7 +29,11 @@ define([
           ordersEl = me.getContentEl();
 
         if (orderEl && ordersEl) {
-          ordersEl.removeChild(orderEl);
+          try {
+            ordersEl.removeChild(orderEl);
+          } catch (e) {
+            // nothing, have to fix may be
+          }
         }
       },
 

@@ -3,8 +3,8 @@
  * (c) 2013 oDesk Corp all rights reserved
  */
 define([
-  'backbone', 'CurrencyValueModel'
-], function(Backbone, CurrencyValueModel) {
+  'backbone', 'AmountModel'
+], function(Backbone, AmountModel) {
 
   var _super = Backbone.Model.prototype;
   return Backbone.Model.extend({
@@ -25,7 +25,7 @@ define([
         var props = attributes[property];
 
         if (props) {
-          attributes[property] = new CurrencyValueModel(props);
+          attributes[property] = new AmountModel(props);
         }
       });
 
