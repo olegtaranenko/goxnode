@@ -15,6 +15,24 @@ define([
         return type == 'bid' ? 10000000000 - value :  -1 * value;
       },
 
+
+      /**
+       *
+       * @param model {OrderModel|oid}
+       */
+      removeOrderUI: function (model) {
+        if (_.isString(model)) {
+          model = this.get(model);
+        }
+        var me = this,
+          orderEl = model.el,
+          ordersEl = me.getContentEl();
+
+        if (orderEl && ordersEl) {
+          ordersEl.removeChild(orderEl);
+        }
+      },
+
       initialize: function() {
         var me = this;
 
@@ -25,31 +43,31 @@ define([
             index = me.indexOf(model),
             orderEls = $(contentEl).find('.trade-order'),
             appendedOrderUIs = orderEls.length,
+            oldOid = model.get('oldOid'),
             insertEl;
 
           if (index <= appendedOrderUIs) {
             insertEl = orderEls[index];
           }
+          if (!_.isEmpty(oldOid)) {
+            this.removeOrderUI(oldOid);
+          }
+
 
           page.createOrder(model, insertEl);
         });
 
 
         me.on("remove", function(model, me, options) {
-          console.log("in Orders collection ---- REMOVE");
-          var orderEl = model.el,
-            ordersEl = me.getContentEl();
-
-          if (orderEl && ordersEl) {
-            ordersEl.removeChild(orderEl);
-          }
+//          console.log("in Orders collection ---- REMOVE");
+          this.removeOrderUI(model);
         });
 
 
         me.on("change", function(model, options) {
           var changedAttributes = model.changed;
 
-          console.log("in Orders collection ---- CHANGE");
+//          console.log("in Orders collection ---- CHANGE");
         });
       },
 

@@ -14,6 +14,7 @@ define([
   return Backbone.Model.extend({
 
     defaults: {
+      pair: null,
       strategies: $G.config.strategies,
       el: null, // reference to the collapsible element with strategies
       owner: null // reference to startupModel
@@ -62,6 +63,56 @@ define([
       });
     },
 
+    getFondScales: function(ticker) {
+      function log10(val) {
+        return Math.log(val) / Math.LN10;
+      }
+
+      var fonds = this.getFreeFonds(this.get('pair')),
+        ask = 100,
+        buy = 100,
+//        ask = ticker.get('ask'),
+//        buy = ticker.get('buy'),
+        baseAmount = fonds.base,
+        curAmount = fonds.cur / buy,
+        totalAmount = baseAmount + curAmount,
+        lg = log10(totalAmount),
+        scale = Math.pow(10, Math.ceil(lg)),
+        decades = Math.ceil(totalAmount / scale * 10 ) * scale / 10,
+        step = decades / 100;
+
+      step = step < 0.01 ? 0.01 : step;
+
+      return {
+        max: decades,
+        step: step
+      };
+    },
+
+    getFonds: function(pair) {
+      pair = pair || this.get('pair');
+      var me = this,
+        ret = {},
+        partial = false;
+
+      if (_.isString(pair)) {
+        pair = [pair];
+        partial = true;
+      }
+
+      _.each(pair, function(currency) {
+        var balance = me.get(currency),
+          amount = balance ? balance.get('value') : 0;
+
+        if (!partial) {
+          ret[currency] = amount;
+        } else {
+          ret = amount;
+        }
+      });
+
+      return ret;
+    },
 
     getFreeFonds: function(pair) {
       var me = this,
@@ -76,13 +127,12 @@ define([
       _.each(pair, function(currency, part) {
         var balance = me.get(currency),
           amount = balance ? balance.get('value') : 0,
-          multipliers = $G.multipliers,
-          value = amount / multipliers[currency];
+          amountFloat = parseFloat(amount);
 
         if (!partial) {
-          ret[part] = amount;
+          ret[part] = amountFloat;
         } else {
-          ret = amount;
+          ret = amountFloat;
         }
       });
 

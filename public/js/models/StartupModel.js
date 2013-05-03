@@ -47,7 +47,12 @@ define([
             cur: cur
           }
         ),
-        tradeAccountData = {},
+        tradeAccountData = {
+          pair: {
+            base: base,
+            cur: cur
+          }
+        },
         initOptions = {
           silent: true,
           base: base,

@@ -7,18 +7,19 @@ define([
     idAttribute: "oid",
     defaults: {
       "collapsed": true,
+      "phantom": false,
 
       "oid": '', // guid
       "oldOid": '', // guid of previous order, which is replaced with oid
       "actions": null,
-      "amount": null, //  CurrencyValueModel
+      "amount": new CurrencyValueModel(), //  CurrencyValueModel
       "currency": null, // 'USD', 'EUR', ...
 
       "date": null, // millis
       "effective_amount": null, //  CurrencyValueModel
       "invalid_amount": null, //  CurrencyValueModel
       "item": null, //  BTC
-      "price": null,
+      "price": new CurrencyValueModel(),
       "priority": 0, // nanos
       "status": '', // 'open', 'invalid', ...
       "type": '' // 'ask', 'bid'
@@ -27,9 +28,6 @@ define([
     dehydrate: function(options) {
       var cloned = _.clone(this),
         attributes = _.pick(this.attributes, 'oid', 'type');
-
-
-
     },
 
     constructor: function(attributes) {
@@ -39,10 +37,11 @@ define([
         var props = attributes[property];
 
         if (props) {
-          attributes[property] = new CurrencyValueModel(props);
+          if (!(props instanceof CurrencyValueModel)) {
+            attributes[property] = new CurrencyValueModel(props);
+          }
         }
       });
-
       _super.constructor.apply(me, arguments);
     },
 
@@ -56,13 +55,17 @@ define([
         me.on(changeEvent, function(model, value, options) {
 //          console.log('changeEvent %s, value ', changeEvent, value);
           changeHeader(model);
+          if (property == 'price') {
+            var collection = me.collection;
+            collection.sort();
+          }
         });
 
       });
 
       me.on('change:status', function(model, value, options) {
         changeTheme(model);
-        tweakConfirmButton(value == 'editing');
+        tweakConfirmButton(value == 'editing' || value == 'new');
 
         var previousStatus = this.previous('status');
 
@@ -125,26 +128,20 @@ define([
     },
 
 
-    getOrderTotal: function() {
-      var
-        price = this.get('price').toPrice(),
-        effective = this.get('effective_amount').toAmount();
-
-    },
-
-
     buildHeaderUI: function() {
       var $G = $.Goxnode(),
         type = this.get('type').toUpperCase(),
         status = this.get('status'),
         editing = status == 'editing',
-        price = this.get('price').toPrice(),
+        priceModel = this.get('price'),
+        price = priceModel.toPrice(),
+        
 
         amountModel = this.get('amount'),
         amount = amountModel.toAmount(),
 
         effectiveModel = this.get('effective_amount'),
-        effective = effectiveModel.toAmount(),
+        effective = effectiveModel ? effectiveModel.toAmount() : 0,
 
         model = (effective > 0 && !editing)? effectiveModel : amountModel,
         total = $G.roundFond(model.toAmount() * price),

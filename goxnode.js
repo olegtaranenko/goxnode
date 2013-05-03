@@ -134,7 +134,7 @@ clientMtgox.on('wallet', function(data) {
 var lessMiddleware = require('less-middleware');
 
 // run node web-server
-server.listen(8000);
+server.listen(8001);
 debug('server started at port', server.port );
 
 // configure express
@@ -189,9 +189,11 @@ io.sockets.on('connection', function (socket) {
   socket.on('createOrder', function(params) {
     Log.debug('createOrder', params);
     var oldOid = params.oid,
+      phantom = params.phantom,
       command = 'cancel';
 
-    if (oldOid) {
+    delete params.phantom;
+    if (!phantom) {
       clientMtgox.queryHttps({
         command: command,
         payload: {
@@ -225,7 +227,7 @@ io.sockets.on('connection', function (socket) {
             status: 'preliminary'
           };
           Log.debug('Order added, arguments', orderConfig);
-//          socket.emit('user_order', orderConfig);
+          socket.emit('user_order', orderConfig);
         }
       })
     }

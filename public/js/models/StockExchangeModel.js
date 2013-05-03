@@ -231,7 +231,7 @@ define([
         fond = this.getOrderFonds(strategyFonds, ticker, part);
       }
 
-      tradePrice = stockTicker.getNatureTradePrice(nature, strategy, part, baseQuant);
+      tradePrice = stockTicker.getNatureTradePrice(nature, strategy, part, baseQuant, ticker);
       var baseBrutto;
       if (baseCurrency === currency) {
         currencyFond = strategyFonds;

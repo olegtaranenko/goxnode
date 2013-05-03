@@ -25,7 +25,7 @@ define([
       }
     },
 
-    getNatureTradePrice: function(nature, strategy, currencyPart, baseQuant) {
+    getNatureTradePrice: function(nature, strategy, currencyPart, baseQuant, ticker) {
       var ret;
 
       switch (nature) {
@@ -34,9 +34,9 @@ define([
             strategySlip = slips[strategy];
 
           if (currencyPart == 'base') {
-            ret = strategySlip.basePrice;
+            ret = ticker.bid;
           } else {
-            ret = strategySlip.curPrice;
+            ret = ticker.ask;
           }
           break;
 
@@ -87,28 +87,28 @@ define([
       ask: null,
       slips: {
         "100": {
-          base: 0.95,
-          basePrice: 29.701,
-          cur:  0.98,
-          curPrice: 29.3213
+          base: 1,
+//          basePrice: 29.701,
+          cur:  1,
+//          curPrice: 29.3213
         },
         "50": {
-          base: 0.97,
-          basePrice: 29.7513,
-          cur:  0.99,
-          curPrice: 29.2011
+          base: 1,
+//          basePrice: 29.7513,
+          cur:  1,
+//          curPrice: 29.2011
         },
         "30": {
-          base: 0.98,
-          basePrice: 29.8121,
+          base: 1,
+//          basePrice: 29.8121,
           cur:  1,
-          curPrice: 29.1234
+//          curPrice: 29.1234
         },
         "2": {
           base: 1,
-          basePrice: 29.8721,
+//          basePrice: 29.8721,
           cur:  1,
-          curPrice: 29.1234
+//          curPrice: 29.1234
         }
 
       }

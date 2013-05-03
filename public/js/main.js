@@ -7,6 +7,7 @@ require.config({
     "socket.io": 'lib/socket.io',
     "localhost": 'localhost',
     config: 'config',
+    uuid: 'lib/Math.uuid',
     backbone: 'lib/backbone',
     jquery: 'lib/jquery',
     jaauldeCookies: 'lib/jaaulde.cookies',
@@ -95,6 +96,7 @@ require([
   'jqueryCookiesPlugin',
   'underscore', 'underscoreDate',
   'mobile',
+  'uuid',
   'text', 'jquery'
 ],
 

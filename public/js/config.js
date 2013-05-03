@@ -71,7 +71,7 @@ define(['socket.io', 'jquery', "settings"],
         }
 
         var ticker = stockTicker.getTicker();
-        var tickerSelector = '.currency-state .ticker-' + side.toLowerCase();
+        var tickerSelector = '.currency-state .ticker.' + side.toLowerCase();
         var tickerDiv = $(tickerSelector, goxEl);
 
         tickerDiv.text('@' + ticker[side]);

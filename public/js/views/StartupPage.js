@@ -8,12 +8,12 @@
 define([
   'jquery', 'underscore', 'backbone',
   'text!/templates/startup.html', 'text!/templates/actionui.html', 'text!/templates/orderui.html',
-  'StartupModel', 'TradeAction', 'CurrencyValueModel'
+  'StartupModel', 'TradeAction', 'CurrencyValueModel', 'OrderModel'
 ],
 
 function($, _, Backbone,
           tpl, actionUI, orderUI,
-          StartupModel, TradeAction, CurrencyValueModel
+          StartupModel, TradeAction, CurrencyValueModel, OrderModel
 ) {
 
   return Backbone.View.extend({
@@ -30,11 +30,72 @@ function($, _, Backbone,
         eventsProto = {
           "#nav a.add": 'addThread',
           "#nav a.menu": 'showNew',
-          ".attempt > span": 'tradeAction'
+          ".attempt > span": 'tradeAction',
+          ".currency-state > span": 'newOrder'
         };
 
       this.events = Goxnode.generateTapEvents(eventsProto);
       this.model = config.model;
+    },
+    
+    newOrder: function(e) {
+      console.log('newBuy', e);
+      var target = $(e.target),
+        allClasses = target.attr('class').split(' '),
+        typeOrder, actionNature;
+
+      _.each(allClasses, function(cls) {
+        switch (cls) {
+          case 'bid':
+          case 'ask':
+            typeOrder = cls;
+            break;
+          case 'ticker':
+            actionNature = 'ORDER';
+            break;
+          case 'usd':
+          case 'btc':
+            actionNature = 'INSTANT';
+            break;
+        }
+
+      });
+      var model = this.model,
+        tradeAccount = model.get('tradeAccount'),
+        stockExchange = model.get('stockExchange'),
+        stockTicker = model.get('stockTicker'),
+        orders = model.get('orders');
+
+
+      var currency = typeOrder == 'bid' ? 'USD' : 'BTC',
+        oppositeCurrency = currency == 'USD' ? 'BTC' : 'USD';
+
+      var fonds = tradeAccount.getFonds(),
+        fond = fonds[currency],
+        noNullFond = fond <= 0.01 ? 0.01 : fond,
+        options = {ui: true},
+        valueModel = new CurrencyValueModel({
+          value: noNullFond,
+          currency: currency
+        }, options),
+        priceModel = new CurrencyValueModel({
+          value: ((actionNature == 'ORDER' && typeOrder == 'ask') || (actionNature == 'INSTANT' && typeOrder == 'bid')) ? stockTicker.get('ask') : stockTicker.get('bid'),
+          currency: 'USD'
+        }, options),
+        params = {
+          oid: Math.uuid().toLowerCase(),
+          phantom: true,
+          type: typeOrder,
+          amount: valueModel,
+          status: 'new',
+          collapsed: false,
+          price: priceModel,
+          item: 'BTC',
+          currency: 'USD'
+        },
+        orderModel = new OrderModel(params);
+
+      orders.add(orderModel);
     },
 
     /**
@@ -97,9 +158,7 @@ function($, _, Backbone,
         strategy: strategyPercent
       });
 
-      var tradeActionEl = this.createTradeAction(tradeAction, stockExchange, stockTicker, {
-        ui: true
-      });
+      var tradeActionEl = this.createTradeAction(tradeAction, stockExchange, stockTicker);
     },
 
     /**
@@ -204,16 +263,18 @@ function($, _, Backbone,
         startupModel = me.model,
         orders = startupModel.get('orders'),
         order = orders.get(orderId),
-        status = order.get('status'),
+        status = order ? order.get('status') : 'new',
         editing = status == 'editing';
 
 
       if (!editing) {
-        if (orderId) {
+        if (status != 'new') {
           var $G = $.Goxnode(),
             socket = $G.socket;
 
           socket.emit('cancelOrder', orderId);
+        } else {
+          orders.removeOrderUI(order);
         }
       } else {
         // revert changes to before edit
@@ -278,6 +339,7 @@ function($, _, Backbone,
             oid: targetId,
             type: orderType,
             price_int: orderPriceInt,
+            phantom: orderModel.get('phantom'),
             amount_int: orderAmountInt
           };
           console.log('about to create order with params', createOptions);
@@ -304,7 +366,7 @@ function($, _, Backbone,
         orders = startupModel.get('orders'),
         el = orders.getContentEl();
 
-      if (!el || (!(orderBase == base && orderCur == cur)) /*&& _.isEmpty(oldOid)*/) {
+      if (!el || (!(orderBase == base && orderCur == cur)) && _.isEmpty(oldOid)) {
         return;
       }
 

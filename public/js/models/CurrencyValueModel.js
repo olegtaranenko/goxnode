@@ -14,8 +14,8 @@ define([
     defaults: {
       "value": 0.0,             //"10000.00000",
       "value_int": 0,           //"1000000000",
-      "display": '$0.00000',    //"$10,000.00000",
-      "display_short": '$0.00', //"$10,000.00",
+      "display": '',    //"$10,000.00000",
+      "display_short": '', //"$10,000.00",
       "currency": ''            //"USD"
     },
 
@@ -43,7 +43,7 @@ define([
         }
       }
 
-      _super.constructor.apply(me, arguments);
+      _super.constructor.apply(me, [attributes]);
     },
 
     toAmount: function() {

@@ -14,10 +14,12 @@
     priceDigits = parsedPrice.digits,
     priceCents = parsedPrice.cents,
     priceMillis = parsedPrice.millis,
-    total = model.getOrderTotal(),
     base = stockExchange.getBaseCurrency(),
     cur = stockExchange.getCurCurrency(),
-    cid = model.id;
+    cid = model.id,
+    status = model.get('status'),
+    confirmVisibility = status == 'editing' || status == 'new',
+    sliderSizeMetrics = tradeAccount.getFondScales(stockTicker);
 
   var stock = stockExchange.get('name');
   var pair = stockExchange.getCurrencyPair();
@@ -44,7 +46,7 @@
   </fieldset>
 
   <fieldset data-role="controlgroup" data-type="horizontal" style="float: right; margin-right: 20px">
-    <a href="#" data-theme="b" data-role="button" data-icon="check" data-inline="true" data-iconpos="notext" style="height: 57px; visibility: hidden"></a>
+    <a href="#" data-theme="b" data-role="button" data-icon="check" data-inline="true" data-iconpos="notext" style="height: 57px; visibility: <%= confirmVisibility %>"></a>
   </fieldset>
 
   <div class="trade-info">
@@ -57,7 +59,7 @@
 
     <div style="clear: both"></div>
     <div>
-      <input type="range" class="amount" name="amount" value="<%= amount %>" min="0" max="30" step="0.1"/>
+      <input type="range" class="amount" name="amount" value="<%= amount %>" min="0.01" max="<%= sliderSizeMetrics.max %>" step="<%= sliderSizeMetrics.step %>"/>
       <input type="range" class="digits" name="digits" value="<%= priceDigits %>" min="<%= minDigits %>" max="<%= maxDigits %>" step="0.1"/>
       <input type="range" class="cents" name="cents" value="<%= priceCents %>" min="0" max="0.1" data-mini="true" step="0.001"/>
       <input type="range" class="millis" name="millis" value="<%= priceMillis %>" min="-0.0005" max="0.0005" data-mini="true" step="0.00001"/>
