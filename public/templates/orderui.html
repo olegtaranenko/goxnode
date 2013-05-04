@@ -16,7 +16,8 @@
     priceMillis = parsedPrice.millis,
     base = stockExchange.getBaseCurrency(),
     cur = stockExchange.getCurCurrency(),
-    cid = model.id,
+    orderid = model.id,
+    cid = model.cid,
     status = model.get('status'),
     confirmVisibility = (status == 'editing' || status == 'new') ? 'visible' : 'hidden',
     sliderSizeMetrics = tradeAccount.getFondScales(stockTicker);
@@ -36,21 +37,38 @@
 
 %>
 
-<div data-role="collapsible" class="trade-order" data-theme="<%= orderTheme %>" data-collapsed="<%= collapsed %>" id="<%= cid %>">
+<div data-role="collapsible" class="trade-order" data-theme="<%= orderTheme %>" data-collapsed="<%= collapsed %>" id="<%= orderid %>">
   <h2>
     <%= model.buildHeaderUI() %>
   </h2>
 
-  <fieldset data-role="controlgroup" data-type="horizontal" style="float: right;">
+  <fieldset data-role="controlgroup" data-type="horizontal" style="float: left;">
     <a href="#" data-theme="h" data-role="button" data-icon="delete" data-inline="true" data-iconpos="notext" style="height: 57px"></a>
   </fieldset>
 
-  <fieldset data-role="controlgroup" data-type="horizontal" style="float: right; margin-right: 20px">
+
+  <fieldset data-role="controlgroup" data-type="horizontal" style="float: left; margin-left: 10px; margin-right: 10px;;">
     <a href="#" data-theme="b" data-role="button" data-icon="check" data-inline="true" data-iconpos="notext" style="height: 57px; visibility: <%= confirmVisibility %>"></a>
   </fieldset>
 
-  <div class="trade-info">
+  <fieldset>
+    <span style="float: left;">
+      <input type="checkbox" id="Hold-<%= cid %>" name="Hold" data-mini="true" />
+      <label for="Hold-<%= cid %>" data-theme="c">Hold</label>
+    </span>
 
+    <span style="float: left;">
+      <input type="checkbox" id="onTop-<%= cid %>" name="onTop" data-mini="true"  />
+      <label for="onTop-<%= cid %>" data-theme="c">On Top</label>
+    </span>
+
+    <span style="float: left;">
+      <input type="checkbox" id="Virtual-<%= cid %>" name="Virtual" data-mini="true" />
+      <label for="Virtual-<%= cid %>" data-theme="c">Virt.</label>
+    </span>
+  </fieldset>
+
+  <div class="trade-info">
     <div class="trade-action-info">
       <span>
         <!--<small><i><%= _.strftime(orderDate, orderDateFormat) %></i></small>-->

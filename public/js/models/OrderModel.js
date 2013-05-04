@@ -8,6 +8,9 @@ define([
     defaults: {
       "collapsed": true,
       "phantom": false,
+      "ontop": false,
+      "virtual": false,
+      "hold": false,
 
       "oid": '', // guid
       "oldOid": '', // guid of previous order, which is replaced with oid
@@ -116,7 +119,13 @@ define([
 
 
     dehydrate: function(defaults) {
-      var attributes = _.pick(this.attributes, 'collapsed', 'price', 'amount', 'type');
+      defaults = defaults || {};
+
+      var attributes = _.pick(this.attributes, 'collapsed', 'price', 'amount', 'type', 'hold', 'ontop', 'virtual'),
+        permanent = attributes.hold || attributes.ontop || attributes.virtual;
+
+      defaults.type = 'Order';
+      defaults.permanent = permanent;
 
       return _.extend(attributes, defaults);
     },

@@ -42,16 +42,29 @@ define(['socket.io', 'jquery', "settings"],
         USD: 100
       },
 
-      reloadOrderSettings: function(model, oid) {
+      restoreOrderSettings: function(model, oid, permanentInfo) {
+        // oid === oldOid
+
         var persisted = localStorage[oid];
+
+        if (permanentInfo) {
+          var props = _.pick(permanentInfo, 'ontop', 'hold', 'virtual');
+          model.set(props, {silent: true});
+        }
 
         if (persisted) {
           var parsed = JSON.parse(persisted),
             hydrated = model.hydrate(parsed);
 
           model.set(hydrated);
-          delete localStorage[oid];
+          if (!parsed.permanent) {
+            delete localStorage[oid];
+          } else {
+            // persist model options with new oid
+            this.persistOrderSettings(model);
+          }
         }
+
       },
 
       persistOrderSettings: function(model, options) {

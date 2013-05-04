@@ -386,14 +386,25 @@ function($, _, Backbone,
       // trick to get new created DOM element
       // let save it to model
       var orderEl = model.el = el.lastElementChild,
-        $order = $(orderEl);
+        $order = $(orderEl),
+        checkboxes = $order.find('input[type=checkbox]');
 
-/*
-      if (insertedEl != null) {
-        $(insertedEl).before($order);
-      }
-*/
+      _.each(checkboxes, function(checkbox) {
+        var $checkbox = $(checkbox),
+          checkboxName = $checkbox.attr('name'),
+          key = checkboxName.toLowerCase();
 
+        var value = model.get(key);
+        $checkbox.prop('checked', value ? 'checked' : '');
+        if (value) {
+          $checkbox.checkboxradio('refresh');
+        }
+
+        $checkbox.on("click", function(e) {
+          var newValue = $(checkbox).prop('checked');
+        });
+
+      });
 
       var tapEvent = $G.tapEvent;
 

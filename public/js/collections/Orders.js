@@ -9,6 +9,8 @@ define([
 
     return Backbone.Collection.extend({
       model: OrderModel,
+      permanentOrders: {},
+
       comparator: function(model) {
         var price = model.get('price'),
           type = model.get('type'),
@@ -20,6 +22,30 @@ define([
 
       initialize: function() {
         var me = this;
+
+        // init permanent Orders
+
+        var i = 0,
+          ordersPrototypes = {},
+          sKey, hasPermanent = false;
+
+        while (sKey = localStorage.key(i)) {
+          var proto = localStorage.getItem(sKey),
+            parsed = JSON.parse(proto);
+
+          if (parsed && parsed.type == 'Order' && parsed.permanent) {
+            delete parsed.type;
+            ordersPrototypes[sKey] = parsed;
+            hasPermanent = true;
+          }
+          i++;
+        }
+
+        if (hasPermanent) {
+          this.permanentOrders = ordersPrototypes;
+        }
+
+
 
         me.on("sort", function(collection, options) {
           var attributes = options._attrs,
@@ -64,25 +90,18 @@ define([
 
         me.on("add", function(model, me, options) {
           console.log("in Orders collection ---- ADD", model);
-          var contentEl = me.getContentEl(),
-            page = me.owner,
-            index = me.indexOf(model),
-            orderEls = $(contentEl).find('.trade-order'),
-            appendedOrderUIs = orderEls.length,
+          var page = me.owner,
             oldOid = model.get('oldOid'),
-            insertEl;
+            id = model.id,
+            permanentInfo = me.permanentOrders[id];
 
-          if (index <= appendedOrderUIs) {
-            insertEl = orderEls[index];
-          }
-
-          $G.reloadOrderSettings(model, oldOid);
+          $G.restoreOrderSettings(model, oldOid, permanentInfo);
 
           if (!_.isEmpty(oldOid)) {
             this.remove(oldOid);
           }
 
-          page.createOrder(model, insertEl);
+          page.createOrder(model);
 
         });
 
