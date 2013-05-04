@@ -244,12 +244,12 @@ function($, _, Backbone,
 
     findOrderId: function (e) {
       var target = e.target,
-        targetId;
+        orderId;
 
       do {
         var done = $(target).hasClass('trade-order');
 
-        targetId = target.id;
+        orderId = target.id;
 
         target = target.parentElement;
         if (!done) {
@@ -257,28 +257,33 @@ function($, _, Backbone,
         }
       } while (!done);
 
-      return targetId;
+      return orderId;
     },
 
 
     cancelOrder: function(e) {
+      var $G = $.Goxnode(),
+        socket = $G.socket;
+
       var me = e.data.me,
         orderId = me.findOrderId(e),
         startupModel = me.model,
         orders = startupModel.get('orders'),
         order = orders.get(orderId),
         status = order ? order.get('status') : 'new',
-        editing = status == 'editing';
+        editing = status == 'editing',
+        hold = order.get('hold');
 
 
       if (!editing) {
-        if (status != 'new') {
-          var $G = $.Goxnode(),
-            socket = $G.socket;
+        if (status == 'new' || hold) {
+          orders.removeOrderUI(order);
+          if (hold) {
+            $G.dropOrderPersistence(order.id);
+          }
+        } else {
 
           socket.emit('cancelOrder', orderId);
-        } else {
-          orders.removeOrderUI(order);
         }
       } else {
         // revert changes to before edit
@@ -290,22 +295,29 @@ function($, _, Backbone,
 
     confirmOrder: function(e) {
       var me = e.data.me,
+        $G = $.Goxnode(),
+        socket = $G.socket,
+
         startupModel = me.model,
         orders = startupModel.get('orders'),
         ticker = startupModel.get('stockTicker'),
         bid = ticker.get('bid'),
         ask = ticker.get('ask'),
-        targetId = me.findOrderId(e),
-        orderModel = orders.get(targetId),
+        orderId = me.findOrderId(e),
+        orderModel = orders.get(orderId),
         orderType = orderModel.get('type'),
-        orderPrice = orderModel.get('price').get('value'),
+        hold = orderModel.get('hold'),
+//        orderPrice = orderModel.get('price').get('value'),
         orderPriceInt = orderModel.get('price').get('value_int'),
-        orderAmountInt = orderModel.get('amount').get('value_int'),
-//        collapsed = orderModel.get('collapsed'),
-        isBid = orderType == 'bid',
-        absoluteEdge = !isBid ? 0 : Number.MAX_VALUE,
-        warningEdge = isBid ? ask : bid;
+        orderAmountInt = orderModel.get('amount').get('value_int');
 
+//
+//        isBid = orderType == 'bid',
+//        absoluteEdge = !isBid ? 0 : Number.MAX_VALUE,
+//        warningEdge = isBid ? ask : bid
+
+
+/*
       orders.each(function(order) {
         var type = order.get('type');
 
@@ -335,24 +347,55 @@ function($, _, Backbone,
 //        var dialog = $('#dialogPage');
 //        $.mobile.changePage( "#dialogPage", { role: "dialog" } );
       }
+*/
 
-      if (targetId) {
-        var $G = $.Goxnode(),
-          socket = $G.socket,
-          createOptions = {
-            oid: targetId,
-            type: orderType,
-            price_int: orderPriceInt,
-            phantom: orderModel.get('phantom'),
-            amount_int: orderAmountInt
-          };
-          console.log('about to create order with params', createOptions);
+
+      if (orderId) {
+        var originalValues = orderModel.original,
+          prevHold = originalValues.hold,
+          phantom = orderModel.get('phantom');
+
+        if (hold || prevHold) {
+
+          if ((hold && !prevHold) && !phantom) {
+            socket.emit('cancelOrder', orderId);
+            orderModel.set('status', 'hold');
+          } else if (!hold && prevHold) {
+            submitOrder(true);
+            $G.dropOrderPersistence(orderModel);
+          } else {
+            // both true, no change
+          }
+          originalValues.hold = hold;
+          orderModel.tweakUIByHold();
+
+        } else {
+          submitOrder();
+        }
 
         $G.persistOrderSettings(orderModel, {
           collapsed: false
         });
+
+      }
+
+
+      function submitOrder(dropOrder) {
+        if (dropOrder === undefined) {
+          dropOrder = orderModel.get('phantom');
+        }
+        var createOptions = {
+          oid: orderId,
+          type: orderType,
+          price_int: orderPriceInt,
+          phantom: dropOrder,
+          amount_int: orderAmountInt
+        };
+
+        console.log('about to create order with params', createOptions);
         socket.emit('createOrder', createOptions);
       }
+
     },
 
 
@@ -392,16 +435,16 @@ function($, _, Backbone,
       _.each(checkboxes, function(checkbox) {
         var $checkbox = $(checkbox),
           checkboxName = $checkbox.attr('name'),
-          key = checkboxName.toLowerCase();
+          field = checkboxName.toLowerCase(),
+          value = model.get(field);
 
-        var value = model.get(key);
-        $checkbox.prop('checked', value ? 'checked' : '');
-        if (value) {
-          $checkbox.checkboxradio('refresh');
-        }
+        model.setCheckboxValue(value, $checkbox);
 
         $checkbox.on("click", function(e) {
-          var newValue = $(checkbox).prop('checked');
+          var newValue = $checkbox.prop('checked');
+
+          model.set(field, newValue);
+          model.set('status', 'editing');
         });
 
       });

@@ -33,8 +33,8 @@ define([
           var proto = localStorage.getItem(sKey),
             parsed = JSON.parse(proto);
 
-          if (parsed && parsed.type == 'Order' && parsed.permanent) {
-            delete parsed.type;
+          if (parsed && parsed.modelType == 'Order' && parsed.permanent) {
+            delete parsed.modelType;
             ordersPrototypes[sKey] = parsed;
             hasPermanent = true;
           }
@@ -49,9 +49,10 @@ define([
 
         me.on("sort", function(collection, options) {
           var attributes = options._attrs,
-            status = attributes ? attributes.status : false;
+            status = attributes ? attributes.status : false,
+            force = options.force;
 
-          if (status == 'pending') {
+          if (status == 'pending' || force) {
             console.log('Collection sort triggered', options);
             var contentEl = me.getContentEl(),
               divCollection = $(contentEl).find('[data-role=collapsible]');
@@ -117,6 +118,24 @@ define([
 
 //          console.log("in Orders collection ---- CHANGE");
         });
+      },
+
+
+      restorePermanentOrders: function() {
+        var me = this;
+
+        _.each(this.permanentOrders, function(attributes, oid) {
+          var exists = me.get(oid);
+
+          if (!exists && attributes.hold) {
+            attributes.oid = oid;
+            attributes.status = 'hold';
+            attributes.collapsed = true;
+            me.add(attributes);
+          }
+        });
+        // one off
+        delete this.permanentOrders;
       },
 
       /**

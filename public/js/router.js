@@ -73,6 +73,8 @@ define([
           models.push(order);
         });
         ordersCollection.set(models, {silent: false});
+        ordersCollection.restorePermanentOrders();
+        ordersCollection.sort({force: true});
       }
 
       function onTicker(ticker) {
@@ -88,9 +90,15 @@ define([
 
       function onOrdersCancelled(oid) {
 //        console.log('onOrdersCancelled() ', oid);
-        var orders = startupModel.get('orders');
+        var orders = startupModel.get('orders'),
+          order = orders.get(oid),
+          hold = order ? order.get('hold') : false;
 
-        orders.remove(oid);
+        if (!hold) {
+          orders.remove(oid);
+        } else {
+          order.tweakUIByHold();
+        }
       }
 
       function onUserOrder(orderRaw) {

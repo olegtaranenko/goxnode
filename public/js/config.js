@@ -49,7 +49,7 @@ define(['socket.io', 'jquery', "settings"],
 
         if (permanentInfo) {
           var props = _.pick(permanentInfo, 'ontop', 'hold', 'virtual');
-          model.set(props, {silent: true});
+          model.set(props);
         }
 
         if (persisted) {
@@ -57,14 +57,22 @@ define(['socket.io', 'jquery', "settings"],
             hydrated = model.hydrate(parsed);
 
           model.set(hydrated);
-          if (!parsed.permanent) {
-            delete localStorage[oid];
-          } else {
+          this.dropOrderPersistence(oid);
+          delete localStorage[oid];
+
+          if (parsed.permanent) {
             // persist model options with new oid
             this.persistOrderSettings(model);
           }
         }
 
+      },
+
+      dropOrderPersistence: function(oid) {
+        if (oid instanceof Backbone.Model) {
+          oid = oid.id;
+        }
+        delete localStorage[oid];
       },
 
       persistOrderSettings: function(model, options) {

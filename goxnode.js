@@ -205,7 +205,7 @@ io.sockets.on('connection', function (socket) {
         },
         cb: function (err) {
           if (err) {
-            Log.error('Error by call to "', command, '", error => ', err);
+            Log.error('Error by call to "cancel", error => ', err);
             return;
           }
           add();
@@ -222,7 +222,7 @@ io.sockets.on('connection', function (socket) {
         payload: params,
         cb: function (err, oid) {
           if (err) {
-            Log.error('Error by call to "', command, '", error => ', err);
+            Log.error('Error by call to "add", error => ', err);
             return;
           }
           var orderConfig = {

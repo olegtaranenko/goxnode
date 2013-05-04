@@ -33,18 +33,49 @@ define([
       this.processAttributes(attributes);
 
       _super.constructor.apply(this, arguments);
+      attributes = this.attributes;
+      this.original = _.extend({}, _.pick(attributes, 'hold', 'ontop', 'virtual'));
+    },
+
+    processAttributes: function (attributes) {
+      var me = this;
+
+
+      _.each(['amount', 'effective_amount', 'invalid_amount', 'price'], function (property) {
+        var props = attributes[property];
+
+        if (props) {
+          if (!(props instanceof CurrencyValueModel)) {
+            if (property == 'price') {
+              attributes[property] = new PriceModel(props);
+            } else {
+              attributes[property] = new AmountModel(props);
+            }
+          }
+        }
+      });
+      return attributes;
     },
 
 
     initialize: function(options) {
       var me = this;
 
+      _.each(['ontop', 'hold', 'virtual'], function(property) {
+        var changeEvent = 'change:' + property,
+          funcName = property + 'Handler',
+          fn = me[funcName];
+
+        me.on(changeEvent, fn);
+
+      });
+
       _.each(['amount', 'effective_amount', 'price'], function(property) {
         var changeEvent = 'change:' + property;
 
         me.on(changeEvent, function(model, value, options) {
 //          console.log('changeEvent %s, value ', changeEvent, value);
-          changeHeader(model);
+          me.changeHeader();
           if (property == 'price') {
             var collection = me.collection;
             collection.sort();
@@ -54,17 +85,18 @@ define([
       });
 
       me.on('change:status', function(model, value, options) {
-        changeTheme(model);
-        tweakConfirmButton(value == 'editing' || value == 'new');
+        me.changeTheme(model);
+        me.tweakConfirmButton(value == 'editing' || value == 'new');
 
         var previousStatus = this.previous('status');
 
         if (value == 'editing') {
-          this.original = {
+          var original = me.original;
+          me.original = _.extend(original, {
             status: previousStatus,
-            price: this.get('price'),
-            amount: this.get('amount')
-          };
+            price: me.get('price'),
+            amount: me.get('amount')
+          });
 
         } if (previousStatus == 'editing' && value == 'revert') {
 //          console.log('revert sliderVal, original', this.original);
@@ -86,45 +118,92 @@ define([
             $(sliderEl).slider("refresh");
           });
 
-          delete this.original;
         }
       });
 
-      function tweakConfirmButton(editing) {
-        var confirmEl = $(me.confirmButtonEl());
+    },
 
-        $(confirmEl).css('visibility', editing ? 'visible' : 'hidden');
-      }
 
-      function changeHeader(model) {
-        var el = model.el,
-          headerEl = $(el).find('h2'),
-          header = model.buildHeaderUI(),
-          innerEl = headerEl.find('span.ui-btn-text');
 
-        $(innerEl).html(header);
-      }
 
-      function changeTheme(model) {
-        var el = model.el,
-          status = model.get('status'),
-          theme = model.getOrderSwatchTheme(),
-          buttonEl = $(el).find('h2 a');
+    ontopHandler: function(model, value, options) {
+      this.refreshCheckbox(value, 'ontop');
+    },
 
-        if (status == 'invalid' || status == 'open') {
-          $(buttonEl).buttonMarkup({theme: theme});
-        }
+    holdHandler: function(model, value, options) {
+      var prevValue = model.previous('hold');
+      this.refreshCheckbox(value, 'hold');
+
+    },
+
+    virtualHandler: function(model, value, options) {
+      this.refreshCheckbox(value, 'virtual');
+    },
+
+    setCheckboxValue: function(value, $checkbox) {
+      $checkbox.prop('checked', value ? 'checked' : '');
+      $checkbox.checkboxradio('refresh');
+    },
+
+    refreshCheckbox: function(value, name) {
+      var contentEl = this.el,
+        selector = '[name=' + name + ']',
+        checkboxEl = $(contentEl).find(selector),
+        $checkbox = $(checkboxEl);
+
+      this.setCheckboxValue(value, $checkbox);
+    },
+
+
+    changeHeader: function () {
+      var model = this,
+        el = model.el,
+        headerEl = $(el).find('h2'),
+        header = model.buildHeaderUI(),
+        innerEl = headerEl.find('span.ui-btn-text');
+
+      $(innerEl).html(header);
+    },
+
+
+    changeTheme: function () {
+      var model = this,
+        el = model.el,
+        status = model.get('status'),
+        theme = model.getOrderSwatchTheme(),
+        buttonEl = $(el).find('h2 a');
+
+      if (status == 'invalid' || status == 'open') {
+        $(buttonEl).buttonMarkup({theme: theme});
       }
     },
 
+    tweakConfirmButton: function (editing) {
+      var me = this;
+
+      var confirmEl = $(me.confirmButtonEl());
+
+      $(confirmEl).css('visibility', editing ? 'visible' : 'hidden');
+    },
+
+
+    tweakUIByHold: function() {
+      this.set({
+        status: 'hold'
+      });
+
+      this.tweakConfirmButton(false);
+      this.changeTheme();
+      this.changeHeader();
+    },
 
     dehydrate: function(defaults) {
       defaults = defaults || {};
 
-      var attributes = _.pick(this.attributes, 'collapsed', 'price', 'amount', 'type', 'hold', 'ontop', 'virtual'),
+      var attributes = _.pick(this.attributes, 'collapsed', 'price', 'amount', 'type', 'hold', 'ontop', 'virtual', 'item', 'currency'),
         permanent = attributes.hold || attributes.ontop || attributes.virtual;
 
-      defaults.type = 'Order';
+      defaults.modelType = 'Order';
       defaults.permanent = permanent;
 
       return _.extend(attributes, defaults);
@@ -133,26 +212,6 @@ define([
 
     hydrate: function(attributes) {
       return this.processAttributes(attributes);
-    },
-
-
-    processAttributes: function (attributes) {
-      var me = this;
-
-      _.each(['amount', 'effective_amount', 'invalid_amount', 'price'], function (property) {
-        var props = attributes[property];
-
-        if (props) {
-          if (!(props instanceof CurrencyValueModel)) {
-            if (property == 'price') {
-              attributes[property] = new PriceModel(props);
-            } else {
-              attributes[property] = new AmountModel(props);
-            }
-          }
-        }
-      });
-      return attributes;
     },
 
 
@@ -205,12 +264,16 @@ define([
     getOrderSwatchTheme: function() {
       var orderType = this.get('type'),
         orderStatus = this.get('status'),
+        hold = this.get('hold'),
+
         orderTheme;
 
       if (orderStatus == 'invalid') {
         orderTheme = 'c';
       } else {
-        if (orderType == 'ask') {
+        if (hold) {
+          orderTheme = 'd';
+        } else if (orderType == 'ask') {
           orderTheme = 'b';
         } else {
           orderTheme = 'e';

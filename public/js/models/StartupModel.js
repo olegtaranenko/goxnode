@@ -36,8 +36,7 @@ define([
 
       var stock = options.stock,
         cur = options.cur,
-        base = options.base,
-        silent = {silent: true};
+        base = options.base;
 
 
       console.log('StartupModel constructor', attributes, options);
@@ -61,7 +60,6 @@ define([
 
       tradeAccountData[base] = 0;
       tradeAccountData[cur] = 0;
-//      tradeAccountData.owner = this;
 
       var tradeAccount = new TradeAccountModel(tradeAccountData, initOptions);
 
