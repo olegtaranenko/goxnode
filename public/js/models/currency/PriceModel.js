@@ -19,13 +19,7 @@ define([
         // assume we supply value from the UI control. Value or Size
         var ui = options && options.ui;
         if (ui) {
-          var value = attributes.value,
-            currency = attributes.currency,
-            valueFloat = parseFloat(value);
-
-          attributes.value_int = $G.convertToIntValue(valueFloat, currency);
-          attributes.value = valueFloat;
-          attributes.display_short = valueFloat + ' ' + currency;
+          me.processAttributes(attributes);
         }
       }
 
@@ -66,7 +60,6 @@ define([
         digits = this.toPriceDigits(options);
 
       return {
-//        price: price,
         digits: digits,
         cents: cents,
         millis: millis

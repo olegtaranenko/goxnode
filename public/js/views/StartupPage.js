@@ -348,8 +348,8 @@ function($, _, Backbone,
           };
           console.log('about to create order with params', createOptions);
 
-        orderModel.dehydrate({
-          collapsed: true
+        $G.persistOrderSettings(orderModel, {
+          collapsed: false
         });
         socket.emit('createOrder', createOptions);
       }
@@ -388,9 +388,11 @@ function($, _, Backbone,
       var orderEl = model.el = el.lastElementChild,
         $order = $(orderEl);
 
+/*
       if (insertedEl != null) {
         $(insertedEl).before($order);
       }
+*/
 
 
       var tapEvent = $G.tapEvent;
@@ -588,7 +590,7 @@ function($, _, Backbone,
 
             if (sliderInfo) {
               sliderInfo.start = value;
-              console.log('Save start value', value);
+//              console.log('Save start value', value);
             }
           },
           stop: function(jqEvent) {

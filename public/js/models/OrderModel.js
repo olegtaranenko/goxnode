@@ -25,28 +25,11 @@ define([
       "type": '' // 'ask', 'bid'
     },
 
-    dehydrate: function(options) {
-      var cloned = _.clone(this),
-        attributes = _.pick(this.attributes, 'oid', 'type');
-    },
 
     constructor: function(attributes) {
-      var me = this;
+      this.processAttributes(attributes);
 
-      _.each(['amount', 'effective_amount', 'invalid_amount', 'price'], function(property) {
-        var props = attributes[property];
-
-        if (props) {
-          if (!(props instanceof CurrencyValueModel)) {
-            if (property == 'price') {
-              attributes[property] = new PriceModel(props);
-            } else {
-              attributes[property] = new AmountModel(props);
-            }
-          }
-        }
-      });
-      _super.constructor.apply(me, arguments);
+      _super.constructor.apply(this, arguments);
     },
 
 
@@ -130,6 +113,39 @@ define([
         }
       }
     },
+
+
+    dehydrate: function(defaults) {
+      var attributes = _.pick(this.attributes, 'collapsed', 'price', 'amount');
+
+      return _.extend(attributes, defaults);
+    },
+
+
+    hydrate: function(attributes) {
+      return this.processAttributes(attributes);
+    },
+
+
+    processAttributes: function (attributes) {
+      var me = this;
+
+      _.each(['amount', 'effective_amount', 'invalid_amount', 'price'], function (property) {
+        var props = attributes[property];
+
+        if (props) {
+          if (!(props instanceof CurrencyValueModel)) {
+            if (property == 'price') {
+              attributes[property] = new PriceModel(props);
+            } else {
+              attributes[property] = new AmountModel(props);
+            }
+          }
+        }
+      });
+      return attributes;
+    },
+
 
 
     buildHeaderUI: function() {

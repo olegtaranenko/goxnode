@@ -42,9 +42,24 @@ define(['socket.io', 'jquery', "settings"],
         USD: 100
       },
 
-      persistOrder: function(model, options) {
-        console.log('persistOrder', model, options);
-        var json = model.dehydrate(options);
+      reloadOrderSettings: function(model, oid) {
+        var persisted = localStorage[oid];
+
+        if (persisted) {
+          var parsed = JSON.parse(persisted),
+            hydrated = model.hydrate(parsed);
+
+          model.set(hydrated);
+          delete localStorage[oid];
+        }
+      },
+
+      persistOrderSettings: function(model, options) {
+        console.log('persistOrderSettings', model, options);
+        var dehydrated = model.dehydrate(options),
+          oid = model.get('oid');
+
+        localStorage[oid] = JSON.stringify(dehydrated);
       },
 
       evaluateStrategies: function (owner, currency, side) {

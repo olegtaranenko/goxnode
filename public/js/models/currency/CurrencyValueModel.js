@@ -3,8 +3,7 @@
  * (c) 2013 oDesk Corp all rights reserved
  */
 define([
-  'backbone'
-  ,'config'
+  'backbone','config'
 ], function(Backbone, config) {
 
   var _super = Backbone.Model.prototype,
@@ -33,6 +32,30 @@ define([
       }
 
       _super.constructor.apply(me, arguments);
+    },
+
+    processAttributes: function (attributes, currency) {
+      var value = attributes.value,
+        valueFloat = parseFloat(value),
+        valueStr = String(valueFloat);
+
+      currency = currency || attributes.currency;
+
+      attributes.value_int = $G.convertToIntValue(valueFloat, currency);
+      attributes.value = String(valueFloat);
+      attributes.display_short = this.convertToShort(valueStr, currency);
+      attributes.display = attributes.value + ' ' + currency;
+      attributes.currency = currency;
+    },
+
+    convertToShort: function (valueStr, currency) {
+      var parsed = valueStr.split('.'),
+        intPart = parsed[0],
+        decPart = parsed[1] || '00';
+
+      decPart = decPart.substr(0, 2);
+
+      return intPart + '.' + decPart + ' ' + currency;
     }
 
   })

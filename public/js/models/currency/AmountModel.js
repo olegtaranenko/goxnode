@@ -12,6 +12,7 @@ define([
 
   return CurrencyValueModel.extend({
 
+
     constructor: function(attributes, options) {
       var me = this;
 
@@ -19,19 +20,8 @@ define([
         // assume we supply value from the UI control. Value or Size
         var ui = options && options.ui;
         if (ui) {
-          var value = attributes.value,
-            currency = 'BTC',
-            valueFloat = parseFloat(value),
-            valueStr = String(valueFloat),
-            parsed = valueStr.split('.'),
-            intPart = parsed[0],
-            decPart = parsed[1] || '00';
-
-          decPart = decPart.substr(0, 2);
-
-          attributes.value_int = $G.convertToIntValue(valueFloat, currency);
-          attributes.value = String(valueFloat);
-          attributes.display_short = intPart + '.' + decPart + ' ' + currency;
+          var currency = 'BTC';
+          me.processAttributes(attributes, currency);
         }
       }
 
