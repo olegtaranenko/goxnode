@@ -42,6 +42,7 @@ define([
 
                 if (movedDiv) {
                   $(div).before($(movedDiv));
+                  divCollection = $(contentEl).find('[data-role=collapsible]');
                 }
               }
 
@@ -77,11 +78,12 @@ define([
 
           $G.reloadOrderSettings(model, oldOid);
 
+          if (!_.isEmpty(oldOid)) {
+            this.remove(oldOid);
+          }
+
           page.createOrder(model, insertEl);
 
-          if (!_.isEmpty(oldOid)) {
-            this.removeOrderUI(oldOid);
-          }
         });
 
 

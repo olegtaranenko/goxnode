@@ -116,7 +116,7 @@ define([
 
 
     dehydrate: function(defaults) {
-      var attributes = _.pick(this.attributes, 'collapsed', 'price', 'amount');
+      var attributes = _.pick(this.attributes, 'collapsed', 'price', 'amount', 'type');
 
       return _.extend(attributes, defaults);
     },
