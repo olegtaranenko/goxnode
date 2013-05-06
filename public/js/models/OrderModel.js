@@ -124,8 +124,6 @@ define([
     },
 
 
-
-
     ontopHandler: function(model, value, options) {
       this.refreshCheckbox(value, 'ontop');
     },
@@ -214,7 +212,9 @@ define([
       return this.processAttributes(attributes);
     },
 
-
+    tweakBidderUI: function(options) {
+      this.changeHeader();
+    },
 
     buildHeaderUI: function() {
       var $G = $.Goxnode(),
@@ -284,4 +284,3 @@ define([
     }
   })
 });
- 

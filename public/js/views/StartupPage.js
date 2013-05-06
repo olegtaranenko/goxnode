@@ -306,7 +306,6 @@ function($, _, Backbone,
         orderId = me.findOrderId(e),
         orderModel = orders.get(orderId),
         orderType = orderModel.get('type'),
-        hold = orderModel.get('hold'),
 //        orderPrice = orderModel.get('price').get('value'),
         orderPriceInt = orderModel.get('price').get('value_int'),
         orderAmountInt = orderModel.get('amount').get('value_int');
@@ -350,9 +349,13 @@ function($, _, Backbone,
 */
 
 
+      var continueCheck = true;
       if (orderId) {
         var originalValues = orderModel.original,
+          hold = orderModel.get('hold'),
           prevHold = originalValues.hold,
+          ontop = orderModel.get('ontop'),
+          prevOntop = originalValues.ontop,
           phantom = orderModel.get('phantom');
 
         if (hold || prevHold) {
@@ -360,16 +363,36 @@ function($, _, Backbone,
           if ((hold && !prevHold) && !phantom) {
             socket.emit('cancelOrder', orderId);
             orderModel.set('status', 'hold');
+            continueCheck = false;
           } else if (!hold && prevHold) {
             submitOrder(true);
             $G.dropOrderPersistence(orderModel);
+            continueCheck = false;
           } else {
             // both true, no change
           }
           originalValues.hold = hold;
           orderModel.tweakUIByHold();
 
-        } else {
+        }
+
+        if (continueCheck && (ontop || prevOntop)) {
+          if (ontop && !prevOntop) {
+            submitBidder();
+            orderModel.set('status', 'ontop');
+            continueCheck = false;
+          } else if (!ontop && prevOntop) {
+            stopBidder();
+            $G.dropOrderPersistence(orderModel);
+            continueCheck = false;
+          } else {
+            // both true, no change
+          }
+          originalValues.ontop = ontop;
+
+        }
+
+        if (continueCheck) {
           submitOrder();
         }
 
@@ -380,20 +403,35 @@ function($, _, Backbone,
       }
 
 
-      function submitOrder(dropOrder) {
+      function preparePayload(dropOrder) {
         if (dropOrder === undefined) {
           dropOrder = orderModel.get('phantom');
         }
-        var createOptions = {
+        return {
           oid: orderId,
           type: orderType,
           price_int: orderPriceInt,
           phantom: dropOrder,
           amount_int: orderAmountInt
         };
+      }
+
+      function submitOrder(dropOrder) {
+        var createOptions = preparePayload(dropOrder);
 
         console.log('about to create order with params', createOptions);
         socket.emit('createOrder', createOptions);
+      }
+
+      function submitBidder() {
+        var createOptions = preparePayload();
+
+        console.log('about to create order with params', createOptions);
+        socket.emit('createBidder', createOptions);
+      }
+
+      function stopBidder(bidderId) {
+
       }
 
     },

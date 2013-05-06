@@ -123,6 +123,30 @@ define([
         tradeAccount.set(currency, balanceModel);
       }
 
+
+      function onUpdateBidder(info) {
+        console.log('onUpdatePidder() ', info);
+        var orders = startupModel.get('orders'),
+          bidderId = info.bidderId,
+          bidder = orders.get(bidderId),
+          op = info.op;
+
+        if (op == 'update') {
+          var oid = info.oid;
+
+          var options = {
+            ontopId: oid,
+            amount_int: info.amount_int
+          };
+
+          bidder.tweakBidderUI(options);
+          $G.persistOrderSettings(bidder, options);
+        } else if (op == 'executed') {
+          orders.remove(bidder);
+          $G.dropOrderPersistence(bidderId);
+        }
+      }
+
       socket.on('connect',    onConnect);
       socket.on('disconnect', onDisconnect);
       socket.on('error',      onError);
@@ -133,8 +157,8 @@ define([
       socket.on('ticker',     onTicker);
       socket.on('order_cancel', onOrdersCancelled);
       socket.on('user_order',  onUserOrder);
-
       socket.on('wallet',  onWallet);
+      socket.on('user_bidder',  onUpdateBidder);
 
       return socket;
     }

@@ -2,23 +2,6 @@
 define(['socket.io', 'jquery', "settings"],
   function(io, $, clientConfig) {
 
-/*
-    $.ajax('/client.json')
-      .done(function(data){
-        try {
-          var clientConfig = eval('statics.config = ' + data);
-          console.log('Client configuration loaded successful => ', clientConfig);
-        } catch (e) {
-          console.error('Failure parsing client.json', e);
-        }
-      })
-      .fail(function() {
-        console.error('Error reading client configuration', arguments);
-//      })
-//      .always(function(data, result, response){
-      });
-*/
-
     var mobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase())),
       tapEvent = mobile ? 'touchstart' : 'vclick';
 
@@ -48,8 +31,11 @@ define(['socket.io', 'jquery', "settings"],
         var persisted = localStorage[oid];
 
         if (permanentInfo) {
-          var props = _.pick(permanentInfo, 'ontop', 'hold', 'virtual');
+          var props = _.pick(permanentInfo, 'ontop', 'hold', 'virtual'),
+            original = model.original || {};
+
           model.set(props);
+          model.original = _.extend(original, props);
         }
 
         if (persisted) {

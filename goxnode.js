@@ -99,9 +99,10 @@ clientMtgox.on('ticker', function(data) {
       var lastValue = lastTicker[term],
         value = ticker[term].value;
 
-      if (Math.round(Math.abs(lastValue - value) * 100) / 100 > 0.01) {
-        ret = true;
-      }
+      ret = lastValue != value;
+//      if (Math.round(Math.abs(lastValue - value) * 100) / 100 > 0.01) {
+//        ret = true;
+//      }
       lastTicker[term] = value;
     }, this);
     return ret;
@@ -132,6 +133,10 @@ clientMtgox.on('wallet', function(data) {
   io.sockets.emit('wallet', wallet);
 });
 
+
+clientMtgox.on('user_bidder', function(data) {
+  io.sockets.emit('user_bidder', data);
+});
 
 
 // on-fly preprocessor for less/css bowels
@@ -189,6 +194,20 @@ io.sockets.on('connection', function (socket) {
     })
   });
 
+
+  socket.on('createBidder', function(params){
+    Log.debug('createBidder function ->', params);
+    clientMtgox.startBidding(params, function() {
+      Log.debug('createBidder function ->', arguments)
+    });
+  });
+
+  socket.on('stopBidder', function(params){
+    Log.debug('stopBidder function ->', params);
+    clientMtgox.stopBidding(params, function() {
+      Log.debug('stopBidder callback ->', arguments)
+    });
+  });
 
   socket.on('createOrder', function(params) {
     Log.debug('createOrder', params);

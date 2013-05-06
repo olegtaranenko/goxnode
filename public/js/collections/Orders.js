@@ -125,13 +125,25 @@ define([
         var me = this;
 
         _.each(this.permanentOrders, function(attributes, oid) {
-          var exists = me.get(oid);
+          var exists = me.get(oid),
+            toAdd = false;
 
-          if (!exists && attributes.hold) {
-            attributes.oid = oid;
-            attributes.status = 'hold';
-            attributes.collapsed = true;
-            me.add(attributes);
+          if (!exists) {
+            if (attributes.hold) {
+              attributes.oid = oid;
+              attributes.status = 'hold';
+              attributes.collapsed = true;
+              toAdd = true;
+            }
+            if (attributes.ontop) {
+              attributes.oid = oid;
+              attributes.status = 'On Top';
+              attributes.collapsed = true;
+              toAdd = true;
+            }
+            if (toAdd) {
+              me.add(attributes);
+            }
           }
         });
         // one off
