@@ -17,27 +17,28 @@ define([
 
       if (attributes != null) {
         // assume we supply value from the UI control. Value or Size
-        var ui = options && options.ui;
-        if (ui) {
-          me.processAttributes(attributes);
+        var ui = options && options.ui,
+          isValueInt = options && options.is_int;
+
+        if (isValueInt) {
+          attributes = {
+            value_int: attributes
+          };
         }
+
+        if (_.isObject(attributes)) {
+          if (ui) {
+            me.processAttributes(attributes, options);
+          }
+        }
+
       }
 
-      _super.constructor.apply(me, arguments);
+      _super.constructor.apply(me, [attributes, options]);
     },
 
     toPrice: function() {
-      var value_int = String(this.get('value_int')),
-        decimalPart = value_int.substr(-5),
-        decimalLen = decimalPart.length,
-        wholeLen = value_int.length,
-        intPartLen = wholeLen - decimalLen,
-        hasIntPart = intPartLen > 0,
-        intPart = hasIntPart ? value_int.substring(0, intPartLen) : '0';
-
-      decimalPart = '000000000000'.substr(0, 5 - decimalPart) + decimalPart;
-
-      return parseFloat(intPart + '.' + decimalPart);
+      return this.stringDivide(5);
     },
 
     fromParsedPrice: function(parsed) {

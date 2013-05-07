@@ -1,8 +1,11 @@
 define([
-  'backbone', 'OrderModel','config'
+  'backbone', 'OrderModel',
+  'PriceModel', 'AmountModel',
+  'config'
 ],
   function(
-    Backbone, OrderModel
+    Backbone, OrderModel,
+    PriceModel, AmountModel
   ) {
 
     var $G = $.Goxnode();
@@ -91,24 +94,53 @@ define([
 
         me.on("add", function(model, me, options) {
           console.log("in Orders collection ---- ADD", model);
+          function findForBidder(id) {
+            var bidder = null;
+            _.some(me.permanentOrders, function(order, oid) {
+              var ontopId = order.ontopId;
+              if (ontopId == id) {
+                bidder = order;
+                bidder.oid = oid;
+                return true;
+              }
+              return false;
+            });
+            return bidder
+          }
+
           var page = me.owner,
             oldOid = model.get('oldOid'),
             id = model.id,
-            permanentInfo = me.permanentOrders[id];
+            permanentInfo = me.permanentOrders[id],
+            bidder = findForBidder(id);
 
-          $G.restoreOrderSettings(model, oldOid, permanentInfo);
 
-          if (!_.isEmpty(oldOid)) {
-            this.remove(oldOid);
+          if (!bidder) {
+            $G.restoreOrderSettings(model, oldOid, permanentInfo);
+
+            if (!_.isEmpty(oldOid)) {
+              this.remove(oldOid);
+            }
+          } else {
+            var orderAttributes = _.pick(model.attributes, 'price', 'amount', 'effective_amount');
+            orderAttributes.status = 'ontop';
+
+            _.extend(bidder, orderAttributes);
+            var doReplace = true;
           }
 
           page.createOrder(model);
+
+          if (doReplace) {
+            me.remove(model);
+            me.add(bidder);
+          }
 
         });
 
 
         me.on("remove", function(model, me, options) {
-//          console.log("in Orders collection ---- REMOVE");
+          $G.dropOrderPersistence(model.id);
           this.removeOrderUI(model);
         });
 
@@ -136,10 +168,24 @@ define([
               toAdd = true;
             }
             if (attributes.ontop) {
-              attributes.oid = oid;
-              attributes.status = 'On Top';
-              attributes.collapsed = true;
-              toAdd = true;
+              var ontopId = attributes.ontopId,
+                ontop = me.get(ontopId);
+
+              if (ontop) {
+                var updateAttributes = _.pick(attributes, 'ontopId'),
+                  price = new PriceModel(attributes.price_int),
+                  amount = new AmountModel(attributes.amount_int);
+
+                updateAttributes.ontop = true;
+                updateAttributes.status = 'On Top';
+                updateAttributes.collapsed = false;
+//                updateAttributes.price = price;
+//                updateAttributes.amount = amount;
+                ontop.set(updateAttributes);
+              } else {
+                // even remove it from the store TODO restore
+                $G.dropOrderPersistence(oid);
+              }
             }
             if (toAdd) {
               me.add(attributes);

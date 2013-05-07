@@ -34,18 +34,56 @@ define([
       _super.constructor.apply(me, arguments);
     },
 
-    processAttributes: function (attributes, currency) {
+
+    processAttributes: function (attributes, options) {
+      var currency = options.currency || attributes.currency;
       var value = attributes.value,
-        valueFloat = parseFloat(value),
-        valueStr = String(valueFloat);
+        isValueInt = options.is_int;
 
-      currency = currency || attributes.currency;
+      if (value == undefined) {
+        value = attributes;
+      }
 
-      attributes.value_int = $G.convertToIntValue(valueFloat, currency);
-      attributes.value = String(valueFloat);
+      var valueFloat,
+        valueInt;
+
+      if (!isValueInt) {
+        valueFloat = parseFloat(value);
+        valueInt = $G.convertToIntValue(valueFloat, currency);
+      } else {
+        valueInt = attributes.value_int;
+        if (valueInt == null) {
+          valueInt = attributes;
+        }
+//        valueInt = parseInt(valueInt);
+        valueFloat = this.stringDivide(currency == 'BTC' ? 8 : 5, valueInt);
+      }
+      var valueStr = String(valueFloat);
+
+      attributes.value_int = valueInt;
+      attributes.value = valueStr;
       attributes.display_short = this.convertToShort(valueStr, currency);
       attributes.display = attributes.value + ' ' + currency;
       attributes.currency = currency;
+    },
+
+    stringDivide: function(exp, valueInt) {
+      exp = +exp; // convert to int
+      valueInt = valueInt || String(this.get('value_int'));
+      if (!_.isString(valueInt)) {
+        valueInt = String(valueInt);
+      }
+
+      var decimalPart = valueInt.substr(-1 * exp),
+        decimalLen = decimalPart.length,
+        wholeLen = valueInt.length,
+        intPartLen = wholeLen - decimalLen,
+        hasIntPart = intPartLen > 0,
+        intPart = hasIntPart ? valueInt.substring(0, intPartLen) : '0';
+
+      decimalPart = '000000000000'.substr(0, exp - decimalLen) + decimalPart;
+
+      return parseFloat(intPart + '.' + decimalPart);
     },
 
     convertToShort: function (valueStr, currency) {
@@ -60,5 +98,3 @@ define([
 
   })
 });
-
- 

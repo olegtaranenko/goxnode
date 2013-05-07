@@ -111,7 +111,7 @@ define([
           amount = balance ? balance.get('value') : 0;
 
         if (part == 'cur') {
-          amount *= price;
+          amount /= price;
         }
         if (!partial) {
           ret[currency] = amount;

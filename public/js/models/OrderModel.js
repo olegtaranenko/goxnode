@@ -11,6 +11,7 @@ define([
       "ontop": false,
       "virtual": false,
       "hold": false,
+      "ontopId": null, // id of order connected to bidder
 
       "oid": '', // guid
       "oldOid": '', // guid of previous order, which is replaced with oid
@@ -84,6 +85,13 @@ define([
 
       });
 
+      me.on('change:collapsed', function(model, value, options) {
+        var el = model.el,
+          $collapsible = $(el);
+
+        $collapsible.collapsible({ collapsed: value });
+      });
+
       me.on('change:status', function(model, value, options) {
         me.changeTheme(model);
         me.tweakConfirmButton(value == 'editing' || value == 'new');
@@ -153,11 +161,11 @@ define([
     },
 
 
-    changeHeader: function () {
+    changeHeader: function (amount, price) {
       var model = this,
         el = model.el,
         headerEl = $(el).find('h2'),
-        header = model.buildHeaderUI(),
+        header = model.buildHeaderUI(amount, price),
         innerEl = headerEl.find('span.ui-btn-text');
 
       $(innerEl).html(header);
@@ -213,22 +221,47 @@ define([
     },
 
     tweakBidderUI: function(options) {
-      this.changeHeader();
+      var amountInt = options.amount_int,
+        priceInt = options.price_int;
+
+      this.changeHeader(amountInt, priceInt);
     },
 
-    buildHeaderUI: function() {
+    buildHeaderUI: function(amount, price) {
+
+      var amountModel = null,
+        priceModel = null,
+        effectiveModel = null;
+
+      if (amount == null) {
+        effectiveModel = this.get('effective_amount');
+        amountModel = this.get('amount');
+        amount = amountModel.toAmount();
+
+      } else if (!(amount instanceof AmountModel)) {
+        amountModel = new AmountModel(amount, {
+          ui: true,
+          is_int: true
+        });
+      }
+
+      if (price == null) {
+        priceModel = this.get('price');
+        price = priceModel.toPrice();
+      } else if ( !(price instanceof PriceModel) ){
+        priceModel = new PriceModel(price, {
+          ui: true,
+          is_int: true
+        });
+        price = priceModel.toPrice();
+      }
+
       var $G = $.Goxnode(),
         type = this.get('type').toUpperCase(),
         status = this.get('status'),
         editing = status == 'editing',
-        priceModel = this.get('price'),
-        price = priceModel.toPrice(),
-        
 
-        amountModel = this.get('amount'),
-        amount = amountModel.toAmount(),
 
-        effectiveModel = this.get('effective_amount'),
         effective = effectiveModel ? effectiveModel.toAmount() : 0,
 
         model = (effective > 0 && !editing)? effectiveModel : amountModel,

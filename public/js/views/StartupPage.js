@@ -269,26 +269,39 @@ function($, _, Backbone,
         orderId = me.findOrderId(e),
         startupModel = me.model,
         orders = startupModel.get('orders'),
-        order = orders.get(orderId),
-        status = order ? order.get('status') : 'new',
+        orderModel = orders.get(orderId),
+        status = orderModel ? orderModel.get('status') : 'new',
         editing = status == 'editing',
-        hold = order.get('hold');
+        hold = orderModel.get('hold'),
+        ontop = orderModel.get('ontop'),
+        doCancel = false;
 
 
       if (!editing) {
         if (status == 'new' || hold) {
-          orders.removeOrderUI(order);
+          orders.removeOrderUI(orderModel);
           if (hold) {
-            $G.dropOrderPersistence(order.id);
+            $G.dropOrderPersistence(orderModel.id);
           }
-        } else {
+        } if (ontop) {
+          var ontopId = orderModel.get('ontopId');
 
+          socket.emit('stopBidder', {
+            bidderId: orderId,
+            orderId: ontopId
+          });
+          orderId = ontopId;
+//          doCancel = true;
+        } else {
+          doCancel = true;
+        }
+
+        if (doCancel) {
           socket.emit('cancelOrder', orderId);
         }
       } else {
         // revert changes to before edit
-        order.set('status', 'revert');
-
+        orderModel.set('status', 'revert');
       }
     },
 
@@ -419,14 +432,16 @@ function($, _, Backbone,
       function submitOrder(dropOrder) {
         var createOptions = preparePayload(dropOrder);
 
-        console.log('about to create order with params', createOptions);
+        console.log('about to create ORDER with params', createOptions);
         socket.emit('createOrder', createOptions);
       }
 
       function submitBidder() {
         var createOptions = preparePayload();
 
-        console.log('about to create order with params', createOptions);
+        delete createOptions.price_int;
+
+        console.log('about to create BIDDER with params', createOptions);
         socket.emit('createBidder', createOptions);
       }
 

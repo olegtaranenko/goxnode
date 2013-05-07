@@ -196,6 +196,7 @@ io.sockets.on('connection', function (socket) {
 
 
   socket.on('createBidder', function(params){
+    params.ticker = lastTicker;
     Log.debug('createBidder function ->', params);
     clientMtgox.startBidding(params, function() {
       Log.debug('createBidder function ->', arguments)
@@ -204,9 +205,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('stopBidder', function(params){
     Log.debug('stopBidder function ->', params);
-    clientMtgox.stopBidding(params, function() {
-      Log.debug('stopBidder callback ->', arguments)
-    });
+    clientMtgox.stopBidding(params);
   });
 
   socket.on('createOrder', function(params) {

@@ -64,6 +64,7 @@ define([
 
       function onOrdersInfo(info) {
         console.log('onOrdersInfo()', info);
+
         // create (or update) Model which contains PrivateInfo
         var ordersCollection = startupModel.get('orders'),
           models = [];
@@ -136,14 +137,17 @@ define([
 
           var options = {
             ontopId: oid,
-            amount_int: info.amount_int
+            amount_int: info.amount_int,
+            price_int: info.price_int
           };
 
-          bidder.tweakBidderUI(options);
-          $G.persistOrderSettings(bidder, options);
+          if (bidder) {
+            bidder.tweakBidderUI(options);
+            $G.persistOrderSettings(bidder, options);
+          }
         } else if (op == 'executed') {
           orders.remove(bidder);
-          $G.dropOrderPersistence(bidderId);
+//          $G.dropOrderPersistence(bidderId);
         }
       }
 

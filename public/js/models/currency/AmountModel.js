@@ -16,21 +16,27 @@ define([
     constructor: function(attributes, options) {
       var me = this;
 
-      if (attributes != null) {
-        // assume we supply value from the UI control. Value or Size
-        var ui = options && options.ui;
+      var ui = options && options.ui,
+        isValueInt = options && options.is_int;
+
+      if (isValueInt) {
+        attributes = {
+          value_int: attributes
+        };
+      }
+
+      if (_.isObject(attributes)) {
         if (ui) {
-          var currency = 'BTC';
-          me.processAttributes(attributes, currency);
+          options.currency = 'BTC';
+          me.processAttributes(attributes, options);
         }
       }
 
-      _super.constructor.apply(me, arguments);
+      _super.constructor.apply(me, [attributes, options]);
     },
 
     toAmount: function() {
-      var value_int = this.get('value_int');
-      return value_int / 1E8;
+      return this.stringDivide(8);
     }
 
   })
