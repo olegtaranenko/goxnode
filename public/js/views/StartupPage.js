@@ -8,12 +8,12 @@
 define([
   'jquery', 'underscore', 'backbone',
   'text!/templates/startup.html', 'text!/templates/actionui.html', 'text!/templates/orderui.html',
-  'StartupModel', 'TradeAction', 'PriceModel', 'AmountModel', 'OrderModel'
+  'StartupModel', 'TradeAction', 'PriceModel', 'AmountModel', 'OrderModel', 'BidderModel'
 ],
 
 function($, _, Backbone,
           tpl, actionUI, orderUI,
-          StartupModel, TradeAction, PriceModel, AmountModel, OrderModel
+          StartupModel, TradeAction, PriceModel, AmountModel, OrderModel, BidderModel
 ) {
 
   var $G = $.Goxnode();
@@ -287,8 +287,57 @@ function($, _, Backbone,
         editing = status == 'editing',
         hold = orderModel.get('hold'),
         ontop = orderModel.get('ontop'),
-        doCancel = false;
+        doCancel = false,
+        event = window.event,
+        meta = event.metaKey,
+        ctrl = event.ctrlKey,
+        alt = event.altKey,
+        shift = event.shiftKey,
+        onlyTyped = alt || meta,
+        removedType = orderModel.get('type'),
+        allOrders = ctrl || shift,
+        massRemove = onlyTyped || allOrders,
+        toRemove = [],
+        bidderRemove = [];
 
+
+      // Mass remove
+      if (massRemove) {
+        console.log('MASS REMOVE ORDER : ' + (onlyTyped ? ('BY TYPE -  ' + removedType.toUpperCase())  : 'ALL ORDERS'));
+        var oid, bidderId;
+        orders.each(function (order) {
+          var type = order.get('type'),
+            ontopId = order.get('ontopId');
+
+          oid = order.id;
+          bidderId = null;
+
+          if (order instanceof BidderModel || ontopId != null) {
+            bidderId = oid;
+            oid = null;
+          }
+          if (onlyTyped) {
+            if (type != removedType) {
+              oid = null;
+              bidderId = null;
+            }
+          }
+          if (oid) {
+            console.log('... removing ', oid);
+            toRemove.push(oid);
+          }
+          if (bidderId) {
+            bidderRemove.push(order);
+          }
+        });
+
+        socket.emit('massOrderCancel', toRemove);
+
+        _.each(bidderRemove, function(bidder) {
+          me.cancelBidder(bidder);
+        });
+        return;
+      }
 
       if (!editing) {
         if (status == 'new' || hold) {

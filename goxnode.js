@@ -190,8 +190,41 @@ io.sockets.on('connection', function (socket) {
       command: 'cancel',
       payload: {
         oid: oid
+      },
+      cb: function (err) {
+        if (err) {
+          Log.error('Error by call to "cancel", error => ', err, oid);
+          return;
+        }
+        Log.info('Order deleted ', oid);
       }
     })
+  });
+
+
+
+  socket.on('massOrderCancel', function(orderIdArray) {
+    Log.info('massOrderCancel', orderIdArray);
+    cancelOrder(orderIdArray);
+
+    function cancelOrder() {
+      if (orderIdArray.length > 0) {
+        var oid = orderIdArray.splice(0, 1);
+        clientMtgox.queryHttps({
+          command: 'cancel',
+          payload: {
+            oid: oid
+          },
+          cb: function (err) {
+            if (err) {
+              Log.error('Error in Mass Cancel, error => ', err, oid);
+            }
+            Log.info('Order deleted ', oid);
+            cancelOrder();
+          }
+        })
+      }
+    }
   });
 
 
@@ -215,7 +248,7 @@ io.sockets.on('connection', function (socket) {
 
 
   socket.on('createOrder', function(params) {
-    Log.debug('createOrder', params);
+    Log.debug('createOrder, old oid ->', params.oid);
     var oldOid = params.oid,
       phantom = params.phantom,
       command = 'cancel';
@@ -254,7 +287,7 @@ io.sockets.on('connection', function (socket) {
             oldOid: oldOid,
             status: 'preliminary'
           };
-          Log.debug('Order added, arguments', orderConfig);
+          Log.debug('Order added, ', oid);
           socket.emit('user_order', orderConfig);
         }
       })
