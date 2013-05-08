@@ -4,11 +4,13 @@
 define([
   'backbone', 'jquery', 'underscore',
   'StartupPage', 'StartupModel',
-  'PrivateInfoModel', 'OrderModel', 'CurrencyValueModel'
+  'PrivateInfoModel', 'OrderModel', 'BidderModel',
+  'CurrencyValueModel'
 ],
   function(Backbone, $, _,
            StartupPage, StartupModel,
-           PrivateInfoModel, OrderModel, CurrencyValueModel
+           PrivateInfoModel, OrderModel, BidderModel,
+           CurrencyValueModel
     ) {
 
 
@@ -70,10 +72,26 @@ define([
           models = [];
 
         _.each(info, function(orderInfo) {
-          var order = new OrderModel(orderInfo);
-          models.push(order);
+          var mayBeBidder = isBidderOrder(orderInfo);
+          if (!mayBeBidder) {
+            var order = new OrderModel(orderInfo);
+            models.push(order);
+          }
+
+
+          function isBidderOrder(orderInfo) {
+            var ret = false;
+            ordersCollection.each(function(order) {
+              var ontopId = order.get('ontopId');
+              if (orderInfo.oid == ontopId) {
+                ret = true;
+              }
+            });
+            return ret;
+          }
+
         });
-        ordersCollection.set(models, {silent: false});
+        ordersCollection.add(models, {silent: false});
         ordersCollection.restorePermanentOrders();
         ordersCollection.sort({force: true});
       }
@@ -147,8 +165,16 @@ define([
           }
         } else if (op == 'executed') {
           orders.remove(bidder);
-//          $G.dropOrderPersistence(bidderId);
         }
+      }
+
+      function onBidders(bidders) {
+        console.log('onBidders', bidders);
+        var orders = startupModel.get('orders');
+        _.each(bidders, function(bidderInfo) {
+          var bidder = new BidderModel(bidderInfo);
+          orders.add(bidder);
+        })
       }
 
       socket.on('connect',    onConnect);
@@ -160,9 +186,10 @@ define([
       socket.on('ordersinfo', onOrdersInfo);
       socket.on('ticker',     onTicker);
       socket.on('order_cancel', onOrdersCancelled);
-      socket.on('user_order',  onUserOrder);
-      socket.on('wallet',  onWallet);
-      socket.on('user_bidder',  onUpdateBidder);
+      socket.on('user_order', onUserOrder);
+      socket.on('wallet',     onWallet);
+      socket.on('user_bidder',onUpdateBidder);
+      socket.on('bidders',    onBidders);
 
       return socket;
     }

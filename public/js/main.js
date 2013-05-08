@@ -24,6 +24,7 @@ require.config({
     PrivateInfoModel: 'models/PrivateInfoModel',
     WalletModel: 'models/WalletModel',
     OrderModel: 'models/OrderModel',
+    BidderModel: 'models/BidderModel',
     TradeAccountModel: 'models/TradeAccountModel',
     TradeAction: 'models/TradeAction',
     StockExchangeModel: 'models/StockExchangeModel',

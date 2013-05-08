@@ -208,6 +208,12 @@ io.sockets.on('connection', function (socket) {
     clientMtgox.stopBidding(params);
   });
 
+  socket.on('holdBidder', function(params){
+    Log.debug('holdBidder function ->', params);
+    clientMtgox.holdBidding(params);
+  });
+
+
   socket.on('createOrder', function(params) {
     Log.debug('createOrder', params);
     var oldOid = params.oid,
@@ -254,7 +260,7 @@ io.sockets.on('connection', function (socket) {
       })
     }
   });
-  executeClosure(socket, [retrievePrivateInfo, retrieveOpenOrders, setLastTicker], this, {});
+  executeClosure(socket, [putBidders, retrievePrivateInfo, retrieveOpenOrders, setLastTicker], this, {});
 });
 
 
@@ -288,6 +294,11 @@ function executeClosure(socket, funcs, scope, options) {
   }
 }
 
+function putBidders(socket, cb, scope, options) {
+  var bidders = clientMtgox.getBidders();
+  socket.emit('bidders', bidders);
+  executeClosure.apply(scope|| this, arguments);
+}
 
 function retrievePrivateInfo(socket, cb, scope, options) {
   var args = arguments;

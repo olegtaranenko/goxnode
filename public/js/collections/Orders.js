@@ -1,10 +1,10 @@
 define([
-  'backbone', 'OrderModel',
+  'backbone', 'OrderModel', 'BidderModel',
   'PriceModel', 'AmountModel',
   'config'
 ],
   function(
-    Backbone, OrderModel,
+    Backbone, OrderModel, BidderModel,
     PriceModel, AmountModel
   ) {
 
@@ -114,19 +114,20 @@ define([
             permanentInfo = me.permanentOrders[id],
             bidder = findForBidder(id);
 
+          if (bidder) {
+            var orderAttributes = _.pick(model.attributes, 'price', 'amount', 'effective_amount');
+            orderAttributes.status = 'ontop';
 
-          if (!bidder) {
+            _.extend(bidder, orderAttributes);
+            var doReplace = false;
+          } else if (model instanceof BidderModel) {
+//            model = bidder;
+          } else  {
             $G.restoreOrderSettings(model, oldOid, permanentInfo);
 
             if (!_.isEmpty(oldOid)) {
               this.remove(oldOid);
             }
-          } else {
-            var orderAttributes = _.pick(model.attributes, 'price', 'amount', 'effective_amount');
-            orderAttributes.status = 'ontop';
-
-            _.extend(bidder, orderAttributes);
-            var doReplace = true;
           }
 
           page.createOrder(model);

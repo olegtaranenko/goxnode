@@ -161,6 +161,27 @@ define([
     },
 
 
+    changeSliders: function(price) {
+      var model = this,
+        allSliders = model.allSliders,
+        priceModel = new PriceModel(price, {
+          ui: true,
+          is_int: true
+        }),
+        parsedPrice = priceModel.toParsedPrice({
+          lower: true
+        });
+
+      _.each(allSliders, function(info, sliderName){
+        var slider = $(info.el);
+
+        if (info.isPrice) {
+          var value = parsedPrice[sliderName];
+          slider.val(value);
+        }
+      });
+    },
+
     changeHeader: function (amount, price) {
       var model = this,
         el = model.el,
@@ -225,6 +246,7 @@ define([
         priceInt = options.price_int;
 
       this.changeHeader(amountInt, priceInt);
+      this.changeSliders(priceInt);
     },
 
     buildHeaderUI: function(amount, price) {

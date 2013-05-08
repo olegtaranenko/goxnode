@@ -16,6 +16,7 @@ function($, _, Backbone,
           StartupModel, TradeAction, PriceModel, AmountModel, OrderModel
 ) {
 
+  var $G = $.Goxnode();
   return Backbone.View.extend({
     template: _.template(tpl),
     actionTemplate: _.template(actionUI),
@@ -261,6 +262,18 @@ function($, _, Backbone,
     },
 
 
+    cancelBidder: function (bidderModel) {
+      var socket = $G.socket;
+
+      var ontopId = bidderModel.get('ontopId'),
+        orderId = bidderModel.id;
+
+      socket.emit('stopBidder', {
+        bidderId: orderId,
+        orderId: ontopId
+      });
+    },
+
     cancelOrder: function(e) {
       var $G = $.Goxnode(),
         socket = $G.socket;
@@ -284,14 +297,7 @@ function($, _, Backbone,
             $G.dropOrderPersistence(orderModel.id);
           }
         } if (ontop) {
-          var ontopId = orderModel.get('ontopId');
-
-          socket.emit('stopBidder', {
-            bidderId: orderId,
-            orderId: ontopId
-          });
-          orderId = ontopId;
-//          doCancel = true;
+          me.cancelBidder(orderModel);
         } else {
           doCancel = true;
         }
@@ -363,6 +369,7 @@ function($, _, Backbone,
 
 
       var continueCheck = true;
+
       if (orderId) {
         var originalValues = orderModel.original,
           hold = orderModel.get('hold'),
@@ -371,38 +378,39 @@ function($, _, Backbone,
           prevOntop = originalValues.ontop,
           phantom = orderModel.get('phantom');
 
-        if (hold || prevHold) {
+        if (continueCheck && (ontop != prevOntop)) {
+          if (ontop && !prevOntop) {
+            continueCheck = false;
+            submitBidder(hold);
+            orderModel.set('status', 'ontop');
+          } else if (!ontop && prevOntop) {
+            continueCheck = false;
+            me.cancelBidder(orderModel);
+          }
+          originalValues.ontop = ontop;
+        }
 
-          if ((hold && !prevHold) && !phantom) {
-            socket.emit('cancelOrder', orderId);
-            orderModel.set('status', 'hold');
-            continueCheck = false;
-          } else if (!hold && prevHold) {
-            submitOrder(true);
-            $G.dropOrderPersistence(orderModel);
-            continueCheck = false;
+        if (continueCheck && (hold != prevHold)) {
+          if (!ontop) {
+            if ((hold && !prevHold) && !phantom) {
+              socket.emit('cancelOrder', orderId);
+              orderModel.set('status', 'hold');
+              continueCheck = false;
+            } else if (!hold && prevHold) {
+              submitOrder(true);
+              $G.dropOrderPersistence(orderModel);
+              continueCheck = false;
+            }
           } else {
-            // both true, no change
+
+            continueCheck = false;
+            socket.emit('holdBidder', {
+              bidderId: orderId,
+              hold: hold
+            });
           }
           originalValues.hold = hold;
           orderModel.tweakUIByHold();
-
-        }
-
-        if (continueCheck && (ontop || prevOntop)) {
-          if (ontop && !prevOntop) {
-            submitBidder();
-            orderModel.set('status', 'ontop');
-            continueCheck = false;
-          } else if (!ontop && prevOntop) {
-            stopBidder();
-            $G.dropOrderPersistence(orderModel);
-            continueCheck = false;
-          } else {
-            // both true, no change
-          }
-          originalValues.ontop = ontop;
-
         }
 
         if (continueCheck) {
@@ -412,7 +420,6 @@ function($, _, Backbone,
         $G.persistOrderSettings(orderModel, {
           collapsed: false
         });
-
       }
 
 
@@ -436,19 +443,15 @@ function($, _, Backbone,
         socket.emit('createOrder', createOptions);
       }
 
-      function submitBidder() {
+      function submitBidder(hold) {
         var createOptions = preparePayload();
 
         delete createOptions.price_int;
+        createOptions.hold = hold;
 
         console.log('about to create BIDDER with params', createOptions);
         socket.emit('createBidder', createOptions);
       }
-
-      function stopBidder(bidderId) {
-
-      }
-
     },
 
 
