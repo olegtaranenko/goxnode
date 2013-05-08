@@ -85,6 +85,14 @@ define([
 
       });
 
+      me.on('change:oldOid', function(model, value, options) {
+        var prevValue = model.previous('oldOid');
+        if (!_.isEmpty(value)) {
+          var collection = me.collection;
+          collection.remove(value);
+        }
+      });
+
       me.on('change:collapsed', function(model, value, options) {
         var el = model.el,
           $collapsible = $(el);

@@ -441,8 +441,10 @@ function($, _, Backbone,
 
         if (continueCheck && (hold != prevHold)) {
           if (!ontop) {
-            if ((hold && !prevHold) && !phantom) {
-              socket.emit('cancelOrder', orderId);
+            if (hold && !prevHold) {
+              if (!phantom) {
+                socket.emit('cancelOrder', orderId);
+              }
               orderModel.set('status', 'hold');
               continueCheck = false;
             } else if (!hold && prevHold) {
@@ -451,7 +453,6 @@ function($, _, Backbone,
               continueCheck = false;
             }
           } else {
-
             continueCheck = false;
             socket.emit('holdBidder', {
               bidderId: orderId,
