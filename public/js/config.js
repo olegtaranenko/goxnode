@@ -32,10 +32,10 @@ define(['socket.io', 'jquery', "settings"],
 
         if (permanentInfo) {
           var props = _.pick(permanentInfo, 'ontop', 'hold', 'virtual'),
-            original = model.original || {};
+            original = model.originalValues || {};
 
           model.set(props);
-          model.original = _.extend(original, props);
+          model.originalValues = _.extend(original, props);
         }
 
         if (persisted) {

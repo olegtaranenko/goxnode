@@ -21,7 +21,7 @@ define([
         // assume we supply value from the UI control. Value or Size
         var ui = options.ui;
 
-        if (_.isNumber(attributes)) {
+        if ($.isNumeric(attributes)) {
           var num = attributes,
             currency = options.currency;
 

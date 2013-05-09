@@ -205,10 +205,15 @@ define([
         var slider = $(info.el);
 
         if (info.isPrice) {
-          var value = parsedPrice[sliderName];
-          slider.val(value);
+          var value = parsedPrice[sliderName],
+            oldValue = slider.val();
+          if (oldValue != value) {
+            slider.val(value);
+            slider.slider('refresh');
+          }
         }
       });
+
 
       return priceModel;
     },

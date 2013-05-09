@@ -21,25 +21,25 @@ define([
         "100": {
           base: 1,
 //          basePrice: 29.701,
-          cur:  1,
+          cur:  1
 //          curPrice: 29.3213
         },
         "50": {
           base: 1,
 //          basePrice: 29.7513,
-          cur:  1,
+          cur:  1
 //          curPrice: 29.2011
         },
         "30": {
           base: 1,
 //          basePrice: 29.8121,
-          cur:  1,
+          cur:  1
 //          curPrice: 29.1234
         },
         "2": {
           base: 1,
 //          basePrice: 29.8721,
-          cur:  1,
+          cur:  1
 //          curPrice: 29.1234
         }
 
@@ -63,11 +63,12 @@ define([
               orders.each(function(model) {
                 var status = model.get('status'),
                   type = model.get('type'),
-                  dirty = model.dirtyPrice();
+                  dirty = model.dirtyPrice(),
+                  phantom = model.get('phantom');
 
-                if (!dirty && type == tradeSide) {
+                if (phantom && !dirty && type == tradeSide) {
                   var price = model.changeSliders(value);
-                  model.set('price', price);
+                  model.changeHeader(null, price);
                 }
               })
             }

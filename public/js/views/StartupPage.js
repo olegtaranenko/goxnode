@@ -420,7 +420,7 @@ function($, _, Backbone,
       var continueCheck = true;
 
       if (orderId) {
-        var originalValues = orderModel.original,
+        var originalValues = orderModel.originalValues,
           hold = orderModel.get('hold'),
           prevHold = originalValues.hold,
           ontop = orderModel.get('ontop'),
@@ -563,11 +563,11 @@ function($, _, Backbone,
       var confirmEl = model.confirmButtonEl();
       $(confirmEl).on(tapEvent, {me: this}, this.confirmOrder);
 
-      function findSlider(sliderName) {
+      function findSliderInfo(sliderName) {
         var ret = null;
         _.some(allSliders, function(sliderInfo, name) {
           if (name == sliderName) {
-            ret = sliderInfo.el;
+            ret = sliderInfo;
             return true;
           }
           return false;
@@ -597,7 +597,7 @@ function($, _, Backbone,
           valueModel = new AmountModel(valueAttributes,valueOptions);
         } else {
           var priceModel = model.get('price');
-          var millisInfo = findSlider('millis'),
+          var millisInfo = findSliderInfo('millis').el,
             startMillis = millisInfo.start,
             lower = startMillis < 0,
             aPrice = priceModel.toParsedPrice({
@@ -657,7 +657,7 @@ function($, _, Backbone,
           }
 
           if (absValue == 0.0005) {
-            var centsSlider = findSlider('cents'),
+            var centsSlider = findSliderInfo('cents').el,
               cents = parseFloat(centsSlider.val()) + direction * 0.001;
 
             ret = direction * boundValue;
@@ -681,7 +681,7 @@ function($, _, Backbone,
 
           if (value == incrementValue || value < 0) {
             var direction = value < 0 ? -1 : 1,
-              digitsSlider = findSlider('digits'),
+              digitsSlider = findSliderInfo('digits').el,
               digitsChange = direction * incrementValue,
               digits = parsedPrice.digits + digitsChange;
 
@@ -746,7 +746,7 @@ function($, _, Backbone,
         $slider.slider({
           beforestart: function(jqEvent) {
             var value = $slider.val(),
-              sliderInfo = findSlider(sliderName);
+              sliderInfo = findSliderInfo(sliderName).el;
 
             if (sliderInfo) {
               sliderInfo.start = value;
@@ -756,7 +756,7 @@ function($, _, Backbone,
           stop: function(jqEvent) {
 
             var stop = $slider.val(),
-              sliderInfo = findSlider(sliderName),
+              sliderInfo = findSliderInfo(sliderName),
               start = sliderInfo.start;
 
             if (start != stop) {
