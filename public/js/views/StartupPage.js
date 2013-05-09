@@ -600,7 +600,7 @@ function($, _, Backbone,
           var millisInfo = findSlider('millis'),
             startMillis = millisInfo.start,
             lower = startMillis < 0,
-            parsedPrice = priceModel.toParsedPrice({
+            aPrice = priceModel.toParsedPrice({
               lower: lower
             });
 
@@ -762,6 +762,9 @@ function($, _, Backbone,
             if (start != stop) {
               var changeOptions = calculateChangeOptions($slider, sliderName);
 
+              if (sliderInfo.isPrice) {
+                model.dirtyPrice(true);
+              }
               // should call separate, otherwise wrong original values
               model.set('status', 'editing');
               model.set(changeOptions);

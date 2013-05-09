@@ -16,14 +16,26 @@ define([
       var me = this;
 
       if (attributes != null) {
-        // assume we supply value from the UI control. Value or Size
-        var ui = options && options.ui,
-          isValueInt = options && options.is_int;
+        options = options || {};
 
-        if (isValueInt) {
-          attributes = {
-            value_int: attributes
-          };
+        // assume we supply value from the UI control. Value or Size
+        var ui = options.ui;
+
+        if (_.isNumber(attributes)) {
+          var num = attributes,
+            currency = options.currency;
+
+          // TODO multicurrency
+          if (currency == null) {
+            options.currency = 'USD'
+          }
+
+          attributes = {};
+          if (options.is_int) {
+            attributes.value_int = num;
+          } else {
+            attributes.value = num;
+          }
         }
 
         if (_.isObject(attributes)) {

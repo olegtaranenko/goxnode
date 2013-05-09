@@ -14,6 +14,69 @@ define([
 
   return Backbone.Model.extend({
 
+    defaults: {
+      bid: null,
+      ask: null,
+      slips: {
+        "100": {
+          base: 1,
+//          basePrice: 29.701,
+          cur:  1,
+//          curPrice: 29.3213
+        },
+        "50": {
+          base: 1,
+//          basePrice: 29.7513,
+          cur:  1,
+//          curPrice: 29.2011
+        },
+        "30": {
+          base: 1,
+//          basePrice: 29.8121,
+          cur:  1,
+//          curPrice: 29.1234
+        },
+        "2": {
+          base: 1,
+//          basePrice: 29.8721,
+          cur:  1,
+//          curPrice: 29.1234
+        }
+
+      }
+    },
+
+    initialize: function(attributes, options) {
+      var me = this,
+        cur = options.cur,
+        base = options.base;
+
+      _.each(['bid', 'ask'], function (tradeSide) {
+        var changeEvent = 'change:' + tradeSide;
+        me.on(changeEvent, function(model, value) {
+          _.each([cur, base], function(currency) {
+            var owner = me.owner,
+              orders = owner ? owner.get('orders') : false;
+
+            if (owner) {
+              $G.evaluateStrategies(owner, currency, tradeSide);
+              orders.each(function(model) {
+                var status = model.get('status'),
+                  type = model.get('type'),
+                  dirty = model.dirtyPrice();
+
+                if (!dirty && type == tradeSide) {
+                  var price = model.changeSliders(value);
+                  model.set('price', price);
+                }
+              })
+            }
+          });
+        });
+
+      });
+    },
+
     getTicker: function (side) {
       if (side === undefined) {
         return {
@@ -24,6 +87,7 @@ define([
         return this.get(side);
       }
     },
+
 
     getNatureTradePrice: function(nature, strategy, currencyPart, baseQuant, ticker) {
       var ret;
@@ -79,59 +143,6 @@ define([
 
       return !(bid == null || ask == null);
 
-    },
-
-
-    defaults: {
-      bid: null,
-      ask: null,
-      slips: {
-        "100": {
-          base: 1,
-//          basePrice: 29.701,
-          cur:  1,
-//          curPrice: 29.3213
-        },
-        "50": {
-          base: 1,
-//          basePrice: 29.7513,
-          cur:  1,
-//          curPrice: 29.2011
-        },
-        "30": {
-          base: 1,
-//          basePrice: 29.8121,
-          cur:  1,
-//          curPrice: 29.1234
-        },
-        "2": {
-          base: 1,
-//          basePrice: 29.8721,
-          cur:  1,
-//          curPrice: 29.1234
-        }
-
-      }
-    },
-
-    initialize: function(attributes, options) {
-      var me = this,
-        cur = options.cur,
-        base = options.base;
-
-      _.each(['bid', 'ask'], function (tradeSide) {
-        var changeEvent = 'change:' + tradeSide;
-        me.on(changeEvent, function(model) {
-          _.each([cur, base], function(currency) {
-            var owner = me.owner;
-
-            if (owner) {
-              $G.evaluateStrategies(owner, currency, tradeSide);
-            }
-          });
-        });
-
-      });
     }
   })
 });

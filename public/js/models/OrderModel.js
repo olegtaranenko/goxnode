@@ -35,7 +35,7 @@ define([
 
       _super.constructor.apply(this, arguments);
       attributes = this.attributes;
-      this.original = _.extend({}, _.pick(attributes, 'hold', 'ontop', 'virtual'));
+      this.originalValues = _.extend({}, _.pick(attributes, 'hold', 'ontop', 'virtual'));
     },
 
     processAttributes: function (attributes) {
@@ -75,12 +75,28 @@ define([
         var changeEvent = 'change:' + property;
 
         me.on(changeEvent, function(model, value, options) {
+          var price = null,
+            amount = null;
+
 //          console.log('changeEvent %s, value ', changeEvent, value);
-          me.changeHeader();
           if (property == 'price') {
-            var collection = me.collection;
+
+            var collection = me.collection,
+              priceInt = value;
+
+            if (value instanceof PriceModel) {
+              priceInt = value.get('value_int')
+            }
+
+            me.changeSliders(priceInt);
+
             collection.sort();
+            price = value;
+          } else {
+            amount = value;
           }
+
+          me.changeHeader(amount, price);
         });
 
       });
@@ -107,16 +123,17 @@ define([
         var previousStatus = this.previous('status');
 
         if (value == 'editing') {
-          var original = me.original;
-          me.original = _.extend(original, {
+          var originalValues = me.originalValues;
+          me.originalValues = _.extend(originalValues, {
             status: previousStatus,
             price: me.get('price'),
             amount: me.get('amount')
           });
 
         } if (previousStatus == 'editing' && value == 'revert') {
-//          console.log('revert sliderVal, original', this.original);
-          model.set(this.original);
+//          console.log('revert sliderVal, originalvalues', this.originalValues);
+          model.set(this.originalValues);
+          model.dirtyPrice(false);
 
           var sliders = model.allSliders;
 
@@ -169,14 +186,18 @@ define([
     },
 
 
-    changeSliders: function(price) {
+    changeSliders: function(priceModel) {
       var model = this,
-        allSliders = model.allSliders,
-        priceModel = new PriceModel(price, {
+        allSliders = model.allSliders;
+
+      if (!(priceModel instanceof PriceModel)) {
+        priceModel = new PriceModel(priceModel, {
           ui: true,
-          is_int: true
-        }),
-        parsedPrice = priceModel.toParsedPrice({
+          is_int: _.isNumber(priceModel) && priceModel > 9999
+        });
+      }
+
+      var parsedPrice = priceModel.toParsedPrice({
           lower: true
         });
 
@@ -188,6 +209,31 @@ define([
           slider.val(value);
         }
       });
+
+      return priceModel;
+    },
+
+    dirtyPrice: function() {
+      var me = this,
+        value = arguments[0];
+
+      if (value === undefined) {
+        return me._dirtyPrice;
+      }
+      me._dirtyPrice = value;
+      return me;
+    },
+
+    tweakOriginalPrice: function(parsedPrice) {
+      var me = this,
+        originalValues = this.originalValues,
+        dirty = me.dirtyPrice();
+
+      if (!dirty) {
+        _.each(parsedPrice, function (value, part) {
+          me.dirtyPrice(false);
+        });
+      }
     },
 
     changeHeader: function (amount, price) {
@@ -273,18 +319,22 @@ define([
           ui: true,
           is_int: true
         });
+      } else {
+        amountModel = amount;
       }
 
       if (price == null) {
         priceModel = this.get('price');
-        price = priceModel.toPrice();
       } else if ( !(price instanceof PriceModel) ){
         priceModel = new PriceModel(price, {
           ui: true,
           is_int: true
         });
-        price = priceModel.toPrice();
+      } else {
+        priceModel = price;
       }
+
+      price = priceModel.toPrice();
 
       var $G = $.Goxnode(),
         type = this.get('type').toUpperCase(),
